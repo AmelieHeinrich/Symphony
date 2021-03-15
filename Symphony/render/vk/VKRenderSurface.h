@@ -2,6 +2,8 @@
 
 #include "core/DLLExport.h"
 #include "render/RenderSurface.h"
+#include "VkCommandBuffer.h"
+#include "VkGraphicsPipeline.h"
 #include <memory>
 #include <vulkan/vulkan.h>
 #include <vector>
@@ -36,9 +38,9 @@ namespace symphony {
 		std::shared_ptr<SwapChain> m_SwapChain;
 		std::shared_ptr<RenderPass> m_RenderPass;
 		std::shared_ptr<CommandPool> m_CommandPool;
-		VkPipelineLayout pipelineLayout;
-		VkPipeline graphicsPipeline;
-		std::vector<VkCommandBuffer> commandBuffers;
+		std::vector<std::shared_ptr<CommandBuffer>> commandBuffers;
+		std::shared_ptr<GraphicsPipeline> graphicsPipeline;
+
 		std::vector<VkSemaphore> imageAvailableSemaphores;
 		std::vector<VkSemaphore> renderFinishedSemaphores;
 		std::vector<VkFence> inFlightFences;
