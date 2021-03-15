@@ -1,0 +1,12 @@
+Commit n1 (3/15/2021):
+- DLL Compiling on Windows
+- DLL Loading using Plugins
+- Random number generator
+- Assertions
+- Platform Detection
+- Exceptions
+- Vulkan 1.0 Rendering (in process)
+- OpenGL 4.5 Rendering (in process)
+- DirectX 11 Rendering (in process)
+- SPIRV, HLSL and GLSL shaders
+- Window abstraction using SDL

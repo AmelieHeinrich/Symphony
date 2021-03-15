@@ -1,0 +1,11 @@
+*.exe
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+.vs/
+
+*.spv
+
+bin/
+obj/
