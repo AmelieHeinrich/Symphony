@@ -45,8 +45,7 @@ project "Symphony"
         "Symphony",
 		"ext/SDL2/include",
 		"ext/glad/include",
-        "$(VULKAN_SDK)/include",
-        "ext/glm"
+        "$(VULKAN_SDK)/include"
     }
 
 	links
