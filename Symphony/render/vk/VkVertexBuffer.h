@@ -44,6 +44,9 @@ namespace symphony
         virtual void* GetVertexBufferHandle() override {
             return (void*)m_BufferHandle;
         }
+
+        static void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+        static void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	private:
 		VkBuffer m_BufferHandle;
 		VkDeviceMemory m_VertexBufferMemory;

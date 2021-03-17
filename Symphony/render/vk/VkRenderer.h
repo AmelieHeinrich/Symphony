@@ -14,6 +14,7 @@
 #include "VkCommandPool.h"
 #include "VkShader.h"
 #include "VkVertexBuffer.h"
+#include "VkIndexBuffer.h"
 #include "core/exception/VulkanException.h"
 #include <memory>
 #include <vulkan/vulkan.h>
@@ -60,12 +61,14 @@ namespace symphony
 		static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 		static void AddVertexBuffer(std::shared_ptr<VulkanVertexBuffer> vertexBuffer);
+		static void AddIndexBuffer(std::shared_ptr<VulkanIndexBuffer> indexBuffer);
 
 		static const RendererData& GetData() {
 			return s_Data;
 		}
 	private:
 		static std::vector<std::shared_ptr<VulkanVertexBuffer>> m_VertexBuffers;
+		static std::vector<std::shared_ptr<VulkanIndexBuffer>> m_IndexBuffers;
 		static RendererData s_Data;
 	};
 }

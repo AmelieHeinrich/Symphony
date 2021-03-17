@@ -5,6 +5,7 @@ namespace symphony
 {
 	RendererData VulkanRenderer::s_Data;
 	std::vector<std::shared_ptr<VulkanVertexBuffer>> VulkanRenderer::m_VertexBuffers;
+	std::vector<std::shared_ptr<VulkanIndexBuffer>> VulkanRenderer::m_IndexBuffers;
 
 	void VulkanRenderer::Init(Window* window)
 	{
@@ -41,6 +42,11 @@ namespace symphony
 	void VulkanRenderer::Shutdown()
 	{
 		vkDeviceWaitIdle(s_Data.m_Device->device());
+
+		for (auto i : m_IndexBuffers) {
+			i.reset();
+		}
+		m_IndexBuffers.clear();
 
 		for (auto i : m_VertexBuffers) {
 			i.reset();
@@ -175,14 +181,34 @@ namespace symphony
 			std::vector<VkBuffer> vertexBuffers;
 			std::vector<VkDeviceSize> offsets = { 0 };
 			uint32_t finalVertexCount = 0;
+	
+			std::vector<VkBuffer> indexBuffers;
+			uint32_t finalIndexCount = 0;
 
 			for (int i = 0; i < m_VertexBuffers.size(); i++) {
 				vertexBuffers.push_back((VkBuffer)m_VertexBuffers[i]->GetVertexBufferHandle());
 				finalVertexCount += m_VertexBuffers[i]->GetVerticesSize();
 			}
 
+			if (!m_IndexBuffers.empty()) {
+				for (int i = 0; i < m_IndexBuffers.size(); i++) {
+					indexBuffers.push_back((VkBuffer)m_IndexBuffers[i]->GetIndexBufferHandle());
+					finalIndexCount += m_IndexBuffers[i]->GetIndicesSize();
+				}
+			}
+
 			vkCmdBindVertexBuffers(s_Data.commandBuffers[i]->GetCommandBuffer(), 0, 1, vertexBuffers.data(), offsets.data());
-			vkCmdDraw(s_Data.commandBuffers[i]->GetCommandBuffer(), finalVertexCount, 1, 0, 0);
+			
+			if (m_IndexBuffers.empty()) {
+				vkCmdDraw(s_Data.commandBuffers[i]->GetCommandBuffer(), finalVertexCount, 1, 0, 0);
+			}
+			else {
+				for (auto buffer : indexBuffers) {
+					vkCmdBindIndexBuffer(s_Data.commandBuffers[i]->GetCommandBuffer(), buffer, 0, VK_INDEX_TYPE_UINT16);
+				}
+
+				vkCmdDrawIndexed(s_Data.commandBuffers[i]->GetCommandBuffer(), finalIndexCount, 1, 0, 0, 0);
+			}
 
 			vkCmdEndRenderPass(s_Data.commandBuffers[i]->GetCommandBuffer());
 
@@ -213,5 +239,10 @@ namespace symphony
 	void VulkanRenderer::AddVertexBuffer(std::shared_ptr<VulkanVertexBuffer> vertexBuffer)
 	{
 		m_VertexBuffers.push_back(vertexBuffer);
+	}
+
+	void VulkanRenderer::AddIndexBuffer(std::shared_ptr<VulkanIndexBuffer> indexBuffer)
+	{
+		m_IndexBuffers.push_back(indexBuffer);
 	}
 }
