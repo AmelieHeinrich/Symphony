@@ -23,6 +23,10 @@ namespace symphony {
 
 		static void InitialiseSDL2();
 		static void TerminateSDL2();
+
+		SDL_Window* GetWindowHandle() {
+			return m_RawHandle;
+		}
 	private:
 		RenderSurface* m_WindowSurface = nullptr;
 		SDL_Window* m_RawHandle;

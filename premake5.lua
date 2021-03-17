@@ -108,12 +108,16 @@ project "SymphonySB"
 
     includedirs
     {
-        "Symphony"
+        "Symphony",
+        "ext/SDL2/include",
+        "$(VULKAN_SDK)/include"
     }
 
     links
     {
-        "Symphony"
+        "Symphony",
+        "$(VULKAN_SDK)/lib/vulkan-1.lib",
+        "sdl2"
     }
 
     filter "system:windows"
