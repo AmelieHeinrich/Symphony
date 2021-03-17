@@ -60,8 +60,8 @@ namespace symphony
 
 		static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
-		static void AddVertexBuffer(std::shared_ptr<VulkanVertexBuffer> vertexBuffer);
-		static void AddIndexBuffer(std::shared_ptr<VulkanIndexBuffer> indexBuffer);
+		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
+		static void AddIndexBuffer(const std::vector<uint16_t>& indices);
 
 		static const RendererData& GetData() {
 			return s_Data;

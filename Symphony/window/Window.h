@@ -27,7 +27,12 @@ namespace symphony {
 		SDL_Window* GetWindowHandle() {
 			return m_RawHandle;
 		}
+
+		const RenderAPI& GetWindowRenderAPI() const {
+			return m_API;
+		}
 	private:
+		RenderAPI m_API;
 		RenderSurface* m_WindowSurface = nullptr;
 		SDL_Window* m_RawHandle;
 		bool m_IsWindowOpen = 1;

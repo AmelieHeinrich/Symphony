@@ -19,7 +19,7 @@ namespace symphony
 		s_Data.m_SwapChain = std::make_shared<SwapChain>(s_Data.m_PhysicalDevice->gpu(), s_Data.m_Surface->surface(), s_Data.m_Device->device());
 		s_Data.m_RenderPass = std::make_shared<RenderPass>(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain_image_format());
 
-		std::shared_ptr<Shader> shader = std::make_shared<Shader>("shaderlib/vksl/Vertex.spv", "shaderlib/vksl/Fragment.spv", s_Data.m_Device->device());
+		std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>("shaderlib/vksl/Vertex.spv", "shaderlib/vksl/Fragment.spv");
 
 		GraphicsPipelineCreateInfo info;
 		info.Width = 1280;
@@ -236,13 +236,13 @@ namespace symphony
 		}
 	}
 
-	void VulkanRenderer::AddVertexBuffer(std::shared_ptr<VulkanVertexBuffer> vertexBuffer)
+	void VulkanRenderer::AddVertexBuffer(const std::vector<Vertex>& vertices)
 	{
-		m_VertexBuffers.push_back(vertexBuffer);
+		m_VertexBuffers.push_back(std::make_shared<VulkanVertexBuffer>(vertices));
 	}
 
-	void VulkanRenderer::AddIndexBuffer(std::shared_ptr<VulkanIndexBuffer> indexBuffer)
+	void VulkanRenderer::AddIndexBuffer(const std::vector<uint16_t>& indices)
 	{
-		m_IndexBuffers.push_back(indexBuffer);
+		m_IndexBuffers.push_back(std::make_shared<VulkanIndexBuffer>(indices));
 	}
 }

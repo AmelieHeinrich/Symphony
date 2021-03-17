@@ -9,7 +9,7 @@ namespace symphony
 {
 	struct GraphicsPipelineCreateInfo
 	{
-		std::shared_ptr<Shader> PipelineShader;
+		std::shared_ptr<VulkanShader> PipelineShader;
 		std::shared_ptr<RenderPass> PipelineRenderPass;
 		uint32_t Width;
 		uint32_t Height;

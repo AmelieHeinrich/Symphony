@@ -4,20 +4,26 @@
 #include <vector>
 #include <string>
 
+#include "render/Shader.h"
+
 namespace symphony
 {
-	class Shader
+	class VulkanShader : public Shader
 	{
 	public:
-		Shader(std::string vertexFile, std::string fragmentFile, const VkDevice& device);
-		~Shader();
+		VulkanShader(std::string vertexFile, std::string fragmentFile);
+		~VulkanShader();
 
-		const VkShaderModule& GetVertexShader() const {
-			return m_VertexShader;
+		virtual void* GetVertexShader() override {
+			return (void*)m_VertexShader;
 		}
 
-		const VkShaderModule& GetFramgentShader() const {
-			return m_FragmentShader;
+		virtual void* GetFragmentShader() override {
+			return (void*)m_FragmentShader;
+		}
+
+		virtual void* GetLinkedProgram() override {
+			return nullptr;
 		}
 	private:
 		VkShaderModule m_VertexShader;

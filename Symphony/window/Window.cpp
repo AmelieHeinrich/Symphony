@@ -12,6 +12,7 @@ static bool GLFWInitialized = false;
 namespace symphony {
 
 	Window::Window(int width, int height, const char* title, RenderAPI api)
+		: m_API(api)
 	{	
 		SDL_WindowFlags flag{};
 	

@@ -2,6 +2,7 @@
 #include <fstream>
 #include "core/exception/VulkanException.h"
 #include <iostream>
+#include "VkRenderer.h"
 
 static std::vector<char> readFile(const std::string& filename) throw(std::runtime_error) {
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
@@ -23,8 +24,8 @@ static std::vector<char> readFile(const std::string& filename) throw(std::runtim
 
 namespace symphony
 {
-	Shader::Shader(std::string vertexFile, std::string fragmentFile, const VkDevice& device)
-		: m_DeviceCopy(device)
+	VulkanShader::VulkanShader(std::string vertexFile, std::string fragmentFile)
+		: m_DeviceCopy(VulkanRenderer::GetData().m_Device->device()), Shader(vertexFile, fragmentFile)
 	{
 		std::vector<char> vertCode;
 		std::vector<char> fragCode;
@@ -62,7 +63,7 @@ namespace symphony
 		}
 	}
 
-	Shader::~Shader()
+	VulkanShader::~VulkanShader()
 	{
 		vkDestroyShaderModule(m_DeviceCopy, m_VertexShader, nullptr);
 		vkDestroyShaderModule(m_DeviceCopy, m_FragmentShader, nullptr);
