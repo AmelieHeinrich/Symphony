@@ -13,6 +13,7 @@
 #include "VkRenderPass.h"
 #include "VkCommandPool.h"
 #include "VkShader.h"
+#include "VkVertexBuffer.h"
 #include "core/exception/VulkanException.h"
 #include <memory>
 #include <vulkan/vulkan.h>
@@ -50,15 +51,21 @@ namespace symphony
 	{
 	public:
 		static void Init(Window* window);
+		static void Prepare();
 		static void Shutdown();
 
 		static void ClearColor(float r, float g, float b, float a);
 		static void Draw();
 
-		const RendererData& GetData() const {
+		static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+		static void AddVertexBuffer(std::shared_ptr<VulkanVertexBuffer> vertexBuffer);
+
+		static const RendererData& GetData() {
 			return s_Data;
 		}
 	private:
+		static std::vector<std::shared_ptr<VulkanVertexBuffer>> m_VertexBuffers;
 		static RendererData s_Data;
 	};
 }

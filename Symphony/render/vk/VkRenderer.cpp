@@ -4,6 +4,7 @@
 namespace symphony
 {
 	RendererData VulkanRenderer::s_Data;
+	std::vector<std::shared_ptr<VulkanVertexBuffer>> VulkanRenderer::m_VertexBuffers;
 
 	void VulkanRenderer::Init(Window* window)
 	{
@@ -35,61 +36,16 @@ namespace symphony
 		QueueFamilyIndices queueFamilyIndices = PhysicalDevice::FindQueueFamilyIndices(s_Data.m_PhysicalDevice->gpu(), s_Data.m_Surface->surface());
 
 		s_Data.m_CommandPool = std::make_shared<CommandPool>(s_Data.m_Device->device(), queueFamilyIndices.graphicsFamily.value());
-
-		s_Data.commandBuffers.resize(s_Data.m_SwapChain->swpa_chain_framebuffers().size());
-
-		for (int i = 0; i < s_Data.commandBuffers.size(); i++) {
-			s_Data.commandBuffers[i] = std::make_unique<CommandBuffer>(s_Data.m_Device, s_Data.m_CommandPool, false);
-		}
-
-		for (size_t i = 0; i < s_Data.commandBuffers.size(); i++) {
-			s_Data.commandBuffers[i]->Begin(0);
-
-			VkRenderPassBeginInfo renderPassInfo{};
-			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			renderPassInfo.renderPass = s_Data.m_RenderPass->render_pass();
-			renderPassInfo.framebuffer = s_Data.m_SwapChain->swpa_chain_framebuffers()[i];
-
-			renderPassInfo.renderArea.offset = { 0, 0 };
-			renderPassInfo.renderArea.extent = s_Data.m_SwapChain->swap_chain_extent();
-
-			VkClearValue clearColor;
-			clearColor.color = { s_Data.ClearColorR, s_Data.ClearColorG, s_Data.ClearColorB, s_Data.ClearColorA };
-
-			renderPassInfo.clearValueCount = 1;
-			renderPassInfo.pClearValues = &clearColor;
-
-			vkCmdBeginRenderPass(s_Data.commandBuffers[i]->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-			vkCmdBindPipeline(s_Data.commandBuffers[i]->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipeline());
-			vkCmdDraw(s_Data.commandBuffers[i]->GetCommandBuffer(), 3, 1, 0, 0);
-			vkCmdEndRenderPass(s_Data.commandBuffers[i]->GetCommandBuffer());
-			s_Data.commandBuffers[i]->End();
-		}
-
-		s_Data.imageAvailableSemaphores.resize(2);
-		s_Data.renderFinishedSemaphores.resize(2);
-		s_Data.inFlightFences.resize(2);
-		s_Data.imagesInFlight.resize(s_Data.m_SwapChain->swap_chain_images().size(), VK_NULL_HANDLE);
-
-		VkSemaphoreCreateInfo semaphoreInfo{};
-		semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-		VkFenceCreateInfo fenceInfo{};
-		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-		for (size_t i = 0; i < 2; i++) {
-			if (vkCreateSemaphore(s_Data.m_Device->device(), &semaphoreInfo, nullptr, &s_Data.imageAvailableSemaphores[i]) != VK_SUCCESS ||
-				vkCreateSemaphore(s_Data.m_Device->device(), &semaphoreInfo, nullptr, &s_Data.renderFinishedSemaphores[i]) != VK_SUCCESS ||
-				vkCreateFence(s_Data.m_Device->device(), &fenceInfo, nullptr, &s_Data.inFlightFences[i]) != VK_SUCCESS) {
-				throw VulkanException("failed to create synchronization objects for a frame!");
-			}
-		}
 	}
 
 	void VulkanRenderer::Shutdown()
 	{
 		vkDeviceWaitIdle(s_Data.m_Device->device());
+
+		for (auto i : m_VertexBuffers) {
+			i.reset();
+		}
+		m_VertexBuffers.clear();
 
 		for (size_t i = 0; i < 2; i++) {
 			vkDestroySemaphore(s_Data.m_Device->device(), s_Data.renderFinishedSemaphores[i], nullptr);
@@ -171,5 +127,91 @@ namespace symphony
 		vkQueuePresentKHR(s_Data.m_Device->present_queue()->queue(), &presentInfo);
 
 		s_Data.currentFrame = (s_Data.currentFrame + 1) % 2;
+	}
+
+	uint32_t VulkanRenderer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+	{
+		VkPhysicalDeviceMemoryProperties memProperties;
+		vkGetPhysicalDeviceMemoryProperties(s_Data.m_PhysicalDevice->gpu(), &memProperties);
+
+		for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+			if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+				return i;
+			}
+		}
+
+		throw std::runtime_error("failed to find suitable memory type!");
+	}
+
+	void VulkanRenderer::Prepare()
+	{
+		s_Data.commandBuffers.resize(s_Data.m_SwapChain->swap_chain_framebuffers().size());
+
+		for (int i = 0; i < s_Data.commandBuffers.size(); i++) {
+			s_Data.commandBuffers[i] = std::make_unique<CommandBuffer>(s_Data.m_Device, s_Data.m_CommandPool, false);
+		}
+
+		for (size_t i = 0; i < s_Data.commandBuffers.size(); i++) {
+			s_Data.commandBuffers[i]->Begin(0);
+
+			VkRenderPassBeginInfo renderPassInfo{};
+			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			renderPassInfo.renderPass = s_Data.m_RenderPass->render_pass();
+			renderPassInfo.framebuffer = s_Data.m_SwapChain->swap_chain_framebuffers()[i];
+
+			renderPassInfo.renderArea.offset = { 0, 0 };
+			renderPassInfo.renderArea.extent = s_Data.m_SwapChain->swap_chain_extent();
+
+			VkClearValue clearColor;
+			clearColor.color = { s_Data.ClearColorR, s_Data.ClearColorG, s_Data.ClearColorB, s_Data.ClearColorA };
+
+			renderPassInfo.clearValueCount = 1;
+			renderPassInfo.pClearValues = &clearColor;
+
+			vkCmdBeginRenderPass(s_Data.commandBuffers[i]->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			vkCmdBindPipeline(s_Data.commandBuffers[i]->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipeline());
+
+			std::vector<VkBuffer> vertexBuffers;
+			std::vector<VkDeviceSize> offsets = { 0 };
+			uint32_t finalVertexCount = 0;
+
+			for (int i = 0; i < m_VertexBuffers.size(); i++) {
+				vertexBuffers.push_back((VkBuffer)m_VertexBuffers[i]->GetVertexBufferHandle());
+				finalVertexCount += m_VertexBuffers[i]->GetVerticesSize();
+			}
+
+			vkCmdBindVertexBuffers(s_Data.commandBuffers[i]->GetCommandBuffer(), 0, 1, vertexBuffers.data(), offsets.data());
+			vkCmdDraw(s_Data.commandBuffers[i]->GetCommandBuffer(), finalVertexCount, 1, 0, 0);
+
+			vkCmdEndRenderPass(s_Data.commandBuffers[i]->GetCommandBuffer());
+
+			s_Data.commandBuffers[i]->End();
+		}
+
+		s_Data.imageAvailableSemaphores.resize(2);
+		s_Data.renderFinishedSemaphores.resize(2);
+		s_Data.inFlightFences.resize(2);
+		s_Data.imagesInFlight.resize(s_Data.m_SwapChain->swap_chain_images().size(), VK_NULL_HANDLE);
+
+		VkSemaphoreCreateInfo semaphoreInfo{};
+		semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+		VkFenceCreateInfo fenceInfo{};
+		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+		for (size_t i = 0; i < 2; i++) {
+			if (vkCreateSemaphore(s_Data.m_Device->device(), &semaphoreInfo, nullptr, &s_Data.imageAvailableSemaphores[i]) != VK_SUCCESS ||
+				vkCreateSemaphore(s_Data.m_Device->device(), &semaphoreInfo, nullptr, &s_Data.renderFinishedSemaphores[i]) != VK_SUCCESS ||
+				vkCreateFence(s_Data.m_Device->device(), &fenceInfo, nullptr, &s_Data.inFlightFences[i]) != VK_SUCCESS) {
+				throw VulkanException("failed to create synchronization objects for a frame!");
+			}
+		}
+	}
+
+	void VulkanRenderer::AddVertexBuffer(std::shared_ptr<VulkanVertexBuffer> vertexBuffer)
+	{
+		m_VertexBuffers.push_back(vertexBuffer);
 	}
 }

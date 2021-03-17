@@ -38,7 +38,7 @@ namespace symphony
 			return m_SwapChainImageViews;
 		}
 
-		const std::vector<VkFramebuffer>& swpa_chain_framebuffers() const {
+		const std::vector<VkFramebuffer>& swap_chain_framebuffers() const {
 			return m_SwapChainFramebuffers;
 		}
 

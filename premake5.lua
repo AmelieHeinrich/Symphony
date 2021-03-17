@@ -45,7 +45,8 @@ project "Symphony"
         "Symphony",
 		"ext/SDL2/include",
 		"ext/glad/include",
-        "$(VULKAN_SDK)/include"
+        "$(VULKAN_SDK)/include",
+        "vendor/glm"
     }
 
 	links
@@ -110,7 +111,8 @@ project "SymphonySB"
     {
         "Symphony",
         "ext/SDL2/include",
-        "$(VULKAN_SDK)/include"
+        "$(VULKAN_SDK)/include",
+        "vendor/glm"
     }
 
     links

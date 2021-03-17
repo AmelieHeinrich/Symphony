@@ -16,7 +16,7 @@ namespace symphony
 			return m_VertexShader;
 		}
 
-		const VkShaderModule& GetFramgnetShader() const {
+		const VkShaderModule& GetFramgentShader() const {
 			return m_FragmentShader;
 		}
 	private:

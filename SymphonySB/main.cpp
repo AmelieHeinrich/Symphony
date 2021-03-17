@@ -3,6 +3,7 @@
 #include <core/PlatformDetection.h>
 #include <core/Assert.h>
 #include <render/vk/VkRenderer.h>
+#include <memory>
 
 using namespace symphony;
 
@@ -10,9 +11,19 @@ using namespace symphony;
 int main()
 {
 	Window VKWindow(1280, 720, "Symphony Vulkan 1.2", symphony::RenderAPI::Vulkan);
-	VulkanRenderer::ClearColor(0.2f, 0.8f, 0.3f, 1.0f);
-
+	
+	VulkanRenderer::ClearColor(0.57647058823f, 0.43921568627f, 0.83921568627f, 1.0f);
 	VulkanRenderer::Init(&VKWindow);
+
+	const std::vector<Vertex> vertices = {
+		{{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+		{{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+		{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}
+	};
+
+	VulkanRenderer::AddVertexBuffer(std::make_shared<VulkanVertexBuffer>(vertices));
+
+	VulkanRenderer::Prepare();
 
 	while (VKWindow.IsWindowOpen()) {
 		VKWindow.Update();
