@@ -88,6 +88,7 @@ project "Symphony"
         symbols "On"
 
     filter "configurations:Release"
+        buildoptions "/MD"
         defines { "SYMPHONY_RELEASE" }
         optimize "On"
 
@@ -137,5 +138,6 @@ project "SymphonySB"
         symbols "On"
 
     filter "configurations:Release"
+        buildoptions "/MT"
         defines { "SYMPHONY_RELEASE" }
         optimize "On"

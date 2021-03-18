@@ -18,12 +18,14 @@ namespace symphony
 		s_Data.m_Device = std::make_shared<Device>(s_Data.m_PhysicalDevice->gpu(), s_Data.m_Surface->surface());
 		s_Data.m_SwapChain = std::make_shared<SwapChain>(s_Data.m_PhysicalDevice->gpu(), s_Data.m_Surface->surface(), s_Data.m_Device->device());
 		s_Data.m_RenderPass = std::make_shared<RenderPass>(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain_image_format());
+		s_Data.descriptorSetLayout = std::make_shared<DescriptorSetLayout>();
 
 		std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>("shaderlib/vksl/Vertex.spv", "shaderlib/vksl/Fragment.spv");
 
 		GraphicsPipelineCreateInfo info;
 		info.Width = 1280;
 		info.Height = 720;
+		info.PipelineDescriptorSetLayout = s_Data.descriptorSetLayout;
 		info.PipelineShader = shader;
 		info.PipelineRenderPass = s_Data.m_RenderPass;
 		info.SwapChainExtent = s_Data.m_SwapChain->swap_chain_extent();
@@ -37,11 +39,20 @@ namespace symphony
 		QueueFamilyIndices queueFamilyIndices = PhysicalDevice::FindQueueFamilyIndices(s_Data.m_PhysicalDevice->gpu(), s_Data.m_Surface->surface());
 
 		s_Data.m_CommandPool = std::make_shared<CommandPool>(s_Data.m_Device->device(), queueFamilyIndices.graphicsFamily.value());
+
+		auto nrImages = s_Data.m_SwapChain->swap_chain_images().size();
+		s_Data.uniformBuffers.resize(nrImages);
+		s_Data.uniformBuffersMemory.resize(nrImages);
+		s_Data.descriptorPool = std::make_shared<DescriptorPool>();
+		s_Data.descriptorSet = std::make_shared<DescriptorSet>();
 	}
 
 	void VulkanRenderer::Shutdown()
 	{
 		vkDeviceWaitIdle(s_Data.m_Device->device());
+
+		s_Data.descriptorSet.reset();
+		s_Data.descriptorPool.reset();
 
 		for (auto i : m_IndexBuffers) {
 			i.reset();
@@ -68,6 +79,7 @@ namespace symphony
 		s_Data.commandBuffers.clear();
 
 		s_Data.graphicsPipeline.reset();
+		s_Data.descriptorSetLayout.reset();
 		s_Data.m_RenderPass.reset();
 		s_Data.m_SwapChain.reset();
 		s_Data.m_Device.reset();

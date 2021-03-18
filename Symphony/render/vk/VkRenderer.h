@@ -16,6 +16,9 @@
 #include "VkVertexBuffer.h"
 #include "VkIndexBuffer.h"
 #include "core/exception/VulkanException.h"
+#include "VkDescriptorSetLayout.h"
+#include "VkDescriptorPool.h"
+#include "VkDescriptorSet.h"
 #include <memory>
 #include <vulkan/vulkan.h>
 #include <vector>
@@ -37,10 +40,19 @@ namespace symphony
 		std::shared_ptr<CommandPool> m_CommandPool;
 		std::vector<std::shared_ptr<CommandBuffer>> commandBuffers;
 		std::shared_ptr<GraphicsPipeline> graphicsPipeline;
+
+		std::shared_ptr<DescriptorSetLayout> descriptorSetLayout;
+		std::shared_ptr<DescriptorPool> descriptorPool;
+		std::shared_ptr<DescriptorSet> descriptorSet;
+
+		std::vector<VkBuffer> uniformBuffers;
+		std::vector<VkDeviceMemory> uniformBuffersMemory;
+
 		std::vector<VkSemaphore> imageAvailableSemaphores;
 		std::vector<VkSemaphore> renderFinishedSemaphores;
 		std::vector<VkFence> inFlightFences;
 		std::vector<VkFence> imagesInFlight;
+
 		size_t currentFrame;
 		float ClearColorR;
 		float ClearColorG;

@@ -88,8 +88,9 @@ namespace symphony
 
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = 0;
+		pipelineLayoutInfo.setLayoutCount = 1;
 		pipelineLayoutInfo.pushConstantRangeCount = 0;
+		pipelineLayoutInfo.pSetLayouts = &createInfo.PipelineDescriptorSetLayout->GetDescriptorSetLayout();
 
 		if (vkCreatePipelineLayout(deviceCopy, &pipelineLayoutInfo, nullptr, &graphicsPipelineLayout) != VK_SUCCESS) {
 			throw VulkanException("failed to create pipeline layout!");

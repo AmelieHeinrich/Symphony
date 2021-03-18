@@ -4,10 +4,18 @@
 #include <vector>
 #include "VertexBuffer.h"
 #include "core/PlatformDetection.h"
+#include <glm/glm.hpp>
 
 namespace symphony
 {
 	class Window;
+
+	struct RendererUniforms
+	{
+		glm::mat4 SceneModel;
+		glm::mat4 SceneProjection;
+		glm::mat4 SceneView;
+	};
 
 	SymphonyClass Renderer
 	{
