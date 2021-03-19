@@ -12,9 +12,9 @@ namespace symphony
 
 	struct RendererUniforms
 	{
-		glm::mat4 SceneModel;
-		glm::mat4 SceneProjection;
-		glm::mat4 SceneView;
+		alignas(16) glm::mat4 SceneModel;
+		alignas(16) glm::mat4 SceneProjection;
+		alignas(16) glm::mat4 SceneView;
 	};
 
 	SymphonyClass Renderer

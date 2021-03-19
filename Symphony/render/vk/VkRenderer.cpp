@@ -1,5 +1,11 @@
 #include "VkRenderer.h"
 #include "window/Window.h"
+#include <chrono>
+#include "render/Renderer.h"
+
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace symphony
 {
@@ -42,7 +48,11 @@ namespace symphony
 
 		auto nrImages = s_Data.m_SwapChain->swap_chain_images().size();
 		s_Data.uniformBuffers.resize(nrImages);
-		s_Data.uniformBuffersMemory.resize(nrImages);
+		
+		for (int i = 0; i < nrImages; i++) {
+			s_Data.uniformBuffers[i] = std::make_shared<VulkanUniformBuffer>();
+		}
+
 		s_Data.descriptorPool = std::make_shared<DescriptorPool>();
 		s_Data.descriptorSet = std::make_shared<DescriptorSet>();
 	}
@@ -50,6 +60,11 @@ namespace symphony
 	void VulkanRenderer::Shutdown()
 	{
 		vkDeviceWaitIdle(s_Data.m_Device->device());
+
+		for (auto i : s_Data.uniformBuffers) {
+			i.reset();
+		}
+		s_Data.uniformBuffers.clear();
 
 		s_Data.descriptorSet.reset();
 		s_Data.descriptorPool.reset();
@@ -102,6 +117,13 @@ namespace symphony
 
 		uint32_t imageIndex;
 		vkAcquireNextImageKHR(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain(), UINT64_MAX, s_Data.imageAvailableSemaphores[s_Data.currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+		RendererUniforms ubo{};
+		ubo.SceneModel = glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000, glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.SceneView = glm::mat4(1.0f);
+		ubo.SceneProjection = glm::mat4(1.0f);
+
+		s_Data.uniformBuffers[imageIndex]->Update(ubo);
 
 		if (s_Data.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
 			vkWaitForFences(s_Data.m_Device->device(), 1, &s_Data.imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -210,6 +232,7 @@ namespace symphony
 			}
 
 			vkCmdBindVertexBuffers(s_Data.commandBuffers[i]->GetCommandBuffer(), 0, 1, vertexBuffers.data(), offsets.data());
+			vkCmdBindDescriptorSets(s_Data.commandBuffers[i]->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipelineLayout(), 0, 1, &s_Data.descriptorSet->GetDescriptorSet()[i], 0, nullptr);
 			
 			if (m_IndexBuffers.empty()) {
 				vkCmdDraw(s_Data.commandBuffers[i]->GetCommandBuffer(), finalVertexCount, 1, 0, 0);
@@ -227,9 +250,9 @@ namespace symphony
 			s_Data.commandBuffers[i]->End();
 		}
 
-		s_Data.imageAvailableSemaphores.resize(2);
-		s_Data.renderFinishedSemaphores.resize(2);
-		s_Data.inFlightFences.resize(2);
+		s_Data.imageAvailableSemaphores.resize(s_Data.m_SwapChain->swap_chain_images().size());
+		s_Data.renderFinishedSemaphores.resize(s_Data.m_SwapChain->swap_chain_images().size());
+		s_Data.inFlightFences.resize(s_Data.m_SwapChain->swap_chain_images().size());
 		s_Data.imagesInFlight.resize(s_Data.m_SwapChain->swap_chain_images().size(), VK_NULL_HANDLE);
 
 		VkSemaphoreCreateInfo semaphoreInfo{};

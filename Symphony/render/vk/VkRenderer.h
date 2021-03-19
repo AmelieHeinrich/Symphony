@@ -19,9 +19,11 @@
 #include "VkDescriptorSetLayout.h"
 #include "VkDescriptorPool.h"
 #include "VkDescriptorSet.h"
+#include "VkUniformBuffer.h"
 #include <memory>
 #include <vulkan/vulkan.h>
 #include <vector>
+#include "render/Renderer.h"
 
 #include "core/DLLExport.h"
 
@@ -45,8 +47,7 @@ namespace symphony
 		std::shared_ptr<DescriptorPool> descriptorPool;
 		std::shared_ptr<DescriptorSet> descriptorSet;
 
-		std::vector<VkBuffer> uniformBuffers;
-		std::vector<VkDeviceMemory> uniformBuffersMemory;
+		std::vector<std::shared_ptr<VulkanUniformBuffer>> uniformBuffers;
 
 		std::vector<VkSemaphore> imageAvailableSemaphores;
 		std::vector<VkSemaphore> renderFinishedSemaphores;

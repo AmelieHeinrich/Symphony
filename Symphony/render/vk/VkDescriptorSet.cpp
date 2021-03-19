@@ -1,7 +1,6 @@
 #include "VkDescriptorSet.h"
 #include <vector>
 #include "VkRenderer.h"
-#include "render/Renderer.h"
 
 namespace symphony
 {
@@ -26,7 +25,7 @@ namespace symphony
 
         for (size_t i = 0; i < nrImages; i++) {
             VkDescriptorBufferInfo bufferInfo{};
-            bufferInfo.buffer = VulkanRenderer::GetData().uniformBuffers[i];
+            bufferInfo.buffer = VulkanRenderer::GetData().uniformBuffers[i]->GetBuffer();
             bufferInfo.offset = 0;
             bufferInfo.range = sizeof(RendererUniforms);
 
