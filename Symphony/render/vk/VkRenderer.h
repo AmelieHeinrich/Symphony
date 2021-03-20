@@ -79,7 +79,7 @@ namespace symphony
 		static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
-		static void AddIndexBuffer(const std::vector<uint16_t>& indices);
+		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);
 		static const std::vector<std::shared_ptr<VulkanTexture2D>>& GetRendererTextures() {
 			return m_Textures;

@@ -12,9 +12,9 @@ namespace symphony
 
 	struct RendererUniforms
 	{
-		alignas(16) glm::mat4 SceneModel;
-		alignas(16) glm::mat4 SceneProjection;
-		alignas(16) glm::mat4 SceneView;
+		alignas(16) glm::mat4 SceneModel = glm::mat4(1.0f);
+		alignas(16) glm::mat4 SceneProjection = glm::mat4(1.0f);
+		alignas(16) glm::mat4 SceneView = glm::mat4(1.0f);
 	};
 
 	SymphonyClass Renderer
@@ -28,7 +28,7 @@ namespace symphony
 		static void Draw();
 
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
-		static void AddIndexBuffer(const std::vector<uint16_t>& indices);
+		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);
 	private:
 		static RenderAPI s_RenderAPI;

@@ -22,7 +22,7 @@ namespace symphony
 		static void Draw();
 
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
-		static void AddIndexBuffer(const std::vector<uint16_t>& indices);
+		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 	private:
 		static std::vector<std::shared_ptr<GLVertexBuffer>> m_VertexBuffers;
 		static std::vector<std::shared_ptr<GLIndexBuffer>> m_IndexBuffers;

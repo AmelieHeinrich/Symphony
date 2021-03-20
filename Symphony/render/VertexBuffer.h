@@ -14,6 +14,10 @@ namespace symphony
 		glm::vec3 Color;
 		glm::vec2 TexCoords;
 		//glm::vec3 Normals;
+
+		bool operator==(const Vertex& other) const {
+			return Position == other.Position && Color == other.Color && TexCoords == other.TexCoords;
+		}
 	};
 
 	SymphonyClass VertexBuffer

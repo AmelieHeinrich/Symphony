@@ -4,7 +4,7 @@
 
 namespace symphony
 {
-	VulkanIndexBuffer::VulkanIndexBuffer(const std::vector<uint16_t>& indices) 
+	VulkanIndexBuffer::VulkanIndexBuffer(const std::vector<uint32_t>& indices) 
 		: IndexBuffer(indices)
 	{
         const VkDevice& device = VulkanRenderer::GetData().m_Device->device();

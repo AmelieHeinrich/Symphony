@@ -9,7 +9,7 @@ namespace symphony
 	class IndexBuffer
 	{
 	public:
-		IndexBuffer(const std::vector<uint16_t>& indices)
+		IndexBuffer(const std::vector<uint32_t>& indices)
 			: IndicesSize(indices.size()) {}
 		virtual ~IndexBuffer() = default;
 

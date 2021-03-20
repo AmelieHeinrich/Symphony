@@ -3,7 +3,6 @@
 #include <chrono>
 #include "render/Renderer.h"
 
-#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -41,17 +40,14 @@ namespace symphony
 
 		shader.reset();
 
-		s_Data.m_SwapChain->InitFramebuffers(s_Data.m_RenderPass->render_pass());
-
 		QueueFamilyIndices queueFamilyIndices = PhysicalDevice::FindQueueFamilyIndices(s_Data.m_PhysicalDevice->gpu(), s_Data.m_Surface->surface());
-
 		s_Data.m_CommandPool = std::make_shared<CommandPool>(s_Data.m_Device->device(), queueFamilyIndices.graphicsFamily.value());
-
-		// DepthResources
 
 		VkFormat depthFormat = VulkanTexture2D::FindDepthFormat();
 		VulkanTexture2D::CreateImage(1280, 720, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, s_Data.DepthImage, s_Data.DepthImageMemory);
 		s_Data.DepthImageView = VulkanTexture2D::CreateImageView(s_Data.DepthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+		VulkanTexture2D::TransitionImageLayout(s_Data.DepthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+		s_Data.m_SwapChain->InitFramebuffers(s_Data.m_RenderPass->render_pass());
 
 		auto nrImages = s_Data.m_SwapChain->swap_chain_images().size();
 		s_Data.uniformBuffers.resize(nrImages);
@@ -133,12 +129,14 @@ namespace symphony
 		uint32_t imageIndex;
 		vkAcquireNextImageKHR(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain(), UINT64_MAX, s_Data.imageAvailableSemaphores[s_Data.currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-		RendererUniforms ubo{};
-		ubo.SceneModel = glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.0f));
-		ubo.SceneView = glm::mat4(1.0f);
-		ubo.SceneProjection = glm::perspective(glm::radians(90.0f), 1280.0f / 720.0f, 0.01f, 10000.0f);
+		{
+			RendererUniforms ubo{};
+			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.01f, 1000.0f);
+			ubo.SceneView = glm::mat4(1.0f);
+			ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 
-		s_Data.uniformBuffers[imageIndex]->Update(ubo);
+			s_Data.uniformBuffers[imageIndex]->Update(ubo);
+		}
 
 		if (s_Data.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
 			vkWaitForFences(s_Data.m_Device->device(), 1, &s_Data.imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -210,19 +208,19 @@ namespace symphony
 		for (size_t i = 0; i < s_Data.commandBuffers.size(); i++) {
 			s_Data.commandBuffers[i]->Begin(0);
 
+			std::array<VkClearValue, 2> clearColor;
+			clearColor[0].color = { s_Data.ClearColorR, s_Data.ClearColorG, s_Data.ClearColorB, s_Data.ClearColorA };
+			clearColor[1].depthStencil.depth = 1.0f;
+			clearColor[1].depthStencil.stencil = 0;
+
 			VkRenderPassBeginInfo renderPassInfo{};
 			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 			renderPassInfo.renderPass = s_Data.m_RenderPass->render_pass();
 			renderPassInfo.framebuffer = s_Data.m_SwapChain->swap_chain_framebuffers()[i];
-
 			renderPassInfo.renderArea.offset = { 0, 0 };
 			renderPassInfo.renderArea.extent = s_Data.m_SwapChain->swap_chain_extent();
-
-			VkClearValue clearColor;
-			clearColor.color = { s_Data.ClearColorR, s_Data.ClearColorG, s_Data.ClearColorB, s_Data.ClearColorA };
-
-			renderPassInfo.clearValueCount = 1;
-			renderPassInfo.pClearValues = &clearColor;
+			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearColor.size());
+			renderPassInfo.pClearValues = clearColor.data();
 
 			vkCmdBeginRenderPass(s_Data.commandBuffers[i]->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -249,13 +247,13 @@ namespace symphony
 
 			vkCmdBindVertexBuffers(s_Data.commandBuffers[i]->GetCommandBuffer(), 0, 1, vertexBuffers.data(), offsets.data());
 			vkCmdBindDescriptorSets(s_Data.commandBuffers[i]->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipelineLayout(), 0, 1, &s_Data.descriptorSet->GetDescriptorSet()[i], 0, nullptr);
-			
+
 			if (m_IndexBuffers.empty()) {
 				vkCmdDraw(s_Data.commandBuffers[i]->GetCommandBuffer(), finalVertexCount, 1, 0, 0);
 			}
 			else {
 				for (auto buffer : indexBuffers) {
-					vkCmdBindIndexBuffer(s_Data.commandBuffers[i]->GetCommandBuffer(), buffer, 0, VK_INDEX_TYPE_UINT16);
+					vkCmdBindIndexBuffer(s_Data.commandBuffers[i]->GetCommandBuffer(), buffer, 0, VK_INDEX_TYPE_UINT32);
 				}
 
 				vkCmdDrawIndexed(s_Data.commandBuffers[i]->GetCommandBuffer(), finalIndexCount, 1, 0, 0, 0);
@@ -292,7 +290,7 @@ namespace symphony
 		m_VertexBuffers.push_back(std::make_shared<VulkanVertexBuffer>(vertices));
 	}
 
-	void VulkanRenderer::AddIndexBuffer(const std::vector<uint16_t>& indices)
+	void VulkanRenderer::AddIndexBuffer(const std::vector<uint32_t>& indices)
 	{
 		m_IndexBuffers.push_back(std::make_shared<VulkanIndexBuffer>(indices));
 	}

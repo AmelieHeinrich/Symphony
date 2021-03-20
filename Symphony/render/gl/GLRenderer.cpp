@@ -75,7 +75,7 @@ namespace symphony
 					i->Bind();
 					j->Bind();
 
-					glDrawElements(GL_TRIANGLES, i->GetVerticesSize() * sizeof(uint16_t), GL_UNSIGNED_SHORT, (void*)0);
+					glDrawElements(GL_TRIANGLES, i->GetVerticesSize() * sizeof(uint16_t), GL_UNSIGNED_INT, (void*)0);
 
 					j->Unbind();
 					i->Unbind();
@@ -91,7 +91,7 @@ namespace symphony
 		m_VertexBuffers.push_back(std::make_shared<GLVertexBuffer>(vertices));
 	}
 
-	void GLRenderer::AddIndexBuffer(const std::vector<uint16_t>& indices)
+	void GLRenderer::AddIndexBuffer(const std::vector<uint32_t>& indices)
 	{
 		m_IndexBuffers.push_back(std::make_shared<GLIndexBuffer>(indices));
 	}

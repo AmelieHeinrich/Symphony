@@ -31,9 +31,14 @@ namespace symphony
 		const VkPipelineLayout& GetPipelineLayout() const {
 			return graphicsPipelineLayout;
 		}
+
+		const VkPipelineCache& GetPipelineCache() const {
+			return graphicsPipelineCache;
+		}
 	private:
 		VkPipeline graphicsPipeline;
 		VkPipelineLayout graphicsPipelineLayout;
+		VkPipelineCache graphicsPipelineCache;
 		const VkDevice& deviceCopy;
 	};
 }

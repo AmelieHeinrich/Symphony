@@ -106,7 +106,7 @@ namespace symphony
 		}
 	}
 
-	void Renderer::AddIndexBuffer(const std::vector<uint16_t>& indices)
+	void Renderer::AddIndexBuffer(const std::vector<uint32_t>& indices)
 	{
 		switch (s_RenderAPI)
 		{

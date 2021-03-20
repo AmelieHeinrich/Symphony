@@ -8,7 +8,7 @@ namespace symphony
 	class GLIndexBuffer : public IndexBuffer
 	{
 	public:
-		GLIndexBuffer(const std::vector<uint16_t>& vertices);
+		GLIndexBuffer(const std::vector<uint32_t>& vertices);
 		~GLIndexBuffer();
 
 		void Bind();

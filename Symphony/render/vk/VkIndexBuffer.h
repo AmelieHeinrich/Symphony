@@ -9,7 +9,7 @@ namespace symphony
 	SymphonyClass VulkanIndexBuffer : public IndexBuffer
 	{
 	public:
-		VulkanIndexBuffer(const std::vector<uint16_t>& indices);
+		VulkanIndexBuffer(const std::vector<uint32_t>& indices);
 		virtual ~VulkanIndexBuffer();
 
 		virtual void* GetIndexBufferHandle() override {

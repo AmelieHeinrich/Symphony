@@ -8,7 +8,7 @@ namespace symphony
 	class DX11IndexBuffer : public IndexBuffer
 	{
 	public:
-		DX11IndexBuffer(const std::vector<uint16_t>& indices);
+		DX11IndexBuffer(const std::vector<uint32_t>& indices);
 		~DX11IndexBuffer();
 
 		void Bind() const;

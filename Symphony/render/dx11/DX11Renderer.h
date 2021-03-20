@@ -41,7 +41,7 @@ namespace symphony
 		static void Draw();
 
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
-		static void AddIndexBuffer(const std::vector<uint16_t>& indices);
+		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 
 		static DirectXRendererData GetRendererData() {
 			return m_RendererData;

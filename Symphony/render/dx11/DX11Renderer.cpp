@@ -157,7 +157,7 @@ namespace symphony
 		RendererShader->Unbind();
 	}
 
-	void DX11Renderer::AddIndexBuffer(const std::vector<uint16_t>& indices)
+	void DX11Renderer::AddIndexBuffer(const std::vector<uint32_t>& indices)
 	{
 		m_IndexBuffers.push_back(std::make_shared<DX11IndexBuffer>(indices));
 	}

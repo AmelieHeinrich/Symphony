@@ -85,7 +85,7 @@ namespace symphony
         m_SwapChainFramebuffers.resize(m_SwapChainImageViews.size());
 
         for (size_t i = 0; i < m_SwapChainImageViews.size(); i++) {
-            VkImageView attachments[] = {
+            std::array<VkImageView, 2> attachments = {
                 m_SwapChainImageViews[i],
                 VulkanRenderer::GetData().DepthImageView
             };
@@ -93,8 +93,8 @@ namespace symphony
             VkFramebufferCreateInfo framebufferInfo{};
             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebufferInfo.renderPass = renderPass;
-            framebufferInfo.attachmentCount = 1;
-            framebufferInfo.pAttachments = attachments;
+            framebufferInfo.attachmentCount = attachments.size();
+            framebufferInfo.pAttachments = attachments.data();
             framebufferInfo.width = 1280;
             framebufferInfo.height = 720;
             framebufferInfo.layers = 1;
