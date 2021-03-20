@@ -128,15 +128,14 @@ namespace symphony
 
 		uint32_t imageIndex;
 		vkAcquireNextImageKHR(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain(), UINT64_MAX, s_Data.imageAvailableSemaphores[s_Data.currentFrame], VK_NULL_HANDLE, &imageIndex);
+			
+		
+		RendererUniforms ubo{};
+		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.01f, 1000.0f);
+		ubo.SceneView = glm::mat4(1.0f);
+		ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -3.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 
-		{
-			RendererUniforms ubo{};
-			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.01f, 1000.0f);
-			ubo.SceneView = glm::mat4(1.0f);
-			ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-
-			s_Data.uniformBuffers[imageIndex]->Update(ubo);
-		}
+		s_Data.uniformBuffers[imageIndex]->Update(ubo);
 
 		if (s_Data.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
 			vkWaitForFences(s_Data.m_Device->device(), 1, &s_Data.imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);

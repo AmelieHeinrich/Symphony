@@ -16,11 +16,11 @@ static void VulkanExample()
 	Renderer::Init(&VKWindow);
 	Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	auto pair = MeshBuilder::CreateModelFromOBJVertexOnly("resources/suzanne.obj");
+	auto pair = MeshBuilder::CreateModelFromOBJ("resources/viking_room.obj");
 
-	Renderer::AddTexture2D("resources/marble.jpg");
-	Renderer::AddVertexBuffer(pair);
-	//Renderer::AddIndexBuffer(pair.second);
+	Renderer::AddTexture2D("resources/viking_room.png");
+	Renderer::AddVertexBuffer(pair.first);
+	Renderer::AddIndexBuffer(pair.second);
 
 	Renderer::Prepare();
 
