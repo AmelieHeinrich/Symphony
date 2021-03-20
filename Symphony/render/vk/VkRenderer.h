@@ -48,6 +48,10 @@ namespace symphony
 		std::shared_ptr<DescriptorPool> descriptorPool;
 		std::shared_ptr<DescriptorSet> descriptorSet;
 
+		VkImage DepthImage;
+		VkDeviceMemory DepthImageMemory;
+		VkImageView DepthImageView;
+
 		std::vector<std::shared_ptr<VulkanUniformBuffer>> uniformBuffers;
 
 		std::vector<VkSemaphore> imageAvailableSemaphores;

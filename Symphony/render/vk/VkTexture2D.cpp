@@ -32,7 +32,7 @@ namespace symphony
         vkDestroyBuffer(device, stagingBuffer, nullptr);
         vkFreeMemory(device, stagingBufferMemory, nullptr);
 
-        m_TextureImageView = CreateImageView(m_TextureImage, VK_FORMAT_R8G8B8A8_SRGB);
+        m_TextureImageView = CreateImageView(m_TextureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 
         VkPhysicalDeviceProperties properties{};
         vkGetPhysicalDeviceProperties(VulkanRenderer::GetData().m_PhysicalDevice->gpu(), &properties);
@@ -179,7 +179,7 @@ namespace symphony
         CommandBuffer::EndSingleTimeCommands(commandBuffer);
 	}
 
-    VkImageView VulkanTexture2D::CreateImageView(VkImage image, VkFormat format)
+    VkImageView VulkanTexture2D::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags)
     {
         auto device = VulkanRenderer::GetData().m_Device->device();
 
@@ -188,7 +188,7 @@ namespace symphony
         viewInfo.image = image;
         viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
         viewInfo.format = format;
-        viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        viewInfo.subresourceRange.aspectMask = aspectFlags;
         viewInfo.subresourceRange.baseMipLevel = 0;
         viewInfo.subresourceRange.levelCount = 1;
         viewInfo.subresourceRange.baseArrayLayer = 0;
@@ -201,4 +201,39 @@ namespace symphony
 
         return imageView;
     }
+
+    VkFormat VulkanTexture2D::FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
+    {
+        auto physicalDevice = VulkanRenderer::GetData().m_PhysicalDevice->gpu();
+
+        for (VkFormat format : candidates) {
+            VkFormatProperties props;
+            vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+
+            if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
+                return format;
+            }
+            else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
+                return format;
+            }
+        }
+
+        throw std::runtime_error("failed to find supported format!");
+    }
+
+    VkFormat VulkanTexture2D::FindDepthFormat()
+    {
+        return FindSupportedFormat(
+            { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+            VK_IMAGE_TILING_OPTIMAL,
+            VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
+        );
+    }
+
+    bool VulkanTexture2D::HasStencilComponent(VkFormat format)
+    {
+        return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
+    }
+
+
 }

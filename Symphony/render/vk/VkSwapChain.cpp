@@ -1,6 +1,7 @@
 #include "VkSwapChain.h"
 #include "core/exception/VulkanException.h"
 #include "VkTexture2D.h"
+#include "VkRenderer.h"
 
 namespace symphony
 {
@@ -62,7 +63,7 @@ namespace symphony
         m_SwapChainImageViews.resize(m_SwapChainImages.size());
 
         for (size_t i = 0; i < m_SwapChainImages.size(); i++) {
-            m_SwapChainImageViews[i] = VulkanTexture2D::CreateImageView(m_SwapChainImages[i], m_SwapChainImageFormat);
+            m_SwapChainImageViews[i] = VulkanTexture2D::CreateImageView(m_SwapChainImages[i], m_SwapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
         }
     }
 
@@ -85,7 +86,8 @@ namespace symphony
 
         for (size_t i = 0; i < m_SwapChainImageViews.size(); i++) {
             VkImageView attachments[] = {
-                m_SwapChainImageViews[i]
+                m_SwapChainImageViews[i],
+                VulkanRenderer::GetData().DepthImageView
             };
 
             VkFramebufferCreateInfo framebufferInfo{};

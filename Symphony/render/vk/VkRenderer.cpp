@@ -47,6 +47,12 @@ namespace symphony
 
 		s_Data.m_CommandPool = std::make_shared<CommandPool>(s_Data.m_Device->device(), queueFamilyIndices.graphicsFamily.value());
 
+		// DepthResources
+
+		VkFormat depthFormat = VulkanTexture2D::FindDepthFormat();
+		VulkanTexture2D::CreateImage(1280, 720, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, s_Data.DepthImage, s_Data.DepthImageMemory);
+		s_Data.DepthImageView = VulkanTexture2D::CreateImageView(s_Data.DepthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+
 		auto nrImages = s_Data.m_SwapChain->swap_chain_images().size();
 		s_Data.uniformBuffers.resize(nrImages);
 		
@@ -89,6 +95,10 @@ namespace symphony
 			vkDestroySemaphore(s_Data.m_Device->device(), s_Data.imageAvailableSemaphores[i], nullptr);
 			vkDestroyFence(s_Data.m_Device->device(), s_Data.inFlightFences[i], nullptr);
 		}
+
+		vkDestroyImageView(s_Data.m_Device->device(), s_Data.DepthImageView, nullptr);
+		vkDestroyImage(s_Data.m_Device->device(), s_Data.DepthImage, nullptr);
+		vkFreeMemory(s_Data.m_Device->device(), s_Data.DepthImageMemory, nullptr);
 
 		s_Data.m_CommandPool.reset();
 
