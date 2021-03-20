@@ -19,6 +19,9 @@ namespace symphony
 		void SubmitIdle();
 		void Submit(const VkSemaphore& waitSemaphore = VK_NULL_HANDLE, const VkSemaphore& signalSemaphore = VK_NULL_HANDLE, VkFence fence = VK_NULL_HANDLE);
 
+		static VkCommandBuffer BeginSingleTimeCommands();
+		static void EndSingleTimeCommands(VkCommandBuffer buffer);
+
 		operator const VkCommandBuffer& () const { return commandBuffer; }
 
 		const VkCommandBuffer& GetCommandBuffer() const { return commandBuffer; }

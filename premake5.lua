@@ -35,7 +35,8 @@ project "Symphony"
         "vendor/imgui/examples/imgui_impl_sdl.h",
         "vendor/imgui/examples/imgui_impl_sdl.cpp",
         "vendor/imgui/examples/imgui_impl_vulkan.h",
-        "vendor/imgui/examples/imgui_impl_vulkan.cpp"
+        "vendor/imgui/examples/imgui_impl_vulkan.cpp",
+        "vendor/stb/stb_image.h"
     }
 
     defines
@@ -52,7 +53,8 @@ project "Symphony"
 		"ext/glad/include",
         "$(VULKAN_SDK)/include",
         "vendor/glm",
-        "vendor/imgui"
+        "vendor/imgui",
+        "vendor/stb"
     }
 
 	links

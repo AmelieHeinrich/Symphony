@@ -121,4 +121,14 @@ namespace symphony
 			break;
 		}
 	}
+
+	void Renderer::AddTexture2D(const char* filepath)
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::Vulkan:
+			VulkanRenderer::AddTexture2D(filepath);
+			break;
+		}
+	}
 }

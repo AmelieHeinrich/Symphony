@@ -1,5 +1,6 @@
 #include "VkCommandBuffer.h"
 #include "core/exception/VulkanException.h"
+#include "VkRenderer.h"
 
 namespace symphony
 {
@@ -108,6 +109,47 @@ namespace symphony
 			vkResetFences(m_DeviceCopy->device(), 1, &fence);
 
 		vkQueueSubmit(queueSelected, 1, &submitInfo, fence);
+	}
+
+	VkCommandBuffer CommandBuffer::BeginSingleTimeCommands()
+	{
+		auto device = VulkanRenderer::GetData().m_Device->device();
+
+		VkCommandBufferAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocInfo.commandPool = VulkanRenderer::GetData().m_CommandPool->command_pool();
+		allocInfo.commandBufferCount = 1;
+
+		VkCommandBuffer commandBuffer;
+		vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+		vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+		return commandBuffer;
+	}
+
+	void CommandBuffer::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
+	{
+		auto device = VulkanRenderer::GetData().m_Device->device();
+		auto graphicsQueue = VulkanRenderer::GetData().m_Device->graphics_queue()->queue();
+		auto commandPool = VulkanRenderer::GetData().m_CommandPool->command_pool();
+
+		vkEndCommandBuffer(commandBuffer);
+
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
+
+		vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+		vkQueueWaitIdle(graphicsQueue);
+
+		vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 	}
 
 	VkQueue CommandBuffer::GetQueue() const

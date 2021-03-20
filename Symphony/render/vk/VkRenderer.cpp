@@ -12,6 +12,7 @@ namespace symphony
 	RendererData VulkanRenderer::s_Data;
 	std::vector<std::shared_ptr<VulkanVertexBuffer>> VulkanRenderer::m_VertexBuffers;
 	std::vector<std::shared_ptr<VulkanIndexBuffer>> VulkanRenderer::m_IndexBuffers;
+	std::vector<std::shared_ptr<VulkanTexture2D>> VulkanRenderer::m_Textures;
 
 	void VulkanRenderer::Init(Window* window)
 	{
@@ -54,12 +55,16 @@ namespace symphony
 		}
 
 		s_Data.descriptorPool = std::make_shared<DescriptorPool>();
-		s_Data.descriptorSet = std::make_shared<DescriptorSet>();
 	}
 
 	void VulkanRenderer::Shutdown()
 	{
 		vkDeviceWaitIdle(s_Data.m_Device->device());
+
+		for (auto i : m_Textures) {
+			i.reset();
+		}
+		m_Textures.clear();
 
 		for (auto i : s_Data.uniformBuffers) {
 			i.reset();
@@ -119,9 +124,9 @@ namespace symphony
 		vkAcquireNextImageKHR(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain(), UINT64_MAX, s_Data.imageAvailableSemaphores[s_Data.currentFrame], VK_NULL_HANDLE, &imageIndex);
 
 		RendererUniforms ubo{};
-		ubo.SceneModel = glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000, glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.SceneModel = glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.0f));
 		ubo.SceneView = glm::mat4(1.0f);
-		ubo.SceneProjection = glm::mat4(1.0f);
+		ubo.SceneProjection = glm::perspective(glm::radians(90.0f), 1280.0f / 720.0f, 0.01f, 10000.0f);
 
 		s_Data.uniformBuffers[imageIndex]->Update(ubo);
 
@@ -185,6 +190,7 @@ namespace symphony
 
 	void VulkanRenderer::Prepare()
 	{
+		s_Data.descriptorSet = std::make_shared<DescriptorSet>();
 		s_Data.commandBuffers.resize(s_Data.m_SwapChain->swap_chain_framebuffers().size());
 
 		for (int i = 0; i < s_Data.commandBuffers.size(); i++) {
@@ -279,5 +285,10 @@ namespace symphony
 	void VulkanRenderer::AddIndexBuffer(const std::vector<uint16_t>& indices)
 	{
 		m_IndexBuffers.push_back(std::make_shared<VulkanIndexBuffer>(indices));
+	}
+
+	void VulkanRenderer::AddTexture2D(const char* filepath)
+	{
+		m_Textures.push_back(std::make_shared<VulkanTexture2D>(filepath));
 	}
 }

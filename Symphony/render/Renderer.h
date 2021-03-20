@@ -29,7 +29,7 @@ namespace symphony
 
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint16_t>& indices);
-
+		static void AddTexture2D(const char* filepath);
 	private:
 		static RenderAPI s_RenderAPI;
 	};

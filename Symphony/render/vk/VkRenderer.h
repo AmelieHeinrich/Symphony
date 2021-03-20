@@ -20,6 +20,7 @@
 #include "VkDescriptorPool.h"
 #include "VkDescriptorSet.h"
 #include "VkUniformBuffer.h"
+#include "VkTexture2D.h"
 #include <memory>
 #include <vulkan/vulkan.h>
 #include <vector>
@@ -75,6 +76,10 @@ namespace symphony
 
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint16_t>& indices);
+		static void AddTexture2D(const char* filepath);
+		static const std::vector<std::shared_ptr<VulkanTexture2D>>& GetRendererTextures() {
+			return m_Textures;
+		}
 
 		static const RendererData& GetData() {
 			return s_Data;
@@ -82,6 +87,7 @@ namespace symphony
 	private:
 		static std::vector<std::shared_ptr<VulkanVertexBuffer>> m_VertexBuffers;
 		static std::vector<std::shared_ptr<VulkanIndexBuffer>> m_IndexBuffers;
+		static std::vector<std::shared_ptr<VulkanTexture2D>> m_Textures;
 		static RendererData s_Data;
 	};
 }
