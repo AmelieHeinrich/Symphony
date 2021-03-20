@@ -11,11 +11,11 @@ namespace symphony {
 	SymphonyClass DX11SwapChain
 	{
 	public:
-		void Create(DX11RenderSurface* surface, HWND hwnd, uint32_t width, uint32_t height);
-		void Release(DX11RenderSurface* surface);
+		DX11SwapChain(HWND hwnd, uint32_t width, uint32_t height);
+		~DX11SwapChain();
 
-		void Present(DX11RenderSurface* surface);
-		void RecreateRenderTargetView(DX11RenderSurface* surface, uint32_t width, uint32_t height);
+		void Present();
+		void RecreateRenderTargetView(uint32_t width, uint32_t height);
 
 		IDXGISwapChain* GetSwapChain() const { return m_Handle; }
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }

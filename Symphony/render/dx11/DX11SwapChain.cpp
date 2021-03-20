@@ -1,10 +1,11 @@
 #include "DX11SwapChain.h"
 #include "DX11RenderSurface.h"
+#include "DX11Renderer.h"
 
 namespace symphony {
-	void DX11SwapChain::Create(DX11RenderSurface* surface, HWND hwnd, uint32_t width, uint32_t height)
+	DX11SwapChain::DX11SwapChain(HWND hwnd, uint32_t width, uint32_t height)
 	{
-		auto device = surface->GetDevice();
+		auto device = DX11Renderer::GetRendererData().Device;
 
 		DXGI_SWAP_CHAIN_DESC swapChainInfo;
 		ZeroMemory(&swapChainInfo, sizeof(swapChainInfo));
@@ -20,7 +21,7 @@ namespace symphony {
 		swapChainInfo.SampleDesc.Quality = 0;
 		swapChainInfo.Windowed = TRUE;
 
-		HRESULT result = surface->GetDXGIFactory()->CreateSwapChain(device, &swapChainInfo, &m_Handle);
+		HRESULT result = DX11Renderer::GetRendererData().DXGIFactory->CreateSwapChain(device, &swapChainInfo, &m_Handle);
 
 		if (FAILED(result))
 		{
@@ -108,8 +109,8 @@ namespace symphony {
 			__debugbreak();
 		}
 
-		surface->GetDeviceContext()->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
-		surface->GetDeviceContext()->OMSetDepthStencilState(m_DepthStencilState, 0);
+		DX11Renderer::GetRendererData().Context->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
+		DX11Renderer::GetRendererData().Context->OMSetDepthStencilState(m_DepthStencilState, 0);
 
 		D3D11_VIEWPORT vp;
 		vp.Width = (FLOAT)width;
@@ -118,10 +119,10 @@ namespace symphony {
 		vp.MaxDepth = 1.0f;
 		vp.TopLeftX = 0;
 		vp.TopLeftY = 0;
-		surface->GetDeviceContext()->RSSetViewports(1, &vp);
+		DX11Renderer::GetRendererData().Context->RSSetViewports(1, &vp);
 	}
 
-	void DX11SwapChain::Release(DX11RenderSurface* surface)
+	DX11SwapChain::~DX11SwapChain()
 	{
 		m_SamplerState->Release();
 		m_RasterizerState->Release();
@@ -130,19 +131,18 @@ namespace symphony {
 		m_DepthStencilBuffer->Release();
 		m_RenderTargetView->Release();
 		m_Handle->Release();
-		delete this;
 	}
 
-	void DX11SwapChain::Present(DX11RenderSurface* surface)
+	void DX11SwapChain::Present()
 	{
 		m_Handle->Present(1, 0);
 	}
 
-	void DX11SwapChain::RecreateRenderTargetView(DX11RenderSurface* surface, uint32_t width, uint32_t height)
+	void DX11SwapChain::RecreateRenderTargetView(uint32_t width, uint32_t height)
 	{
 		if (m_Handle != nullptr)
 		{
-			surface->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
+			DX11Renderer::GetRendererData().Context->OMSetRenderTargets(0, 0, 0);
 			m_RenderTargetView->Release();
 
 			HRESULT hr;
@@ -159,10 +159,10 @@ namespace symphony {
 				__debugbreak();
 			}
 
-			hr = surface->GetDevice()->CreateRenderTargetView(buffer, NULL, &m_RenderTargetView);
+			hr = DX11Renderer::GetRendererData().Device->CreateRenderTargetView(buffer, NULL, &m_RenderTargetView);
 			buffer->Release();
 
-			surface->GetDeviceContext()->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
+			DX11Renderer::GetRendererData().Context->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
 
 			D3D11_VIEWPORT vp;
 			vp.Width = width;
@@ -171,7 +171,7 @@ namespace symphony {
 			vp.MaxDepth = 1.0f;
 			vp.TopLeftX = 0;
 			vp.TopLeftY = 0;
-			surface->GetDeviceContext()->RSSetViewports(1, &vp);
+			DX11Renderer::GetRendererData().Context->RSSetViewports(1, &vp);
 		}
 	}
 }

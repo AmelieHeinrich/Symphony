@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "vk/VkRenderer.h"
 #include "gl/GLRenderer.h"
+#include "dx11/DX11Renderer.h"
 #include "window/Window.h"
 
 namespace symphony
@@ -19,6 +20,9 @@ namespace symphony
 		case RenderAPI::OpenGL:
 			GLRenderer::Init(window);
 			break;
+		case RenderAPI::DirectX:
+			DX11Renderer::Init(window);
+			break;
 		}
 	}
 
@@ -31,6 +35,9 @@ namespace symphony
 			break;
 		case RenderAPI::OpenGL:
 			GLRenderer::Shutdown();
+			break;
+		case RenderAPI::DirectX:
+			DX11Renderer::Shutdown();
 			break;
 		}
 	}
@@ -45,6 +52,9 @@ namespace symphony
 		case RenderAPI::OpenGL:
 			GLRenderer::Prepare();
 			break;
+		case RenderAPI::DirectX:
+			DX11Renderer::Prepare();
+			break;
 		}
 	}
 
@@ -57,6 +67,9 @@ namespace symphony
 			break;
 		case RenderAPI::OpenGL:
 			GLRenderer::ClearColor(r, g, b, a);
+			break;
+		case RenderAPI::DirectX:
+			DX11Renderer::ClearColor(r, g, b, a);
 			break;
 		}
 	}
@@ -71,6 +84,9 @@ namespace symphony
 		case RenderAPI::OpenGL:
 			GLRenderer::Draw();
 			break;
+		case RenderAPI::DirectX:
+			DX11Renderer::Draw();
+			break;
 		}
 	}
 
@@ -84,6 +100,9 @@ namespace symphony
 		case RenderAPI::OpenGL:
 			GLRenderer::AddVertexBuffer(vertices);
 			break;
+		case RenderAPI::DirectX:
+			DX11Renderer::AddVertexBuffer(vertices);
+			break;
 		}
 	}
 
@@ -96,6 +115,9 @@ namespace symphony
 			break;
 		case RenderAPI::OpenGL:
 			GLRenderer::AddIndexBuffer(indices);
+			break;
+		case RenderAPI::DirectX:
+			DX11Renderer::AddIndexBuffer(indices);
 			break;
 		}
 	}

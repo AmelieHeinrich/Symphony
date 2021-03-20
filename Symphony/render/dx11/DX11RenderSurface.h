@@ -16,26 +16,7 @@ namespace symphony {
 		void Clear() override;
 		void ClearColor(float r, float g, float b, float a) override;
 		void ResizeBuffers(int x, int y, int w, int h) override;
-
-		ID3D11Device* GetDevice() { return m_Device; }
-		ID3D11DeviceContext* GetDeviceContext() { return m_Context;  }
-
-		IDXGIDevice* GetDXGIDevice() { return m_DXGIDevice; }
-		IDXGIAdapter* GetDXGIAdapter() { return m_DXGIAdapter; }
-		IDXGIFactory* GetDXGIFactory() { return m_DXGIFactory; }
 	private:
 		SDL_Window* m_TargetWindow;
-		HWND m_Win32Handle;
-
-		ID3D11Device* m_Device;
-		ID3D11DeviceContext* m_Context;
-		D3D_FEATURE_LEVEL m_FeatureLevel;
-
-		IDXGIDevice* m_DXGIDevice;
-		IDXGIAdapter* m_DXGIAdapter;
-		IDXGIFactory* m_DXGIFactory;
-
-		DX11SwapChain* m_RendererSwapChain;
-		DX11RenderContext* m_RendererContext;
 	};
 }
