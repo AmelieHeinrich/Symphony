@@ -103,7 +103,7 @@ static void DirectXExample()
 
 int main()
 {
-	DirectXExample();
+	VulkanExample();
 
 	return 0;
 }
