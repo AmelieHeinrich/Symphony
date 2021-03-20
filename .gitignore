@@ -8,5 +8,6 @@
 *.spv
 
 bin/
+bin-int/
 obj/
 ext/ 
