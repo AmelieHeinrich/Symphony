@@ -10,7 +10,7 @@ using namespace symphony;
 
 static void VulkanExample()
 {
-	Window VKWindow(1280, 720, "Symphony Vulkan 1.2", RenderAPI::Vulkan);
+	Window VKWindow(1280, 720, "Symphony Vulkan 1.0", RenderAPI::Vulkan);
 
 	Renderer::Init(&VKWindow);
 	Renderer::ClearColor(0.57647058823f, 0.43921568627f, 0.83921568627f, 1.0f);
@@ -41,7 +41,7 @@ static void VulkanExample()
 
 static void OpenGLExample()
 {
-	Window VKWindow(1280, 720, "Symphony Vulkan 1.2", RenderAPI::OpenGL);
+	Window VKWindow(1280, 720, "Symphony OpenGL 4.5", RenderAPI::OpenGL);
 
 	Renderer::Init(&VKWindow);
 	Renderer::ClearColor(0.57647058823f, 0.43921568627f, 0.83921568627f, 1.0f);
@@ -72,7 +72,7 @@ static void OpenGLExample()
 
 int main()
 {
-	VulkanExample();
+	OpenGLExample();
 
 	return 0;
 }

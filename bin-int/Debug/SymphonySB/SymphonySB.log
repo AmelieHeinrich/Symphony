@@ -1,0 +1,5 @@
+﻿  main.cpp
+D:\dev\Symphony\Symphony\core\PlatformDetection.h(4,1): warning C4005: 'SYMPHONY_WINDOWS': macro redefinition
+D:\dev\Symphony\SymphonySB\main.cpp : message : see previous definition of 'SYMPHONY_WINDOWS'
+D:\dev\Symphony\Symphony\render\VertexBuffer.h(22,15): warning C4267: 'initializing': conversion from 'size_t' to 'uint32_t', possible loss of data
+  SymphonySB.vcxproj -> D:\dev\Symphony\bin\Debug\SymphonySB\SymphonySB.exe

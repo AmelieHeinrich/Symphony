@@ -13,6 +13,7 @@ outputdir = "%{cfg.buildcfg}"
 group "ext"
 	include "ext/SDL2"
 	include "ext/glad"
+    include "vendor/imgui"
 group ""
 
 project "Symphony"
@@ -22,15 +23,19 @@ project "Symphony"
     cppdialect "C++17"
     staticruntime "On"
 
-    --warnings 'Off'
+    warnings 'Off'
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("%{wks.location}/obj/" .. outputdir .. "/%{prj.name}")
+    objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
     files
     {
         "Symphony/**.cpp",
-        "Symphony/**.h"
+        "Symphony/**.h",
+        "vendor/imgui/examples/imgui_impl_sdl.h",
+        "vendor/imgui/examples/imgui_impl_sdl.cpp",
+        "vendor/imgui/examples/imgui_impl_vulkan.h",
+        "vendor/imgui/examples/imgui_impl_vulkan.cpp"
     }
 
     defines
@@ -46,14 +51,16 @@ project "Symphony"
 		"ext/SDL2/include",
 		"ext/glad/include",
         "$(VULKAN_SDK)/include",
-        "vendor/glm"
+        "vendor/glm",
+        "vendor/imgui"
     }
 
 	links
 	{
 		"glad",
 		"sdl2",
-        "$(VULKAN_SDK)/lib/vulkan-1.lib"
+        "$(VULKAN_SDK)/lib/vulkan-1.lib",
+        "imgui"
 	}
 
     filter "system:windows"
@@ -100,7 +107,7 @@ project "SymphonySB"
     staticruntime "On"
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("%{wks.location}/obj/" .. outputdir .. "/%{prj.name}")
+    objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
     files
     {

@@ -1,14 +1,17 @@
 #pragma once
+#include <memory>
 
 #include "render/Renderer.h"
 #include "GLShader.h"
 #include "GLVertexBuffer.h"
 #include "GLIndexBuffer.h"
+#include "GLUniformBuffer.h"
 #include <SDL.h>
+#include "core/DLLExport.h"
 
 namespace symphony
 {
-	class GLRenderer
+	SymphonyClass GLRenderer
 	{
 	public:
 		static void Init(Window* window);
@@ -24,6 +27,7 @@ namespace symphony
 		static std::vector<std::shared_ptr<GLVertexBuffer>> m_VertexBuffers;
 		static std::vector<std::shared_ptr<GLIndexBuffer>> m_IndexBuffers;
 		static std::shared_ptr<GLShader> m_RendererShader;
+		static std::shared_ptr<GLUniformBuffer> m_UniformBuffer;
 		static uint32_t m_RendererVAO;
 	};
 }

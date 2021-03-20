@@ -1,16 +1,20 @@
 #include "GLRenderer.h"
 #include "window/Window.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace symphony
 {
 	std::vector<std::shared_ptr<GLVertexBuffer>> GLRenderer::m_VertexBuffers;
 	std::vector<std::shared_ptr<GLIndexBuffer>> GLRenderer::m_IndexBuffers;
 	std::shared_ptr<GLShader> GLRenderer::m_RendererShader;
+	std::shared_ptr<GLUniformBuffer> GLRenderer::m_UniformBuffer;
 	uint32_t GLRenderer::m_RendererVAO = 0;
 
 	void GLRenderer::Init(Window* window)
 	{
 		m_RendererShader = std::make_shared<GLShader>("shaderlib/glsl/Vertex.glsl", "shaderlib/glsl/Fragment.glsl");
+		m_UniformBuffer = std::make_shared<GLUniformBuffer>((uint32_t)m_RendererShader->GetLinkedProgram());
 		glCreateVertexArrays(1, &m_RendererVAO);
 		glBindVertexArray(m_RendererVAO);
 	}
@@ -31,6 +35,8 @@ namespace symphony
 
 	void GLRenderer::Shutdown()
 	{
+		m_UniformBuffer.reset();
+		m_RendererShader.reset();
 		m_VertexBuffers.clear();
 		m_IndexBuffers.clear();
 
@@ -46,6 +52,13 @@ namespace symphony
 	{
 		glBindVertexArray(m_RendererVAO);
 		m_RendererShader->Bind();
+
+		RendererUniforms ubo{};
+		ubo.SceneModel = glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000, glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.SceneView = glm::mat4(1.0f);
+		ubo.SceneProjection = glm::mat4(1.0f);
+
+		m_UniformBuffer->Update(ubo);
 
 		if (m_IndexBuffers.empty()) 
 		{

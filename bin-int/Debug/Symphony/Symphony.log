@@ -1,0 +1,46 @@
+﻿cl : command line warning D9025: overriding '/MTd' with '/MDd'
+  imgui_impl_sdl.cpp
+  imgui_impl_vulkan.cpp
+  DLLMain.cpp
+  FileSystem.cpp
+  Plugin.cpp
+  RandomEngine.cpp
+  RenderSurface.cpp
+  Renderer.cpp
+  DX11RenderContext.cpp
+  DX11RenderSurface.cpp
+  DX11SwapChain.cpp
+  GLIndexBuffer.cpp
+  GLRenderSurface.cpp
+  GLRenderer.cpp
+  GLShader.cpp
+  GLVertexBuffer.cpp
+  VKRenderSurface.cpp
+  VkCommandBuffer.cpp
+  VkCommandPool.cpp
+  VkDescriptorPool.cpp
+  Generating Code...
+  Compiling...
+  VkDescriptorSet.cpp
+  VkDescriptorSetLayout.cpp
+  VkDevice.cpp
+  VkGraphicsPipeline.cpp
+  VkIndexBuffer.cpp
+  VkInstance.cpp
+  VkPhysicalDevice.cpp
+  VkQueue.cpp
+  VkRenderPass.cpp
+  VkRenderer.cpp
+  VkShader.cpp
+  VkSurface.cpp
+  VkSwapChain.cpp
+  VkUniformBuffer.cpp
+  VkVertexBuffer.cpp
+  Window.cpp
+  Generating Code...
+     Creating library ..\bin\Debug\Symphony\Symphony.lib and object ..\bin\Debug\Symphony\Symphony.exp
+LINK : warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs; use /NODEFAULTLIB:library
+GLRenderer.obj : error LNK2019: unresolved external symbol "public: __cdecl symphony::GLUniformBuffer::GLUniformBuffer(unsigned int)" (??0GLUniformBuffer@symphony@@QEAA@I@Z) referenced in function "void __cdecl std::_Construct_in_place<class symphony::GLUniformBuffer,unsigned int>(class symphony::GLUniformBuffer &,unsigned int &&)" (??$_Construct_in_place@VGLUniformBuffer@symphony@@I@std@@YAXAEAVGLUniformBuffer@symphony@@$$QEAI@Z)
+GLRenderer.obj : error LNK2019: unresolved external symbol "public: __cdecl symphony::GLUniformBuffer::~GLUniformBuffer(void)" (??1GLUniformBuffer@symphony@@QEAA@XZ) referenced in function "public: void * __cdecl symphony::GLUniformBuffer::`scalar deleting destructor'(unsigned int)" (??_GGLUniformBuffer@symphony@@QEAAPEAXI@Z)
+GLRenderer.obj : error LNK2019: unresolved external symbol "public: void __cdecl symphony::GLUniformBuffer::Update(struct symphony::RendererUniforms)" (?Update@GLUniformBuffer@symphony@@QEAAXURendererUniforms@2@@Z) referenced in function "public: static void __cdecl symphony::GLRenderer::Draw(void)" (?Draw@GLRenderer@symphony@@SAXXZ)
+..\bin\Debug\Symphony\Symphony.dll : fatal error LNK1120: 3 unresolved externals
