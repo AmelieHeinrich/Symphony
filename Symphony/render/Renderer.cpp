@@ -132,6 +132,9 @@ namespace symphony
 		case RenderAPI::OpenGL:
 			GLRenderer::AddTexture2D(filepath);
 			break;
+		case RenderAPI::DirectX:
+			DX11Renderer::AddTexture2D(filepath);
+			break;
 		}
 	}
 }

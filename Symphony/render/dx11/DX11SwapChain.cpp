@@ -13,7 +13,7 @@ namespace symphony {
 		swapChainInfo.BufferDesc.Width = width;
 		swapChainInfo.BufferDesc.Height = height;
 		swapChainInfo.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		swapChainInfo.BufferDesc.RefreshRate.Numerator = 60; // TODO: Select refresh rate
+		swapChainInfo.BufferDesc.RefreshRate.Numerator = 256; // TODO: Select refresh rate
 		swapChainInfo.BufferDesc.RefreshRate.Denominator = 1;
 		swapChainInfo.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainInfo.OutputWindow = hwnd;
@@ -78,7 +78,7 @@ namespace symphony {
 		D3D11_DEPTH_STENCIL_DESC depthstencildesc = {};
 		depthstencildesc.DepthEnable = true;
 		depthstencildesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
-		depthstencildesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+		depthstencildesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
 
 		result = device->CreateDepthStencilState(&depthstencildesc, &m_DepthStencilState);
 		if (FAILED(result))
@@ -89,6 +89,7 @@ namespace symphony {
 		D3D11_RASTERIZER_DESC rasterizerDesc = {};
 		rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
 		rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
+		rasterizerDesc.FrontCounterClockwise = true;
 		result = device->CreateRasterizerState(&rasterizerDesc, &m_RasterizerState);
 		if (FAILED(result))
 		{

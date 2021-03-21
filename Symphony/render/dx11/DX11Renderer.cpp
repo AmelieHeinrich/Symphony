@@ -11,6 +11,7 @@ namespace symphony
 	DirectXRendererData DX11Renderer::m_RendererData;
 	std::vector<std::shared_ptr<DX11VertexBuffer>> DX11Renderer::m_VertexBuffers;
 	std::vector<std::shared_ptr<DX11IndexBuffer>> DX11Renderer::m_IndexBuffers;
+	std::vector<std::shared_ptr<DX11Texture2D>> DX11Renderer::m_Textures;
 	std::shared_ptr<DX11Shader> DX11Renderer::RendererShader;
 	std::shared_ptr<DX11UniformBuffer> DX11Renderer::RendererUniformBuffer;
 
@@ -71,6 +72,11 @@ namespace symphony
 
 	void DX11Renderer::Shutdown()
 	{
+		for (auto i : m_Textures) {
+			i.reset();
+		}
+		m_Textures.clear();
+
 		for (auto i : m_IndexBuffers) {
 			i.reset();
 		}
@@ -108,6 +114,10 @@ namespace symphony
 		RendererShader->Bind();
 		RendererUniformBuffer->BindForShader(0);
 
+		for (int i = 0; i < m_Textures.size(); i++) {
+			m_Textures[i]->Bind(i);
+		}
+
 		uint32_t finalVertexSize = 0;
 		uint32_t finalIndexCount = 0;
 
@@ -138,11 +148,14 @@ namespace symphony
 			m_RendererData.Context->DrawIndexed(finalIndexCount, 0, 0);
 		}
 
-		RendererUniforms ubo{};
-		ubo.SceneModel = glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000, glm::vec3(0.0f, 0.0f, 1.0f));
-		ubo.SceneView = glm::mat4(1.0f);
-		ubo.SceneProjection = glm::mat4(1.0f);
+		for (int i = 0; i < m_Textures.size(); i++) {
+			m_Textures[i]->Unbind(i);
+		}
 
+		RendererUniforms ubo{};
+		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.01f, 1000.0f);
+		ubo.SceneView = glm::mat4(1.0f);
+		ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -50.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, -1.0f, 0.0f));
 		RendererUniformBuffer->Update(ubo);
 
 		RendererShader->Unbind();
@@ -160,5 +173,10 @@ namespace symphony
 	void DX11Renderer::AddIndexBuffer(const std::vector<uint32_t>& indices)
 	{
 		m_IndexBuffers.push_back(std::make_shared<DX11IndexBuffer>(indices));
+	}
+
+	void DX11Renderer::AddTexture2D(const char* filepath)
+	{
+		m_Textures.push_back(std::make_shared<DX11Texture2D>(filepath));
 	}
 }

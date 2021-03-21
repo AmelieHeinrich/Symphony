@@ -7,6 +7,7 @@
 #include "DX11VertexBuffer.h"
 #include "DX11IndexBuffer.h"
 #include "DX11UniformBuffer.h"
+#include "DX11Texture2D.h"
 #include <memory>
 
 namespace symphony
@@ -43,6 +44,7 @@ namespace symphony
 
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
+		static void AddTexture2D(const char* filepath);
 
 		static DirectXRendererData GetRendererData() {
 			return m_RendererData;
@@ -51,6 +53,7 @@ namespace symphony
 		static DirectXRendererData m_RendererData;
 		static std::vector<std::shared_ptr<DX11VertexBuffer>> m_VertexBuffers;
 		static std::vector<std::shared_ptr<DX11IndexBuffer>> m_IndexBuffers;
+		static std::vector<std::shared_ptr<DX11Texture2D>> m_Textures;
 		static std::shared_ptr<DX11Shader> RendererShader;
 		static std::shared_ptr<DX11UniformBuffer> RendererUniformBuffer;
 	};
