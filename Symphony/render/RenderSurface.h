@@ -5,6 +5,8 @@
 #include <memory>
 
 namespace symphony {
+	// Mother class (by the way I don't know  why the Render Surface has the renderer's function...
+	// TODO : make the code more professionnal lmao
 	SymphonyClass RenderSurface
 	{
 	public:

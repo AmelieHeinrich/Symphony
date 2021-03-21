@@ -24,6 +24,7 @@ namespace symphony
 		std::shared_ptr<DX11SwapChain> RendererSwapChain;
 		std::shared_ptr<DX11RenderContext> RendererContext;
 
+		// Clear color values
 		float CCR = 0.0f;
 		float CCG = 0.0f;
 		float CCB = 0.0f;

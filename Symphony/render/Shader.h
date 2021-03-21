@@ -5,6 +5,7 @@
 
 namespace symphony
 {
+	// Mother class
 	SymphonyClass Shader
 	{
 	public:

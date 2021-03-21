@@ -16,8 +16,6 @@ namespace symphony {
 	void GLRenderSurface::Clear()
 	{
 		SDL_GL_SwapWindow(m_TargetWindow);
-		glEnable(GL_DEPTH_TEST);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	void GLRenderSurface::ClearColor(float r, float g, float b, float a)

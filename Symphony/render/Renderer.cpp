@@ -129,6 +129,9 @@ namespace symphony
 		case RenderAPI::Vulkan:
 			VulkanRenderer::AddTexture2D(filepath);
 			break;
+		case RenderAPI::OpenGL:
+			GLRenderer::AddTexture2D(filepath);
+			break;
 		}
 	}
 }

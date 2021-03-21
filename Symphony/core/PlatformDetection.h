@@ -1,5 +1,7 @@
 #pragma once
 
+// Classic platform detection using macros
+
 #ifdef _WIN64
 	#define SYMPHONY_WINDOWS
 #else
@@ -24,6 +26,8 @@
 #endif
 
 #include <iostream>
+
+// Wrappers around those macros
 
 namespace symphony {
 	enum class Platform {

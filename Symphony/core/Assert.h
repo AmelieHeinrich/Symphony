@@ -4,6 +4,8 @@
 #include <stdlib.h>
 
 namespace symphony {
+	// Assert class I don't use but if I ever need it I have it ;)
+
 	class Assert
 	{
 	public:

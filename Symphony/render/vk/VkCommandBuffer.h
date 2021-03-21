@@ -7,6 +7,7 @@
 
 namespace symphony
 {
+	// That took forever to make
 	class CommandBuffer
 	{
 	public:

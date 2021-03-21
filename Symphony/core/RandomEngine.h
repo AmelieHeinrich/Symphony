@@ -7,6 +7,8 @@
 #include <random>
 
 namespace symphony {
+
+	// Random singleton for rng
 	SymphonyClass RandomEngine : public BaseSingleton {
 	public:
 		static RandomEngine& Get();

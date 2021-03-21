@@ -10,6 +10,7 @@ namespace symphony {
 		virtual ~IPlugin() {}
 	};
 
+	// DLL Loading using the Win 32 api
 	SymphonyClass IDLLPlugin : public IPlugin
 	{
 	public:

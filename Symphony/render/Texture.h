@@ -2,6 +2,7 @@
 
 namespace symphony
 {
+	// Mother class
 	class Texture
 	{
 	public:

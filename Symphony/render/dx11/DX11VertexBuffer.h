@@ -5,6 +5,7 @@
 
 namespace symphony
 {
+	// Vertex Buffer class inspired by the Sparky game engine (hi cherno <3)
 	class DX11VertexBuffer : public VertexBuffer
 	{
 	public:

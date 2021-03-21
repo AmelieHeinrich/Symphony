@@ -2,6 +2,7 @@
 
 namespace symphony
 {
+	// Simple struct that wrapps stb_image functions
 	struct ImageData
 	{
 		int Width;

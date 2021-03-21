@@ -6,6 +6,7 @@
 
 namespace symphony
 {
+	// Mother class
 	class IndexBuffer
 	{
 	public:

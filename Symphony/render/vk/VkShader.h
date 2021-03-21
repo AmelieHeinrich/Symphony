@@ -11,6 +11,8 @@ namespace symphony
 	class VulkanShader : public Shader
 	{
 	public:
+		// Can't compile shaders in runtime, they must already be in SPIRV format
+		// TODO : Include a runtime shader compiler
 		VulkanShader(std::string vertexFile, std::string fragmentFile);
 		~VulkanShader();
 

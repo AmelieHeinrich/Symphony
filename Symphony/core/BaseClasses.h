@@ -2,6 +2,8 @@
 
 namespace symphony {
 
+	// Base classes so it's easier to make singletons or other specific classes
+
 	class BaseNonMovable
 	{
 	public:

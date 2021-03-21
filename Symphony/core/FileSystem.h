@@ -5,6 +5,8 @@
 
 namespace symphony
 {
+	// TODO : Make a better FileSystem
+
 	enum class ReadMode
 	{
 		Normal,

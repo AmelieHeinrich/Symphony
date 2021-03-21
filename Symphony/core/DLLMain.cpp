@@ -4,6 +4,8 @@
 #include "window/Window.h"
 #include <iostream>
 
+// DLL main to trace dll attachment
+
 HMODULE Win32DLLHandle;
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved)

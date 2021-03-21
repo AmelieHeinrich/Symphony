@@ -8,6 +8,7 @@
 
 namespace symphony
 {
+	// Struct that represents a single vertex
 	struct Vertex
 	{
 		glm::vec3 Position;
@@ -20,6 +21,7 @@ namespace symphony
 		}
 	};
 
+	// Mother class
 	SymphonyClass VertexBuffer
 	{
 	public:

@@ -4,7 +4,11 @@ layout (location = 0) out vec4 Color;
 
 in vec3 passColor;
 
+uniform sampler2D RendererTextures[20];
+uniform int TextureSlot;
+in vec2 passTexCoords;
+
 void main()
 {
-	Color = vec4(passColor, 1.0);
+	Color = texture(RendererTextures[TextureSlot], passTexCoords);
 }

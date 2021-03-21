@@ -7,6 +7,7 @@
 
 namespace symphony
 {
+    // Child class to have vk specific functions
 	struct VulkanVertex : public Vertex
 	{
         static VkVertexInputBindingDescription getBindingDescription() {
@@ -50,6 +51,7 @@ namespace symphony
             return (void*)m_BufferHandle;
         }
 
+        // Vulkan buffer specific stuff
         static void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         static void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	private:
