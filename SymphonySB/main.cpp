@@ -55,9 +55,9 @@ static void OpenGLExample()
 	Renderer::Shutdown();
 }
 
-static void DirectXExample()
+static void DirectX11Example()
 {
-	Window VKWindow(1280, 720, "Symphony DirectX 11", RenderAPI::DirectX);
+	Window VKWindow(1280, 720, "Symphony DirectX 11", RenderAPI::DirectX11);
 
 	Renderer::Init(&VKWindow);
 	Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -78,9 +78,27 @@ static void DirectXExample()
 	Renderer::Shutdown();
 }
 
+static void DirectX12Example()
+{
+	Window VKWindow(1280, 720, "Symphony DirectX 12", RenderAPI::DirectX12);
+
+	Renderer::Init(&VKWindow);
+	Renderer::ClearColor(0.2f, 0.8f, 0.3f, 1.0f);
+	
+	Renderer::Prepare();
+
+	while (VKWindow.IsWindowOpen()) {
+		VKWindow.Update();
+		
+		Renderer::Draw();
+	}
+
+	Renderer::Shutdown();
+}
+
 int main()
 {
-	DirectXExample();
+	DirectX12Example();
 
 	return 0;
 }

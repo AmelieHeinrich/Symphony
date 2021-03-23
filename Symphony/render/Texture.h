@@ -1,9 +1,11 @@
 #pragma once
 
+#include "core/DLLExport.h"
+
 namespace symphony
 {
 	// Mother class
-	class Texture
+	SymphonyClass Texture
 	{
 	public:
 		virtual ~Texture() = default;

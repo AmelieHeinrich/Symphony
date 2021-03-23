@@ -5,6 +5,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "VkImGui.h"
 
 namespace symphony
 {
@@ -12,9 +13,11 @@ namespace symphony
 	std::vector<std::shared_ptr<VulkanVertexBuffer>> VulkanRenderer::m_VertexBuffers;
 	std::vector<std::shared_ptr<VulkanIndexBuffer>> VulkanRenderer::m_IndexBuffers;
 	std::vector<std::shared_ptr<VulkanTexture2D>> VulkanRenderer::m_Textures;
+	Window* VulkanRenderer::targetWindow;
 
 	void VulkanRenderer::Init(Window* window)
 	{
+		targetWindow = window;
 		int width, height;
 		SDL_GetWindowSize(window->GetWindowHandle(), &width, &height);
 

@@ -85,14 +85,14 @@ namespace symphony
 		}
 
 		const DX11Shader* shader = DX11Shader::CurrentlyBound();
-		DX11Renderer::GetRendererData().Device->CreateInputLayout(desc, Layout.size(), shader->GetData().VertexBlob->GetBufferPointer(), shader->GetData().VertexBlob->GetBufferSize(), &m_InputLayout);
+		DX11Renderer::GetRendererData().Device->CreateInputLayout(desc, static_cast<uint32_t>(Layout.size()), shader->GetData().VertexBlob->GetBufferPointer(), shader->GetData().VertexBlob->GetBufferSize(), &m_InputLayout);
 		delete[] desc;
 
 		// ACTUAL BUFFER CREATION
 
 		m_BufferDesc = {};
 		m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		m_BufferDesc.ByteWidth = sizeof(Vertex) * vertices.size();
+		m_BufferDesc.ByteWidth = sizeof(Vertex) * static_cast<uint32_t>(vertices.size());
 		m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		m_BufferDesc.CPUAccessFlags = 0;
 		m_BufferDesc.MiscFlags = 0;

@@ -6,6 +6,7 @@
 #include "render/dx11/DX11RenderSurface.h"
 #include "render/gl/GLRenderSurface.h"
 #include "render/vk/VKRenderSurface.h"
+#include "render/dx12/DX12RenderSurface.h"
 
 static bool GLFWInitialized = false;
 
@@ -26,9 +27,13 @@ namespace symphony {
 			flag = SDL_WINDOW_VULKAN;
 			m_WindowSurface = new VKRenderSurface();
 			break;
-		case RenderAPI::DirectX:
+		case RenderAPI::DirectX11:
 			flag = SDL_WINDOW_SHOWN;
 			m_WindowSurface = new DX11RenderSurface();
+			break;
+		case RenderAPI::DirectX12:
+			flag = SDL_WINDOW_SHOWN;
+			m_WindowSurface = new DX12RenderSurface();
 			break;
 		case RenderAPI::Metal:
 			break;
@@ -98,6 +103,6 @@ namespace symphony {
 
 	void Window::TerminateSDL2()
 	{
-		
+		SDL_Quit();
 	}
 }

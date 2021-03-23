@@ -33,7 +33,7 @@ namespace symphony
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
 
 		m_RendererShader = std::make_shared<GLShader>("shaderlib/glsl/Vertex.glsl", "shaderlib/glsl/Fragment.glsl");
-		m_UniformBuffer = std::make_shared<GLUniformBuffer>((uint32_t)m_RendererShader->GetLinkedProgram());
+		m_UniformBuffer = std::make_shared<GLUniformBuffer>(reinterpret_cast<uint32_t>(m_RendererShader->GetLinkedProgram()));
 		glCreateVertexArrays(1, &m_RendererVAO);
 		glBindVertexArray(m_RendererVAO);
 	}
@@ -55,7 +55,7 @@ namespace symphony
 			i->Unbind();
 		}
 
-		m_UniformBuffer->SetUniformSampler((uint32_t)m_RendererShader->GetLinkedProgram());
+		m_UniformBuffer->SetUniformSampler(reinterpret_cast<uint32_t>(m_RendererShader->GetLinkedProgram()));
 		m_RendererShader->Unbind();
 
 		glEnable(GL_DEPTH_TEST);
@@ -87,7 +87,7 @@ namespace symphony
 		for (int i = 0; i < m_Textures.size(); i++)
 		{
 			m_Textures[i]->Bind(i);
-			m_UniformBuffer->SetCurrentTexture((uint32_t)m_RendererShader->GetLinkedProgram(), i);
+			m_UniformBuffer->SetCurrentTexture(reinterpret_cast<uint32_t>(m_RendererShader->GetLinkedProgram()), i);
 		}
 
 		if (m_IndexBuffers.empty()) 

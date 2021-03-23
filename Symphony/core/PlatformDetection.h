@@ -40,9 +40,10 @@ namespace symphony {
 	enum class RenderAPI {
 		None = 0,
 		OpenGL = 1,
-		DirectX = 2,
+		DirectX11 = 2,
 		Metal = 3,
-		Vulkan = 4
+		Vulkan = 4,
+		DirectX12 = 5
 	};
 
 	static Platform s_Platform;

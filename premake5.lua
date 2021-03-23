@@ -23,8 +23,6 @@ project "Symphony"
     cppdialect "C++17"
     staticruntime "On"
 
-    warnings 'Off'
-
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
@@ -67,9 +65,12 @@ project "Symphony"
         "imgui"
 	}
 
-    filter "system:windows"
-        defines { "SYMPHONY_WINDOWS" }
+    defines
+    {
+        "_CRT_SECURE_NO_WARNINGS"
+    }
 
+    filter "system:windows"
         postbuildcommands
         {
             ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/SymphonySB")
@@ -84,14 +85,9 @@ project "Symphony"
             "user32",
 			"d3d11",
 			"d3dcompiler",
+            "d3d12",
 			"dxgi"
         }
-
-    filter "system:linux"
-        defines { "SYMPHONY_LINUX" }
-
-    filter "system:macos"
-        defines { "SYMPHONY_MAC" }
 
     filter "configurations:Debug"
 		buildoptions "/MDd"
@@ -134,14 +130,10 @@ project "SymphonySB"
         "sdl2"
     }
 
-    filter "system:windows"
-        defines { "SYMPHONY_WINDOWS" }
-
-    filter "system:linux"
-        defines { "SYMPHONY_LINUX" }
-
-    filter "system:macos"
-        defines { "SYMPHONY_MAC" }
+    defines
+    {
+        "_CRT_SECURE_NO_WARNINGS"
+    }
 
     filter "configurations:Debug"
 		buildoptions "/MTd"

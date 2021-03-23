@@ -40,8 +40,8 @@ namespace symphony
 		VkViewport viewport{};
 		viewport.x = 0.0f;
 		viewport.y = 0.0f;
-		viewport.width = createInfo.Width;
-		viewport.height = createInfo.Height;
+		viewport.width = (float)createInfo.Width;
+		viewport.height = (float)createInfo.Height;
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 

@@ -36,7 +36,7 @@ namespace symphony
 		
 		for (int i = 0; i < 10; i++) {
 			if (i < textures.size()) {
-				gltextures.push_back((uint32_t)textures[i]->GetTextureBuffer());
+				gltextures.push_back(reinterpret_cast<uint32_t>(textures[i]->GetTextureBuffer()));
 			}
 			else {
 				gltextures.push_back(-1);

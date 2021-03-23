@@ -93,5 +93,6 @@ namespace symphony
 		static std::vector<std::shared_ptr<VulkanIndexBuffer>> m_IndexBuffers;
 		static std::vector<std::shared_ptr<VulkanTexture2D>> m_Textures;
 		static RendererData s_Data;
+		static Window* targetWindow;
 	};
 }

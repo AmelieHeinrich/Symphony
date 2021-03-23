@@ -166,8 +166,8 @@ namespace symphony {
 			DX11Renderer::GetRendererData().Context->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
 
 			D3D11_VIEWPORT vp;
-			vp.Width = width;
-			vp.Height = height;
+			vp.Width = (float)width;
+			vp.Height = (float)height;
 			vp.MinDepth = 0.0f;
 			vp.MaxDepth = 1.0f;
 			vp.TopLeftX = 0;

@@ -4,7 +4,7 @@
 #include <Windows.h>
 
 namespace symphony {
-	class IPlugin
+	SymphonyClass IPlugin
 	{
 	public:
 		virtual ~IPlugin() {}

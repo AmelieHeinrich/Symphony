@@ -9,7 +9,7 @@ namespace symphony
 		D3D11_BUFFER_DESC ibd;
 		ZeroMemory(&ibd, sizeof(D3D11_BUFFER_DESC));
 		ibd.Usage = D3D11_USAGE_DEFAULT;
-		ibd.ByteWidth = indices.size() * sizeof(uint32_t);
+		ibd.ByteWidth = indices.size() * (UINT)sizeof(uint32_t);
 		ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		ibd.CPUAccessFlags = 0;
 		ibd.MiscFlags = 0;

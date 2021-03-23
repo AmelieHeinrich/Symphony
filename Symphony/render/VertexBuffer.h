@@ -26,7 +26,7 @@ namespace symphony
 	{
 	public:
 		VertexBuffer(const std::vector<Vertex>& vertices)
-			: VerticesSize(vertices.size()) {};
+			: VerticesSize(static_cast<uint32_t>(vertices.size())) {};
 		virtual ~VertexBuffer() = default;
 
 		virtual void* GetVertexBufferHandle() = 0;

@@ -14,16 +14,16 @@ namespace symphony
 {
 	struct DirectXRendererData
 	{
-		ID3D11Device* Device;
-		ID3D11DeviceContext* Context;
-		D3D_FEATURE_LEVEL FeatureLevel;
+		ID3D11Device* Device = nullptr;
+		ID3D11DeviceContext* Context = nullptr;
+		D3D_FEATURE_LEVEL FeatureLevel = D3D_FEATURE_LEVEL_11_0;
 
-		IDXGIDevice* DXGIDevice;
-		IDXGIAdapter* DXGIAdapter;
-		IDXGIFactory* DXGIFactory;
+		IDXGIDevice* DXGIDevice = nullptr;
+		IDXGIAdapter* DXGIAdapter = nullptr;
+		IDXGIFactory* DXGIFactory = nullptr;
 
-		std::shared_ptr<DX11SwapChain> RendererSwapChain;
-		std::shared_ptr<DX11RenderContext> RendererContext;
+		std::shared_ptr<DX11SwapChain> RendererSwapChain = nullptr;
+		std::shared_ptr<DX11RenderContext> RendererContext = nullptr;
 
 		// Clear color values
 		float CCR = 0.0f;

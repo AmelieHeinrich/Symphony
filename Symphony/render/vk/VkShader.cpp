@@ -4,7 +4,8 @@
 #include <iostream>
 #include "VkRenderer.h"
 
-static std::vector<char> readFile(const std::string& filename) throw(std::runtime_error) {
+static std::vector<char> readFile(const std::string& filename)
+{
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
 	if (!file.is_open()) {

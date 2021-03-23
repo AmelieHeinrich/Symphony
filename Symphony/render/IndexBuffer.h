@@ -7,11 +7,11 @@
 namespace symphony
 {
 	// Mother class
-	class IndexBuffer
+	SymphonyClass IndexBuffer
 	{
 	public:
 		IndexBuffer(const std::vector<uint32_t>& indices)
-			: IndicesSize(indices.size()) {}
+			: IndicesSize(static_cast<uint32_t>(indices.size())) {}
 		virtual ~IndexBuffer() = default;
 
 		virtual void* GetIndexBufferHandle() = 0;
