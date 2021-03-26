@@ -1,5 +1,6 @@
 #include "DX12Shader.h"
 #include "DX12Device.h"
+#include "DX12Renderer.h"
 #include <fstream>
 
 namespace symphony
@@ -35,6 +36,7 @@ namespace symphony
 		: Shader(vertexFile, fragmentFile)
 	{
 		{
+			auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
 			D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
 			rootSignatureDesc.NumParameters = 0;
 			rootSignatureDesc.pParameters = nullptr;
@@ -45,6 +47,7 @@ namespace symphony
 			ID3DBlob* signature;
 			ID3DBlob* error;
 			DX12Device::ThrowIfFailed(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
+			DX12Device::ThrowIfFailed(device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
 		}
 
 		{
@@ -65,28 +68,21 @@ namespace symphony
 
 	void DX12Shader::Bind()
 	{
-
+		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		clist->SetGraphicsRootSignature(rootSignature);
 	}
 
 	void DX12Shader::Unbind()
 	{
-
+		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		clist->SetGraphicsRootSignature(nullptr);
 	}
 
 	ID3DBlob* DX12Shader::Compile(const std::string& source, const std::string& profile, const std::string& main)
 	{
 		ID3DBlob* shaderBlob;
 		ID3DBlob* errorBlob;
-		HRESULT status = D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, main.c_str(), profile.c_str(), D3DCOMPILE_DEBUG, 0, &shaderBlob, &errorBlob);
-		if (status != S_OK)
-			throw std::exception();
-		if (errorBlob)
-		{
-			throw std::exception();
-			errorBlob->Release();
-		}
-		if (status == S_OK)
-			return shaderBlob;
-		return nullptr;
+		DX12Device::ThrowIfFailed(D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, main.c_str(), profile.c_str(), 0, 0, &shaderBlob, &errorBlob));
+		return shaderBlob;
 	}
 }

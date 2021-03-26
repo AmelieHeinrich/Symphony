@@ -10,6 +10,7 @@ namespace symphony
 		{
 			ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debug)));
 			debug->EnableDebugLayer();
+			debug->SetEnableGPUBasedValidation(true);
 		}
 
 		ThrowIfFailed(CreateDXGIFactory(IID_PPV_ARGS(&factory)));
@@ -26,9 +27,12 @@ namespace symphony
 		device->Release();
 		factory->Release();
 
-		debug->Release();
-		debugDevice->ReportLiveDeviceObjects(D3D12_RLDO_IGNORE_INTERNAL | D3D12_RLDO_DETAIL);
-		debugDevice->Release();
+		if (DebugEnabled)
+		{
+			debugDevice->ReportLiveDeviceObjects(D3D12_RLDO_IGNORE_INTERNAL | D3D12_RLDO_DETAIL);
+			debugDevice->Release();
+			debug->Release();
+		}
 	}
 
 	void DX12Device::ThrowIfFailed(HRESULT hr)

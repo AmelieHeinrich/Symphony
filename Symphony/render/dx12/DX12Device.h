@@ -23,7 +23,7 @@ namespace symphony
 			return device;
 		}
 
-		ID3D12Debug* GetDebug() {
+		ID3D12Debug1* GetDebug() {
 			if (DebugEnabled)
 				return debug;
 			else
@@ -40,7 +40,7 @@ namespace symphony
 		IDXGIFactory* factory = nullptr;
 		ID3D12Device* device = nullptr;
 
-		ID3D12Debug* debug = nullptr;
+		ID3D12Debug1* debug = nullptr;
 		ID3D12DebugDevice* debugDevice = nullptr;
 
 		float DebugEnabled = true;

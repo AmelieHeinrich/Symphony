@@ -15,8 +15,8 @@ namespace symphony
 		void Bind();
 		void Unbind();
 
-		virtual void* GetVertexShader() override { return nullptr; }
-		virtual void* GetFragmentShader() override { return nullptr; }
+		virtual void* GetVertexShader() override { return (void*)VertexBlob; }
+		virtual void* GetFragmentShader() override { return (void*)FragmentBlob; }
 		virtual void* GetLinkedProgram() override { return (void*)rootSignature; }
 	private:
 		ID3D12RootSignature* rootSignature;

@@ -39,6 +39,7 @@ namespace symphony
 		swapDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 		DX12Device::ThrowIfFailed(factory->CreateSwapChain(commandQueue, &swapDesc, &swapChain));
+		factory->MakeWindowAssociation(windowRaw, DXGI_MWA_NO_ALT_ENTER);
 
 		UINT uiDescHeapSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
@@ -62,7 +63,7 @@ namespace symphony
 
 	void DX12SwapChain::ReleaseSwapChain()
 	{
-		delete swapChain;
+		
 	}
 
 	void DX12SwapChain::Present()
