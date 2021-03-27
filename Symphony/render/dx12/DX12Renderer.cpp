@@ -4,6 +4,7 @@ namespace symphony
 {
 	DX12RendererData DX12Renderer::m_RendererData;
 	std::vector<std::shared_ptr<DX12VertexBuffer>> DX12Renderer::m_VertexBuffers;
+	std::vector<std::shared_ptr<DX12IndexBuffer>> DX12Renderer::m_IndexBuffers;
 
 	void DX12Renderer::Init(Window* window)
 	{
@@ -28,6 +29,11 @@ namespace symphony
 
 	void DX12Renderer::Shutdown()
 	{
+		for (auto i : m_IndexBuffers) {
+			i.reset();
+		}
+		m_IndexBuffers.clear();
+
 		for (auto i : m_VertexBuffers) {
 			i.reset();
 		}
@@ -78,16 +84,30 @@ namespace symphony
 		m_RendererData.RendererShader->Bind();
 
 		uint32_t finalVertexSize = 0;
+		uint32_t finalIndexSize = 0;
 		for (auto i : m_VertexBuffers) {
 			finalVertexSize += i->GetVerticesSize();
 		}
+		for (auto i : m_IndexBuffers) {
+			finalIndexSize += i->GetIndicesSize();
+		}
 
-		for (auto i : m_VertexBuffers) {
-			auto size = i->GetVerticesSize();
-			i->Bind();
-			m_RendererData.RendererCommand->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			m_RendererData.RendererCommand->GetCommandList()->DrawInstanced(finalVertexSize, 1, 0, 0);
-			i->Unbind();
+		if (m_IndexBuffers.empty()) {
+			for (auto i : m_VertexBuffers) {
+				i->Bind();
+				m_RendererData.RendererCommand->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_RendererData.RendererCommand->GetCommandList()->DrawInstanced(finalVertexSize, 1, 0, 0);
+			}
+		}
+		else {
+			for (auto i : m_VertexBuffers) {
+				i->Bind();
+			}
+			for (auto i : m_IndexBuffers) {
+				i->Bind();
+				m_RendererData.RendererCommand->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				m_RendererData.RendererCommand->GetCommandList()->DrawIndexedInstanced(finalIndexSize, 1, 0, 0, 0);
+			}
 		}
 		// END
 
@@ -102,7 +122,7 @@ namespace symphony
 
 	void DX12Renderer::AddIndexBuffer(const std::vector<uint32_t>& indices)
 	{
-
+		m_IndexBuffers.push_back(std::make_shared<DX12IndexBuffer>(indices));
 	}
 
 	void DX12Renderer::AddTexture2D(const char* filepath)

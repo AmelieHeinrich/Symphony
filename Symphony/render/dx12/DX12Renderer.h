@@ -10,6 +10,7 @@
 #include "DX12Shader.h"
 #include "DX12Pipeline.h"
 #include "DX12VertexBuffer.h"
+#include "DX12IndexBuffer.h"
 #include "window/Window.h"
 
 namespace symphony
@@ -21,6 +22,7 @@ namespace symphony
 			std::vector<D3D12_INPUT_ELEMENT_DESC> desc;
 			desc.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 			desc.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float) * 3, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
+			desc.push_back({ "TEXCOORDS", 0, DXGI_FORMAT_R32G32_FLOAT, 0, sizeof(float) * 5, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 			return desc;
 		}
 	};
@@ -58,5 +60,6 @@ namespace symphony
 	private:
 		static DX12RendererData m_RendererData;
 		static std::vector<std::shared_ptr<DX12VertexBuffer>> m_VertexBuffers;
+		static std::vector<std::shared_ptr<DX12IndexBuffer>> m_IndexBuffers;
 	};
 }
