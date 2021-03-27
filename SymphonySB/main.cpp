@@ -83,21 +83,22 @@ static void DirectX12Example()
 	Window VKWindow(1280, 720, "Symphony DirectX 12", RenderAPI::DirectX12);
 
 	Renderer::Init(&VKWindow);
-	Renderer::ClearColor(0.2f, 0.8f, 0.3f, 1.0f);
+	Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	const std::vector<Vertex> vertices = {
-		{{-0.5f,-0.5f, 0.0f},  {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-		{{-0.5f, 0.5f, 0.0f},  {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-		{{ 0.5f, 0.5f, 0.0f},  {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
-		{{ 0.5f,-0.5f, 0.0f},  {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}}
+		{{ 0.5f, 0.5f, 0.0f},  {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+		{{ 0.5f,-0.5f, 0.0f},  {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+		{{-0.5f,-0.5f, 0.0f},  {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+		{{-0.5f, 0.5f, 0.0f},  {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
 	};
 
 	const std::vector<uint32_t> indices = {
-		0, 1, 2, 0, 2, 3
+		0, 1, 3, 1, 2, 3
 	};
 
 	Renderer::AddVertexBuffer(vertices);
 	Renderer::AddIndexBuffer(indices);
+	Renderer::AddTexture2D("resources/texture.jpg");
 	
 	Renderer::Prepare();
 

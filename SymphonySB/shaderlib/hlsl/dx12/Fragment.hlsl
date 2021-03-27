@@ -1,3 +1,6 @@
+Texture2D t1 : register(t0);
+sampler s1 : register(s0);
+
 struct PS_INPUT
 {
 	float4 position: SV_POSITION;
@@ -7,5 +10,5 @@ struct PS_INPUT
 
 float4 PSMain(PS_INPUT input) : SV_TARGET
 {
-	return float4(input.color, 1.0);
+	return t1.Sample(s1, input.texcoords);
 }

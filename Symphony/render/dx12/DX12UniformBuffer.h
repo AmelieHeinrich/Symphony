@@ -16,6 +16,10 @@ namespace symphony
 		void Bind();
 		void Unbind();
 		void Update(RendererUniforms uniforms);
+
+		std::shared_ptr<DX12Memory> GetDescriptorHeap() {
+			return m_DescriptorHeap;
+		}
 	private:
 		std::shared_ptr<DX12Memory> m_DescriptorHeap;
 		ID3D12Resource* m_Resource;

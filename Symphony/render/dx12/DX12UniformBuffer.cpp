@@ -35,10 +35,11 @@ namespace symphony
 
 		DX12Device::ThrowIfFailed(device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_Resource)));
 
-		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-		cbvDesc.BufferLocation = m_Resource->GetGPUVirtualAddress();
-		cbvDesc.SizeInBytes = 256;
-		device->CreateConstantBufferView(&cbvDesc, m_DescriptorHeap->GetHeapHandle());
+		m_View = {};
+
+		m_View.BufferLocation = m_Resource->GetGPUVirtualAddress();
+		m_View.SizeInBytes = 256;
+		device->CreateConstantBufferView(&m_View, m_DescriptorHeap->GetHeapHandle());
 	}
 
 	DX12UniformBuffer::~DX12UniformBuffer()
@@ -50,9 +51,7 @@ namespace symphony
 	void DX12UniformBuffer::Bind()
 	{
 		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
-		ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap->GetDescriptorHeap() };
-		clist->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-		clist->SetGraphicsRootDescriptorTable(0, m_DescriptorHeap->GetGPUHandle());
+		clist->SetGraphicsRootConstantBufferView(0, m_Resource->GetGPUVirtualAddress());
 	}
 
 	void DX12UniformBuffer::Unbind()

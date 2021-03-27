@@ -8,6 +8,7 @@ namespace symphony
 	DX12RendererData DX12Renderer::m_RendererData;
 	std::vector<std::shared_ptr<DX12VertexBuffer>> DX12Renderer::m_VertexBuffers;
 	std::vector<std::shared_ptr<DX12IndexBuffer>> DX12Renderer::m_IndexBuffers;
+	std::vector<std::shared_ptr<DX12Texture2D>> DX12Renderer::m_Textures;
 
 	void DX12Renderer::Init(Window* window)
 	{
@@ -16,6 +17,10 @@ namespace symphony
 		m_RendererData.RendererCommand = std::make_shared<DX12Command>();
 		m_RendererData.RendererMemory = std::make_shared<DX12Memory>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 2);
 		m_RendererData.RendererSwapChain = std::make_shared<DX12SwapChain>(window);
+	}
+
+	void DX12Renderer::Prepare()
+	{
 		m_RendererData.RendererShader = std::make_shared<DX12Shader>("shaderlib/hlsl/dx12/Vertex.hlsl", "shaderlib/hlsl/dx12/Fragment.hlsl");
 
 		DX12PipelineCreateInfo pci;
@@ -30,13 +35,13 @@ namespace symphony
 		}
 	}
 
-	void DX12Renderer::Prepare()
-	{
-
-	}
-
 	void DX12Renderer::Shutdown()
 	{
+		for (auto i : m_Textures) {
+			i.reset();
+		}
+		m_Textures.clear();
+
 		for (auto i : m_RendererData.RendererUniformBuffers) {
 			i.reset();
 		}
@@ -101,6 +106,10 @@ namespace symphony
 		ubo.SceneView = glm::mat4(1.0f);
 		ubo.SceneProjection = glm::mat4(1.0f);
 
+		for (auto i : m_Textures) {
+			i->Bind();
+		}
+
 		for (int i = 0; i < 2; i++) {
 			m_RendererData.RendererUniformBuffers[i]->Bind();
 			m_RendererData.RendererUniformBuffers[i]->Update(ubo);
@@ -150,6 +159,6 @@ namespace symphony
 
 	void DX12Renderer::AddTexture2D(const char* filepath)
 	{
-
+		m_Textures.push_back(std::make_shared<DX12Texture2D>(filepath));
 	}
 }

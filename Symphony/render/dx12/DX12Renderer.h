@@ -12,6 +12,7 @@
 #include "DX12VertexBuffer.h"
 #include "DX12IndexBuffer.h"
 #include "DX12UniformBuffer.h"
+#include "DX12Texture2D.h"
 #include "window/Window.h"
 
 namespace symphony
@@ -63,5 +64,6 @@ namespace symphony
 		static DX12RendererData m_RendererData;
 		static std::vector<std::shared_ptr<DX12VertexBuffer>> m_VertexBuffers;
 		static std::vector<std::shared_ptr<DX12IndexBuffer>> m_IndexBuffers;
+		static std::vector<std::shared_ptr<DX12Texture2D>> m_Textures;
 	};
 }

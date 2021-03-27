@@ -45,7 +45,7 @@ namespace symphony
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesk;
 		ZeroMemory(&psoDesk, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 		psoDesk.pRootSignature = reinterpret_cast<ID3D12RootSignature*>(pci.PipelineShader->GetLinkedProgram());
-		psoDesk.InputLayout.NumElements = 3;
+		psoDesk.InputLayout.NumElements = desc.size();
 		psoDesk.InputLayout.pInputElementDescs = desc.data();
 		psoDesk.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		psoDesk.VS = { reinterpret_cast<UINT8*>(vertexShader->GetBufferPointer()), vertexShader->GetBufferSize() };
