@@ -8,6 +8,18 @@ namespace symphony
 	{
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
 
+		D3D12_DEPTH_STENCIL_DESC depthStencilDesc;
+		ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+		depthStencilDesc.DepthEnable = TRUE;
+		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+		depthStencilDesc.StencilEnable = FALSE;
+		depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+		depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+		const D3D12_DEPTH_STENCILOP_DESC defaultStencilOp = { D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
+		depthStencilDesc.FrontFace = defaultStencilOp;
+		depthStencilDesc.BackFace = defaultStencilOp;
+
 		D3D12_RASTERIZER_DESC rasterizerDesk;
 		ZeroMemory(&rasterizerDesk, sizeof(D3D12_RASTERIZER_DESC));
 		rasterizerDesk.FillMode = D3D12_FILL_MODE_SOLID;
@@ -25,6 +37,7 @@ namespace symphony
 		std::vector<D3D12_INPUT_ELEMENT_DESC> desc;
 		desc.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 		desc.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float) * 3, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
+		desc.push_back({ "TEXCOORDS", 0, DXGI_FORMAT_R32G32_FLOAT, 0, sizeof(float) * 5, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 
 		ID3DBlob* vertexShader = reinterpret_cast<ID3DBlob*>(pci.PipelineShader->GetVertexShader());
 		ID3DBlob* fragmentShader = reinterpret_cast<ID3DBlob*>(pci.PipelineShader->GetFragmentShader());
@@ -32,7 +45,7 @@ namespace symphony
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesk;
 		ZeroMemory(&psoDesk, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 		psoDesk.pRootSignature = reinterpret_cast<ID3D12RootSignature*>(pci.PipelineShader->GetLinkedProgram());
-		psoDesk.InputLayout.NumElements = 2;
+		psoDesk.InputLayout.NumElements = 3;
 		psoDesk.InputLayout.pInputElementDescs = desc.data();
 		psoDesk.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		psoDesk.VS = { reinterpret_cast<UINT8*>(vertexShader->GetBufferPointer()), vertexShader->GetBufferSize() };
@@ -47,7 +60,7 @@ namespace symphony
 			D3D12_LOGIC_OP_NOOP,
 			D3D12_COLOR_WRITE_ENABLE_ALL,
 		};
-		psoDesk.DepthStencilState.DepthEnable = FALSE;
+		psoDesk.DepthStencilState = depthStencilDesc;
 		psoDesk.SampleMask = UINT_MAX;
 		psoDesk.NumRenderTargets = 1;
 		psoDesk.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;

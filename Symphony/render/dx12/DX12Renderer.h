@@ -9,6 +9,7 @@
 #include "DX12SwapChain.h"
 #include "DX12Shader.h"
 #include "DX12Pipeline.h"
+#include "DX12VertexBuffer.h"
 #include "window/Window.h"
 
 namespace symphony
@@ -56,5 +57,6 @@ namespace symphony
 		}
 	private:
 		static DX12RendererData m_RendererData;
+		static std::vector<std::shared_ptr<DX12VertexBuffer>> m_VertexBuffers;
 	};
 }

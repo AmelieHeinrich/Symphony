@@ -3,6 +3,7 @@
 namespace symphony
 {
 	DX12RendererData DX12Renderer::m_RendererData;
+	std::vector<std::shared_ptr<DX12VertexBuffer>> DX12Renderer::m_VertexBuffers;
 
 	void DX12Renderer::Init(Window* window)
 	{
@@ -27,6 +28,11 @@ namespace symphony
 
 	void DX12Renderer::Shutdown()
 	{
+		for (auto i : m_VertexBuffers) {
+			i.reset();
+		}
+		m_VertexBuffers.clear();
+
 		m_RendererData.RendererGraphicsPipeline.reset();
 		m_RendererData.RendererShader.reset();
 		m_RendererData.RendererSwapChain->ReleaseBackBuffers();
@@ -55,8 +61,34 @@ namespace symphony
 		m_RendererData.RendererCommand->BeginFrame(m_RendererData.BufferIndex);
 
 		// DRAW
+		D3D12_VIEWPORT view{};
+		view.Width = 1280;
+		view.Height = 720;
+		view.MaxDepth = 1.0f;
+		view.MinDepth = 0.0f;
+
+		D3D12_RECT scissor{0};
+		scissor.right = view.Width;
+		scissor.bottom = view.Height;
+
+		m_RendererData.RendererCommand->GetCommandList()->RSSetViewports(1, &view);
+		m_RendererData.RendererCommand->GetCommandList()->RSSetScissorRects(1, &scissor);
 		m_RendererData.RendererCommand->Clear(m_RendererData.BufferIndex);
 		m_RendererData.RendererGraphicsPipeline->Bind();
+		m_RendererData.RendererShader->Bind();
+
+		uint32_t finalVertexSize = 0;
+		for (auto i : m_VertexBuffers) {
+			finalVertexSize += i->GetVerticesSize();
+		}
+
+		for (auto i : m_VertexBuffers) {
+			auto size = i->GetVerticesSize();
+			i->Bind();
+			m_RendererData.RendererCommand->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_RendererData.RendererCommand->GetCommandList()->DrawInstanced(finalVertexSize, 1, 0, 0);
+			i->Unbind();
+		}
 		// END
 
 		m_RendererData.RendererSwapChain->Present();
@@ -65,7 +97,7 @@ namespace symphony
 
 	void DX12Renderer::AddVertexBuffer(const std::vector<Vertex>& vertices)
 	{
-
+		m_VertexBuffers.push_back(std::make_shared<DX12VertexBuffer>(vertices));
 	}
 
 	void DX12Renderer::AddIndexBuffer(const std::vector<uint32_t>& indices)
