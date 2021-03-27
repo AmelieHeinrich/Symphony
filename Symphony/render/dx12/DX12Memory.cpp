@@ -3,14 +3,14 @@
 
 namespace symphony
 {
-	DX12Memory::DX12Memory()
+	DX12Memory::DX12Memory(D3D12_DESCRIPTOR_HEAP_TYPE memoryType, D3D12_DESCRIPTOR_HEAP_FLAGS flags, int numDescriptors)
 	{
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
-		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-		rtvHeapDesc.NumDescriptors = 2;
-		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		rtvHeapDesc.Type = memoryType;
+		rtvHeapDesc.NumDescriptors = numDescriptors;
+		rtvHeapDesc.Flags = flags;
 		rtvHeapDesc.NodeMask = NULL;
 
 		DX12Device::ThrowIfFailed(device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&descriptorHeap)));
@@ -24,5 +24,10 @@ namespace symphony
 	D3D12_CPU_DESCRIPTOR_HANDLE DX12Memory::GetHeapHandle()
 	{
 		return descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	}
+
+	D3D12_GPU_DESCRIPTOR_HANDLE DX12Memory::GetGPUHandle()
+	{
+		return descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	}
 }

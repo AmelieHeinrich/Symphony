@@ -7,7 +7,7 @@ namespace symphony
 	class DX12Memory
 	{
 	public:
-		DX12Memory();
+		DX12Memory(D3D12_DESCRIPTOR_HEAP_TYPE memoryType, D3D12_DESCRIPTOR_HEAP_FLAGS flags, int numDescriptors);
 		~DX12Memory();
 
 		ID3D12DescriptorHeap* GetDescriptorHeap() {
@@ -15,6 +15,7 @@ namespace symphony
 		}
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetHeapHandle();
+		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle();
 	private:
 		ID3D12DescriptorHeap* descriptorHeap = nullptr;
 	};

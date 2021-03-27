@@ -1,4 +1,7 @@
 #include "DX12Renderer.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <SDL.h>
 
 namespace symphony
 {
@@ -11,7 +14,7 @@ namespace symphony
 		m_RendererData.RendererDevice = std::make_shared<DX12Device>(true);
 		m_RendererData.RendererFence = std::make_shared<DX12Fence>();
 		m_RendererData.RendererCommand = std::make_shared<DX12Command>();
-		m_RendererData.RendererMemory = std::make_shared<DX12Memory>();
+		m_RendererData.RendererMemory = std::make_shared<DX12Memory>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 2);
 		m_RendererData.RendererSwapChain = std::make_shared<DX12SwapChain>(window);
 		m_RendererData.RendererShader = std::make_shared<DX12Shader>("shaderlib/hlsl/dx12/Vertex.hlsl", "shaderlib/hlsl/dx12/Fragment.hlsl");
 
@@ -20,6 +23,11 @@ namespace symphony
 		pci.MultisampleCount = 0;
 		pci.PipelineShader = m_RendererData.RendererShader;
 		m_RendererData.RendererGraphicsPipeline = std::make_shared<DX12Pipeline>(pci);
+
+		m_RendererData.RendererUniformBuffers.resize(2);
+		for (int i = 0; i < 2; i++) {
+			m_RendererData.RendererUniformBuffers[i] = std::make_shared<DX12UniformBuffer>();
+		}
 	}
 
 	void DX12Renderer::Prepare()
@@ -29,6 +37,11 @@ namespace symphony
 
 	void DX12Renderer::Shutdown()
 	{
+		for (auto i : m_RendererData.RendererUniformBuffers) {
+			i.reset();
+		}
+		m_RendererData.RendererUniformBuffers.clear();
+
 		for (auto i : m_IndexBuffers) {
 			i.reset();
 		}
@@ -82,6 +95,16 @@ namespace symphony
 		m_RendererData.RendererCommand->Clear(m_RendererData.BufferIndex);
 		m_RendererData.RendererGraphicsPipeline->Bind();
 		m_RendererData.RendererShader->Bind();
+
+		RendererUniforms ubo{};
+		ubo.SceneModel = glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000, glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.SceneView = glm::mat4(1.0f);
+		ubo.SceneProjection = glm::mat4(1.0f);
+
+		for (int i = 0; i < 2; i++) {
+			m_RendererData.RendererUniformBuffers[i]->Bind();
+			m_RendererData.RendererUniformBuffers[i]->Update(ubo);
+		}
 
 		uint32_t finalVertexSize = 0;
 		uint32_t finalIndexSize = 0;

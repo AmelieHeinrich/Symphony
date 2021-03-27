@@ -11,6 +11,7 @@
 #include "DX12Pipeline.h"
 #include "DX12VertexBuffer.h"
 #include "DX12IndexBuffer.h"
+#include "DX12UniformBuffer.h"
 #include "window/Window.h"
 
 namespace symphony
@@ -36,6 +37,7 @@ namespace symphony
 		std::shared_ptr<DX12SwapChain> RendererSwapChain;
 		std::shared_ptr<DX12Shader> RendererShader;
 		std::shared_ptr<DX12Pipeline> RendererGraphicsPipeline;
+		std::vector<std::shared_ptr<DX12UniformBuffer>> RendererUniformBuffers;
 
 		uint32_t BufferIndex = 0;
 	};

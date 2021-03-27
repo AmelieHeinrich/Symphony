@@ -37,12 +37,36 @@ namespace symphony
 	{
 		{
 			auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
+
+			D3D12_DESCRIPTOR_RANGE  descriptorTableRanges[1]; // only one range right now
+			descriptorTableRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV; // this is a range of constant buffer views (descriptors)
+			descriptorTableRanges[0].NumDescriptors = 1; // we only have one constant buffer, so the range is only 1
+			descriptorTableRanges[0].BaseShaderRegister = 0; // start index of the shader registers in the range
+			descriptorTableRanges[0].RegisterSpace = 0; // space 0. can usually be zero
+			descriptorTableRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the root signature descriptor tables
+
+			D3D12_ROOT_DESCRIPTOR_TABLE descriptorTable;
+			descriptorTable.NumDescriptorRanges = _countof(descriptorTableRanges); 
+			descriptorTable.pDescriptorRanges = &descriptorTableRanges[0];
+
+			// create a root parameter and fill it out
+			D3D12_ROOT_PARAMETER  rootParameters[1]; // only one parameter right now
+			rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; // this is a descriptor table
+			rootParameters[0].DescriptorTable = descriptorTable; // this is our descriptor table for this root parameter
+			rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+			auto flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // we can deny shader stages here for better performance
+				D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+				D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+				D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+				D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+
 			D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-			rootSignatureDesc.NumParameters = 0;
-			rootSignatureDesc.pParameters = nullptr;
+			rootSignatureDesc.NumParameters = _countof(rootParameters);
+			rootSignatureDesc.pParameters = rootParameters;
 			rootSignatureDesc.NumStaticSamplers = 0;
 			rootSignatureDesc.pStaticSamplers = nullptr;
-			rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+			rootSignatureDesc.Flags = flags;
 
 			ID3DBlob* signature;
 			ID3DBlob* error;
