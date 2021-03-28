@@ -44,6 +44,9 @@ namespace symphony
 		ID3D12Resource* RendererDepthResource;
 
 		uint32_t BufferIndex = 0;
+
+		uint32_t FBWidth;
+		uint32_t FBHeight;
 	};
 
 	class DX12Renderer

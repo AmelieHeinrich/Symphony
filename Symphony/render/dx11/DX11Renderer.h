@@ -30,6 +30,9 @@ namespace symphony
 		float CCG = 0.0f;
 		float CCB = 0.0f;
 		float CCA = 1.0f;
+
+		uint32_t FBWidth;
+		uint32_t FBHeight;
 	};
 
 	class DX11Renderer : public Renderer

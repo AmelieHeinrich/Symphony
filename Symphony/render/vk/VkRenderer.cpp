@@ -21,6 +21,9 @@ namespace symphony
 		int width, height;
 		SDL_GetWindowSize(window->GetWindowHandle(), &width, &height);
 
+		s_Data.FBWidth = width;
+		s_Data.FBHeight = height;
+
 		s_Data.m_Instance = std::make_shared<Instance>(window->GetWindowHandle());
 		s_Data.m_Surface = std::make_shared<Surface>(s_Data.m_Instance->instance(), window->GetWindowHandle());
 		s_Data.m_PhysicalDevice = std::make_shared<PhysicalDevice>(s_Data.m_Instance->instance(), s_Data.m_Surface->surface());
@@ -32,8 +35,8 @@ namespace symphony
 		std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>("shaderlib/vksl/Vertex.spv", "shaderlib/vksl/Fragment.spv");
 
 		GraphicsPipelineCreateInfo info;
-		info.Width = 1280;
-		info.Height = 720;
+		info.Width = s_Data.FBWidth;
+		info.Height = s_Data.FBHeight;
 		info.PipelineDescriptorSetLayout = s_Data.descriptorSetLayout;
 		info.PipelineShader = shader;
 		info.PipelineRenderPass = s_Data.m_RenderPass;
@@ -47,7 +50,7 @@ namespace symphony
 		s_Data.m_CommandPool = std::make_shared<CommandPool>(s_Data.m_Device->device(), queueFamilyIndices.graphicsFamily.value());
 
 		VkFormat depthFormat = VulkanTexture2D::FindDepthFormat();
-		VulkanTexture2D::CreateImage(1280, 720, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, s_Data.DepthImage, s_Data.DepthImageMemory);
+		VulkanTexture2D::CreateImage(s_Data.FBWidth, s_Data.FBHeight, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, s_Data.DepthImage, s_Data.DepthImageMemory);
 		s_Data.DepthImageView = VulkanTexture2D::CreateImageView(s_Data.DepthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 		VulkanTexture2D::TransitionImageLayout(s_Data.DepthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 		s_Data.m_SwapChain->InitFramebuffers(s_Data.m_RenderPass->render_pass());
@@ -134,7 +137,7 @@ namespace symphony
 			
 		
 		RendererUniforms ubo{};
-		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.01f, 1000.0f);
+		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), s_Data.FBWidth / (float)s_Data.FBHeight, 0.01f, 1000.0f);
 		ubo.SceneView = glm::mat4(1.0f);
 		ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -50.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 

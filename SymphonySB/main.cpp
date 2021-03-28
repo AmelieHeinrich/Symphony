@@ -104,7 +104,7 @@ static void DirectX12Example()
 
 int main()
 {
-	DirectX12Example();
+	VulkanExample();
 
 	return 0;
 }

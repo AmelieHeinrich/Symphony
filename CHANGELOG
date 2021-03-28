@@ -10,3 +10,18 @@ Commit n1 (3/15/2021):
 - DirectX 11 Rendering (in process)
 - SPIRV, HLSL and GLSL shaders
 - Window abstraction using SDL
+
+Commit n30 (3/28/2021):
+- DLL Compiling on Windows
+- DLL Loading using Plugins
+- Random number generator
+- Assertions
+- Platform Detection
+- Exceptions
+- Image, file and OBJ loading
+- Vulkan 1.0 Rendering
+- OpenGL 4.5 Rendering
+- DirectX 11 Rendering
+- DirectX 12 Rendering
+- SPIRV, HLSL and GLSL shaders
+- Window abstraction using SDL

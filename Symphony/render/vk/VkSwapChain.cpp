@@ -90,13 +90,16 @@ namespace symphony
                 VulkanRenderer::GetData().DepthImageView
             };
 
+            uint32_t width = VulkanRenderer::GetData().FBWidth;
+            uint32_t height = VulkanRenderer::GetData().FBHeight;
+
             VkFramebufferCreateInfo framebufferInfo{};
             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebufferInfo.renderPass = renderPass;
             framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
             framebufferInfo.pAttachments = attachments.data();
-            framebufferInfo.width = 1280;
-            framebufferInfo.height = 720;
+            framebufferInfo.width = width;
+            framebufferInfo.height = height;
             framebufferInfo.layers = 1;
 
             if (vkCreateFramebuffer(m_DeviceCopy, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]) != VK_SUCCESS) {

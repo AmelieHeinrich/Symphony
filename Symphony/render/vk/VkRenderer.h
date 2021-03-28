@@ -59,6 +59,9 @@ namespace symphony
 		std::vector<VkFence> inFlightFences;
 		std::vector<VkFence> imagesInFlight;
 
+		uint32_t FBWidth;
+		uint32_t FBHeight;
+
 		size_t currentFrame;
 		float ClearColorR;
 		float ClearColorG;

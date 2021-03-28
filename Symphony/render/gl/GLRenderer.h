@@ -35,6 +35,8 @@ namespace symphony
 		static std::vector<std::shared_ptr<GLTexture2D>> m_Textures;
 		static std::shared_ptr<GLShader> m_RendererShader;
 		static std::shared_ptr<GLUniformBuffer> m_UniformBuffer;
+		static uint32_t FBWidth;
+		static uint32_t FBHeight;
 		static uint32_t m_RendererVAO;
 	};
 }

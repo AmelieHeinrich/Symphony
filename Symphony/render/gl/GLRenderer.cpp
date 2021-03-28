@@ -13,6 +13,9 @@ namespace symphony
 	std::shared_ptr<GLUniformBuffer> GLRenderer::m_UniformBuffer;
 	uint32_t GLRenderer::m_RendererVAO = 0;
 
+	uint32_t GLRenderer::FBWidth = 0;
+	uint32_t GLRenderer::FBHeight = 0;
+
 	static void GLDebug(unsigned source,
 		unsigned type,
 		unsigned id,
@@ -36,6 +39,12 @@ namespace symphony
 		m_UniformBuffer = std::make_shared<GLUniformBuffer>(reinterpret_cast<uint32_t>(m_RendererShader->GetLinkedProgram()));
 		glCreateVertexArrays(1, &m_RendererVAO);
 		glBindVertexArray(m_RendererVAO);
+
+		int w;
+		int h;
+		SDL_GetWindowSize(window->GetWindowHandle(), &w, &h);
+		FBWidth = w;
+		FBHeight = h;
 	}
 
 	void GLRenderer::Prepare()
@@ -115,7 +124,7 @@ namespace symphony
 
 
 		RendererUniforms ubo{};
-		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.01f, 1000.0f);
+		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), FBWidth / (float)FBHeight, 0.01f, 1000.0f);
 		ubo.SceneView = glm::mat4(1.0f);
 		ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -50.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, -1.0f, 0.0f));
 

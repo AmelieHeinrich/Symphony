@@ -17,6 +17,13 @@ namespace symphony
 		m_RendererData.RendererCommand = std::make_shared<DX12Command>();
 		m_RendererData.RendererMemory = std::make_shared<DX12Memory>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 2);
 		m_RendererData.RendererSwapChain = std::make_shared<DX12SwapChain>(window);
+
+		int w;
+		int h;
+		SDL_GetWindowSize(window->GetWindowHandle(), &w, &h);
+
+		m_RendererData.FBWidth = w;
+		m_RendererData.FBHeight = h;
 	}
 
 	void DX12Renderer::Prepare()
@@ -47,8 +54,8 @@ namespace symphony
 		ZeroMemory(&dsResDesc, sizeof(D3D12_RESOURCE_DESC));
 		dsResDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		dsResDesc.Alignment = 0;
-		dsResDesc.Width = 1280;
-		dsResDesc.Height = 720;
+		dsResDesc.Width = m_RendererData.FBWidth;
+		dsResDesc.Height = m_RendererData.FBHeight;
 		dsResDesc.DepthOrArraySize = 1;
 		dsResDesc.MipLevels = 1;
 		dsResDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -136,8 +143,8 @@ namespace symphony
 
 		// DRAW
 		D3D12_VIEWPORT view{};
-		view.Width = 1280;
-		view.Height = 720;
+		view.Width = m_RendererData.FBWidth;
+		view.Height = m_RendererData.FBHeight;
 		view.MaxDepth = 1.0f;
 		view.MinDepth = 0.0f;
 
@@ -152,7 +159,7 @@ namespace symphony
 		m_RendererData.RendererShader->Bind();
 
 		RendererUniforms ubo{};
-		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.01f, 1000.0f);
+		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
 		ubo.SceneView = glm::mat4(1.0f);
 		ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -50.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, -1.0f, 0.0f));
 
