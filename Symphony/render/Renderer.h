@@ -2,12 +2,20 @@
 
 #include "core/DLLExport.h"
 #include <vector>
-#include "VertexBuffer.h"
 #include "core/PlatformDetection.h"
+#include "VertexBuffer.h"
 #include <glm/glm.hpp>
+#include <utility>
 
 namespace symphony
 {
+	typedef std::pair<std::vector<Vertex>, std::vector<uint32_t>> ModelRendererResources;
+	struct ModelData
+	{
+		ModelRendererResources RendererResources;
+		const char* TextureFilepath;
+	};
+
 	class Window;
 
 	// Renderer uniforms (nO WAY)
@@ -39,6 +47,7 @@ namespace symphony
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);
+		static void AddModelData(ModelData data);
 	private:
 		static RenderAPI s_RenderAPI;
 	};

@@ -16,12 +16,9 @@ static void VulkanExample()
 	Renderer::Init(&VKWindow);
 	Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	auto pair = MeshBuilder::CreateModelFromOBJ("resources/low.obj");
+	ModelData gun = MeshBuilder::LoadModelData("resources/low.obj", "resources/gun_texture.png");
 
-	Renderer::AddTexture2D("resources/gun_texture.png");
-	Renderer::AddVertexBuffer(pair.first);
-	Renderer::AddIndexBuffer(pair.second);
-
+	Renderer::AddModelData(gun);
 	Renderer::Prepare();
 
 	while (VKWindow.IsWindowOpen()) {
@@ -39,12 +36,9 @@ static void OpenGLExample()
 	Renderer::Init(&VKWindow);
 	Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	auto pair = MeshBuilder::CreateModelFromOBJ("resources/low.obj");
+	ModelData gun = MeshBuilder::LoadModelData("resources/low.obj", "resources/gun_texture.png");
 
-	Renderer::AddTexture2D("resources/gun_texture.png");
-	Renderer::AddVertexBuffer(pair.first);
-	Renderer::AddIndexBuffer(pair.second);
-
+	Renderer::AddModelData(gun);
 	Renderer::Prepare();
 
 	while (VKWindow.IsWindowOpen()) {
@@ -62,12 +56,9 @@ static void DirectX11Example()
 	Renderer::Init(&VKWindow);
 	Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	auto pair = MeshBuilder::CreateModelFromOBJ("resources/low.obj");
+	ModelData gun = MeshBuilder::LoadModelData("resources/low.obj", "resources/gun_texture.png");
 
-	Renderer::AddVertexBuffer(pair.first);
-	Renderer::AddIndexBuffer(pair.second);
-	Renderer::AddTexture2D("resources/gun_texture.png");
-
+	Renderer::AddModelData(gun);
 	Renderer::Prepare();
 
 	while (VKWindow.IsWindowOpen()) {
@@ -85,12 +76,9 @@ static void DirectX12Example()
 	Renderer::Init(&VKWindow);
 	Renderer::ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-	auto pair = MeshBuilder::CreateModelFromOBJ("resources/low.obj");
-
-	Renderer::AddVertexBuffer(pair.first);
-	Renderer::AddIndexBuffer(pair.second);
-	Renderer::AddTexture2D("resources/gun_texture.png");
+	ModelData gun = MeshBuilder::LoadModelData("resources/low.obj", "resources/gun_texture.png");
 	
+	Renderer::AddModelData(gun);
 	Renderer::Prepare();
 
 	while (VKWindow.IsWindowOpen()) {

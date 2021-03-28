@@ -3,6 +3,8 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
+#include "Renderer.h"
+
 namespace std {
     template<> struct hash<symphony::Vertex> {
         size_t operator()(symphony::Vertex const& vertex) const {
@@ -93,5 +95,13 @@ namespace symphony
         }
 
         return vertices;
+    }
+
+    ModelData MeshBuilder::LoadModelData(const char* meshFile, const char* textureFile)
+    {
+        ModelData returnData{};
+        returnData.RendererResources = MeshBuilder::CreateModelFromOBJ(meshFile);
+        returnData.TextureFilepath = textureFile;
+        return returnData;
     }
 }

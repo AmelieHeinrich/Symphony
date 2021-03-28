@@ -32,7 +32,7 @@ namespace symphony
 		s_Data.m_RenderPass = std::make_shared<RenderPass>(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain_image_format());
 		s_Data.descriptorSetLayout = std::make_shared<DescriptorSetLayout>();
 
-		std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>("shaderlib/vksl/Vertex.spv", "shaderlib/vksl/Fragment.spv");
+		std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>("shaderlib/vksl/Vertex.vert", "shaderlib/vksl/Fragment.frag");
 
 		GraphicsPipelineCreateInfo info;
 		info.Width = s_Data.FBWidth;

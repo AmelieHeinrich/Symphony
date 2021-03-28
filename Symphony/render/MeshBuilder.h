@@ -15,11 +15,14 @@
 
 namespace symphony
 {
+	struct ModelData;
+
 	SymphonyClass MeshBuilder
 	{
 	public:
 		// Can only load .objs for now
 		static std::pair<std::vector<Vertex>, std::vector<uint32_t>> CreateModelFromOBJ(const char* filepath);
 		static std::vector<Vertex> CreateModelFromOBJVertexOnly(const char* filepath);
+		static ModelData LoadModelData(const char* meshFile, const char* textureFile);
 	};
 }

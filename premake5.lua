@@ -59,9 +59,9 @@ project "Symphony"
 
 	links
 	{
+        "opengl32",
 		"glad",
 		"sdl2",
-        "$(VULKAN_SDK)/lib/vulkan-1.lib",
         "imgui"
 	}
 
@@ -78,8 +78,10 @@ project "Symphony"
 
         links
         {
-            "opengl32",
-			"glad",
+            "$(VULKAN_SDK)/lib/vulkan-1.lib",
+            "$(VULKAN_SDK)/lib/shaderc.lib",
+            "$(VULKAN_SDK)/lib/shaderc_combined.lib",
+            "$(VULKAN_SDK)/lib/glslang.lib",
             "gdi32",
             "kernel32",
             "user32",

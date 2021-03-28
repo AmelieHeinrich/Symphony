@@ -3,24 +3,24 @@
 #include "core/exception/VulkanException.h"
 #include <iostream>
 #include "VkRenderer.h"
+#include <shaderc/shaderc.hpp>
 
-static std::vector<char> readFile(const std::string& filename)
-{
-	std::ifstream file(filename, std::ios::ate | std::ios::binary);
-
-	if (!file.is_open()) {
-		throw std::runtime_error("failed to open file!");
+static std::string readFile(std::string filepath) {
+	std::string result;
+	std::ifstream in(filepath, std::ios::in | std::ios::binary); // ifstream closes itself due to RAII
+	if (in)
+	{
+		in.seekg(0, std::ios::end);
+		size_t size = in.tellg();
+		if (size != -1)
+		{
+			result.resize(size);
+			in.seekg(0, std::ios::beg);
+			in.read(&result[0], size);
+		}
 	}
 
-	size_t fileSize = (size_t)file.tellg();
-	std::vector<char> buffer(fileSize);
-
-	file.seekg(0);
-	file.read(buffer.data(), fileSize);
-
-	file.close();
-
-	return buffer;
+	return result;
 }
 
 namespace symphony
@@ -28,8 +28,8 @@ namespace symphony
 	VulkanShader::VulkanShader(std::string vertexFile, std::string fragmentFile)
 		: m_DeviceCopy(VulkanRenderer::GetData().m_Device->device()), Shader(vertexFile, fragmentFile)
 	{
-		std::vector<char> vertCode;
-		std::vector<char> fragCode;
+		std::string vertCode;
+		std::string fragCode;
 
 		try {
 			vertCode = readFile(vertexFile);
@@ -45,10 +45,31 @@ namespace symphony
 			std::cout << e.what() << std::endl;
 		}
 
+		shaderc::Compiler compiler;
+		shaderc::CompileOptions options;
+
+#ifndef _DEBUG
+		options.SetOptimizationLevel(shaderc_optimization_level_size);
+#endif
+
+		shaderc::SpvCompilationResult vertResult = compiler.CompileGlslToSpv(vertCode.c_str(), shaderc_shader_kind::shaderc_glsl_vertex_shader, "vs", options);
+		if (vertResult.GetCompilationStatus() != shaderc_compilation_status_success) {
+			throw VulkanException("Failed to compile vertex shader!");
+		}
+		std::vector<uint32_t> vertexSPRV;
+		vertexSPRV.assign(vertResult.cbegin(), vertResult.cend());
+
+		shaderc::SpvCompilationResult fragResult = compiler.CompileGlslToSpv(fragCode.c_str(), shaderc_shader_kind::shaderc_glsl_fragment_shader, "fs", options);
+		if (fragResult.GetCompilationStatus() != shaderc_compilation_status_success) {
+			throw VulkanException("Failed to compile fragment shader!");
+		}
+		std::vector<uint32_t> fragmentSPRV;
+		fragmentSPRV.assign(fragResult.cbegin(), fragResult.cend());
+
 		VkShaderModuleCreateInfo vertCreateInfo{};
 		vertCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		vertCreateInfo.codeSize = vertCode.size();
-		vertCreateInfo.pCode = reinterpret_cast<const uint32_t*>(vertCode.data());
+		vertCreateInfo.codeSize = vertexSPRV.size() * sizeof(uint32_t);
+		vertCreateInfo.pCode = reinterpret_cast<const uint32_t*>(vertexSPRV.data());
 
 		if (vkCreateShaderModule(m_DeviceCopy, &vertCreateInfo, nullptr, &m_VertexShader) != VK_SUCCESS) {
 			throw VulkanException("failed to create shader module!");
@@ -56,8 +77,8 @@ namespace symphony
 
 		VkShaderModuleCreateInfo fragCreateInfo{};
 		fragCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		fragCreateInfo.codeSize = fragCode.size();
-		fragCreateInfo.pCode = reinterpret_cast<const uint32_t*>(fragCode.data());
+		fragCreateInfo.codeSize = fragmentSPRV.size() * sizeof(uint32_t);
+		fragCreateInfo.pCode = reinterpret_cast<const uint32_t*>(fragmentSPRV.data());
 
 		if (vkCreateShaderModule(m_DeviceCopy, &fragCreateInfo, nullptr, &m_FragmentShader) != VK_SUCCESS) {
 			throw VulkanException("failed to create shader module!");

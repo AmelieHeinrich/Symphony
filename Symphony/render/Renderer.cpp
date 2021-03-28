@@ -162,4 +162,31 @@ namespace symphony
 			break;
 		}
 	}
+
+	void Renderer::AddModelData(ModelData data)
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::Vulkan:
+			VulkanRenderer::AddVertexBuffer(data.RendererResources.first);
+			VulkanRenderer::AddIndexBuffer(data.RendererResources.second);
+			VulkanRenderer::AddTexture2D(data.TextureFilepath);
+			break;
+		case RenderAPI::OpenGL:
+			GLRenderer::AddVertexBuffer(data.RendererResources.first);
+			GLRenderer::AddIndexBuffer(data.RendererResources.second);
+			GLRenderer::AddTexture2D(data.TextureFilepath);
+			break;
+		case RenderAPI::DirectX11:
+			DX11Renderer::AddVertexBuffer(data.RendererResources.first);
+			DX11Renderer::AddIndexBuffer(data.RendererResources.second);
+			DX11Renderer::AddTexture2D(data.TextureFilepath);
+			break;
+		case RenderAPI::DirectX12:
+			DX12Renderer::AddVertexBuffer(data.RendererResources.first);
+			DX12Renderer::AddIndexBuffer(data.RendererResources.second);
+			DX12Renderer::AddTexture2D(data.TextureFilepath);
+			break;
+		}
+	}
 }
