@@ -84,11 +84,13 @@ namespace symphony
 	{
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
 		auto memory = DX12Renderer::GetRendererData().RendererMemory->GetHeapHandle();
+		auto depthMemory = DX12Renderer::GetRendererData().RendererDepthMemory->GetHeapHandle();
 		memory.ptr += (SIZE_T)uiDescHeapSizeRTV * bufferIndex;
 
 		static FLOAT clearColorValues[4] = { ccr, ccg, ccb, cca };
+		commandList->OMSetRenderTargets(1, &memory, FALSE, &depthMemory);
 		commandList->ClearRenderTargetView(memory, clearColorValues, 0, NULL);
-		commandList->OMSetRenderTargets(1, &memory, TRUE, NULL);
+		commandList->ClearDepthStencilView(depthMemory, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
 	}
 
 	void DX12Command::ClearColor(float r, float g, float b, float a)

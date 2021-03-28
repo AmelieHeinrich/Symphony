@@ -64,9 +64,9 @@ static void DirectX11Example()
 
 	auto pair = MeshBuilder::CreateModelFromOBJ("resources/low.obj");
 
-	Renderer::AddTexture2D("resources/gun_texture.png");
 	Renderer::AddVertexBuffer(pair.first);
 	Renderer::AddIndexBuffer(pair.second);
+	Renderer::AddTexture2D("resources/gun_texture.png");
 
 	Renderer::Prepare();
 
@@ -83,22 +83,13 @@ static void DirectX12Example()
 	Window VKWindow(1280, 720, "Symphony DirectX 12", RenderAPI::DirectX12);
 
 	Renderer::Init(&VKWindow);
-	Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	Renderer::ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-	const std::vector<Vertex> vertices = {
-		{{ 0.5f, 0.5f, 0.0f},  {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-		{{ 0.5f,-0.5f, 0.0f},  {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-		{{-0.5f,-0.5f, 0.0f},  {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-		{{-0.5f, 0.5f, 0.0f},  {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-	};
+	auto pair = MeshBuilder::CreateModelFromOBJ("resources/low.obj");
 
-	const std::vector<uint32_t> indices = {
-		0, 1, 3, 1, 2, 3
-	};
-
-	Renderer::AddVertexBuffer(vertices);
-	Renderer::AddIndexBuffer(indices);
-	Renderer::AddTexture2D("resources/texture.jpg");
+	Renderer::AddVertexBuffer(pair.first);
+	Renderer::AddIndexBuffer(pair.second);
+	Renderer::AddTexture2D("resources/gun_texture.png");
 	
 	Renderer::Prepare();
 

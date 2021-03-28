@@ -25,7 +25,7 @@ namespace symphony
 		rasterizerDesk.FillMode = D3D12_FILL_MODE_SOLID;
 		rasterizerDesk.CullMode = D3D12_CULL_MODE_BACK;
 		rasterizerDesk.DepthClipEnable = FALSE;
-		rasterizerDesk.FrontCounterClockwise = FALSE;
+		rasterizerDesk.FrontCounterClockwise = TRUE;
 		rasterizerDesk.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 		rasterizerDesk.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
 		rasterizerDesk.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
@@ -37,7 +37,7 @@ namespace symphony
 		std::vector<D3D12_INPUT_ELEMENT_DESC> desc;
 		desc.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 		desc.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float) * 3, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
-		desc.push_back({ "TEXCOORDS", 0, DXGI_FORMAT_R32G32_FLOAT, 0, sizeof(float) * 5, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
+		desc.push_back({ "TEXCOORDS", 0, DXGI_FORMAT_R32G32_FLOAT, 0, sizeof(float) * 6, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 
 		ID3DBlob* vertexShader = reinterpret_cast<ID3DBlob*>(pci.PipelineShader->GetVertexShader());
 		ID3DBlob* fragmentShader = reinterpret_cast<ID3DBlob*>(pci.PipelineShader->GetFragmentShader());
@@ -64,6 +64,7 @@ namespace symphony
 		psoDesk.SampleMask = UINT_MAX;
 		psoDesk.NumRenderTargets = 1;
 		psoDesk.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		psoDesk.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 		psoDesk.SampleDesc.Count = 1;
 		psoDesk.SampleDesc.Quality = 0;
 

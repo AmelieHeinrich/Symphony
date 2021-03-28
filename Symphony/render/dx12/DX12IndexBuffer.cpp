@@ -12,7 +12,7 @@ namespace symphony
 		D3D12_INDEX_BUFFER_VIEW controlPointsBufferView;
 		controlPointsBufferView.BufferLocation = m_Handle->GetGPUVirtualAddress();
 		controlPointsBufferView.Format = DXGI_FORMAT_R32_UINT;
-		controlPointsBufferView.SizeInBytes = static_cast<UINT>(sizeof(indices));
+		controlPointsBufferView.SizeInBytes = indices.size() * sizeof(uint32_t);
 
 		m_View = controlPointsBufferView;
 	}

@@ -34,7 +34,7 @@ namespace symphony
 		D3D12_SUBRESOURCE_DATA textureData = {};
 		textureData.pData = image_Data.DataBuffer;
 		textureData.RowPitch = 4 * textureDesc.Width; // size of all our triangle vertex data
-		textureData.SlicePitch = static_cast<LONG_PTR>(4) * textureDesc.Height; // also the size of our triangle vertex data
+		textureData.SlicePitch = 4 * textureDesc.Height; // also the size of our triangle vertex data
 
 		auto commandList = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
 		auto commandQueue = DX12Renderer::GetRendererData().RendererCommand->GetCommandQueue();
