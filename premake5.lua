@@ -54,7 +54,8 @@ project "Symphony"
         "vendor/glm",
         "vendor/imgui",
         "vendor/stb",
-        "vendor/tinyobjloader"
+        "vendor/tinyobjloader",
+        "vendor/entt/single_include"
     }
 
 	links
@@ -122,7 +123,8 @@ project "SymphonySB"
         "Symphony",
         "ext/SDL2/include",
         "$(VULKAN_SDK)/include",
-        "vendor/glm"
+        "vendor/glm",
+        "vendor/entt/single_include/"
     }
 
     links

@@ -3,7 +3,6 @@
 #include <vulkan/vulkan.h>
 #include "VkShader.h"
 #include "VkRenderPass.h"
-#include "VkDescriptorSetLayout.h"
 #include <memory>
 
 namespace symphony
@@ -12,7 +11,7 @@ namespace symphony
 	{
 		std::shared_ptr<VulkanShader> PipelineShader;
 		std::shared_ptr<RenderPass> PipelineRenderPass;
-		std::shared_ptr<DescriptorSetLayout> PipelineDescriptorSetLayout;
+		VkDescriptorSetLayout PipelineDescriptorSetLayout;
 		uint32_t Width;
 		uint32_t Height;
 		VkExtent2D SwapChainExtent;

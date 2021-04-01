@@ -16,9 +16,6 @@ namespace symphony
 		if (vkAllocateCommandBuffers(m_DeviceCopy->device(), &commandBufferAllocateInfo, &commandBuffer) != VK_SUCCESS) {
 			throw VulkanException("Failed to allocate command buffers!");
 		}
-
-		if (begin)
-			Begin();
 	}
 
 	CommandBuffer::~CommandBuffer()
@@ -28,9 +25,6 @@ namespace symphony
 
 	void CommandBuffer::Begin(VkCommandBufferUsageFlags usage)
 	{
-		if (running)
-			return;
-
 		VkCommandBufferBeginInfo beginInfo = {};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		beginInfo.pInheritanceInfo = nullptr;
@@ -39,26 +33,18 @@ namespace symphony
 		if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
 			throw VulkanException("Failed to begin command buffer!");
 		}
-		running = true;
 	}
 
 	void CommandBuffer::End()
 	{
-		if (!running) return;
-
 		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 			throw VulkanException("Failed to end command buffer!");
 		}
-
-		running = false;
 	}
 
 	void CommandBuffer::SubmitIdle()
 	{
 		auto queueSelected = GetQueue();
-
-		if (running)
-			End();
 
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -82,9 +68,6 @@ namespace symphony
 	void CommandBuffer::Submit(const VkSemaphore& waitSemaphore, const VkSemaphore& signalSemaphore, VkFence fence)
 	{
 		auto queueSelected = GetQueue();
-
-		if (running)
-			End();
 
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

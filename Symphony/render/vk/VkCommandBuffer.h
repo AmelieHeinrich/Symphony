@@ -26,7 +26,6 @@ namespace symphony
 		operator const VkCommandBuffer& () const { return commandBuffer; }
 
 		const VkCommandBuffer& GetCommandBuffer() const { return commandBuffer; }
-		bool IsRunning() const { return running; }
 	private:
 		std::shared_ptr<Device> m_DeviceCopy;
 		VkQueue GetQueue() const;
@@ -35,6 +34,5 @@ namespace symphony
 
 		VkQueueFlagBits queueType;
 		VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
-		bool running = false;
 	};
 }

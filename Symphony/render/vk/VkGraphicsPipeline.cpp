@@ -1,6 +1,7 @@
 #include "VkGraphicsPipeline.h"
 #include "core/exception/VulkanException.h"
 #include "VkVertexBuffer.h"
+#include "render/Renderer.h"
 
 namespace symphony
 {
@@ -102,10 +103,17 @@ namespace symphony
 		colorBlending.blendConstants[2] = 0.0f;
 		colorBlending.blendConstants[3] = 0.0f;
 
+		VkPushConstantRange push_constant;
+		push_constant.offset = 0;
+		push_constant.size = sizeof(RendererUniforms);
+		push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipelineLayoutInfo.setLayoutCount = 1;
-		pipelineLayoutInfo.pSetLayouts = &createInfo.PipelineDescriptorSetLayout->GetDescriptorSetLayout();
+		pipelineLayoutInfo.pSetLayouts = &createInfo.PipelineDescriptorSetLayout;
+		pipelineLayoutInfo.pPushConstantRanges = &push_constant;
+		pipelineLayoutInfo.pushConstantRangeCount = 1;
 
 		if (vkCreatePipelineLayout(deviceCopy, &pipelineLayoutInfo, nullptr, &graphicsPipelineLayout) != VK_SUCCESS) {
 			throw VulkanException("failed to create pipeline layout!");

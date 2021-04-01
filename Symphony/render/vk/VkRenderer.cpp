@@ -5,7 +5,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "VkImGui.h"
 
 namespace symphony
 {
@@ -37,7 +36,7 @@ namespace symphony
 		GraphicsPipelineCreateInfo info;
 		info.Width = s_Data.FBWidth;
 		info.Height = s_Data.FBHeight;
-		info.PipelineDescriptorSetLayout = s_Data.descriptorSetLayout;
+		info.PipelineDescriptorSetLayout = s_Data.descriptorSetLayout->GetDescriptorSetLayout();
 		info.PipelineShader = shader;
 		info.PipelineRenderPass = s_Data.m_RenderPass;
 		info.SwapChainExtent = s_Data.m_SwapChain->swap_chain_extent();
@@ -92,23 +91,16 @@ namespace symphony
 		}
 		m_VertexBuffers.clear();
 
-		for (size_t i = 0; i < 2; i++) {
-			vkDestroySemaphore(s_Data.m_Device->device(), s_Data.renderFinishedSemaphores[i], nullptr);
-			vkDestroySemaphore(s_Data.m_Device->device(), s_Data.imageAvailableSemaphores[i], nullptr);
-			vkDestroyFence(s_Data.m_Device->device(), s_Data.inFlightFences[i], nullptr);
-		}
-
 		vkDestroyImageView(s_Data.m_Device->device(), s_Data.DepthImageView, nullptr);
 		vkDestroyImage(s_Data.m_Device->device(), s_Data.DepthImage, nullptr);
 		vkFreeMemory(s_Data.m_Device->device(), s_Data.DepthImageMemory, nullptr);
 
+		s_Data.commandBuffer.reset();
 		s_Data.m_CommandPool.reset();
 
-		for (auto i : s_Data.commandBuffers) {
-			i.reset();
-		}
-
-		s_Data.commandBuffers.clear();
+		vkDestroyFence(s_Data.m_Device->device(), s_Data.renderFence, nullptr);
+		vkDestroySemaphore(s_Data.m_Device->device(), s_Data.renderFinishedSemaphores, nullptr);
+		vkDestroySemaphore(s_Data.m_Device->device(), s_Data.imageAvailableSemaphores, nullptr);
 
 		s_Data.graphicsPipeline.reset();
 		s_Data.descriptorSetLayout.reset();
@@ -130,43 +122,95 @@ namespace symphony
 
 	void VulkanRenderer::Draw()
 	{
-		vkWaitForFences(s_Data.m_Device->device(), 1, &s_Data.inFlightFences[s_Data.currentFrame], VK_TRUE, UINT64_MAX);
+		vkWaitForFences(s_Data.m_Device->device(), 1, &s_Data.renderFence, VK_TRUE, 1000000000);
+		vkResetFences(s_Data.m_Device->device(), 1, &s_Data.renderFence);
+		vkResetCommandBuffer(s_Data.commandBuffer->GetCommandBuffer(), 0);
 
 		uint32_t imageIndex;
-		vkAcquireNextImageKHR(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain(), UINT64_MAX, s_Data.imageAvailableSemaphores[s_Data.currentFrame], VK_NULL_HANDLE, &imageIndex);
-			
-		
-		RendererUniforms ubo{};
-		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), s_Data.FBWidth / (float)s_Data.FBHeight, 0.01f, 1000.0f);
-		ubo.SceneView = glm::mat4(1.0f);
-		ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -50.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		vkAcquireNextImageKHR(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain(), 1000000000, s_Data.imageAvailableSemaphores, VK_NULL_HANDLE, &imageIndex);
 
-		s_Data.uniformBuffers[imageIndex]->Update(ubo);
+		{
+			s_Data.commandBuffer->Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-		if (s_Data.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
-			vkWaitForFences(s_Data.m_Device->device(), 1, &s_Data.imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+			std::array<VkClearValue, 2> clearColor;
+			clearColor[0].color = { s_Data.ClearColorR, s_Data.ClearColorG, s_Data.ClearColorB, s_Data.ClearColorA };
+			clearColor[1].depthStencil.depth = 1.0f;
+			clearColor[1].depthStencil.stencil = 0;
+
+			VkRenderPassBeginInfo renderPassInfo{};
+			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			renderPassInfo.renderPass = s_Data.m_RenderPass->render_pass();
+			renderPassInfo.framebuffer = s_Data.m_SwapChain->swap_chain_framebuffers()[imageIndex];
+			renderPassInfo.renderArea.offset = { 0, 0 };
+			renderPassInfo.renderArea.extent = s_Data.m_SwapChain->swap_chain_extent();
+			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearColor.size());
+			renderPassInfo.pClearValues = clearColor.data();
+
+			RendererUniforms ubo{};
+			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), s_Data.FBWidth / (float)s_Data.FBHeight, 0.01f, 1000.0f);
+			ubo.SceneView = glm::mat4(1.0f);
+			ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -50.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+
+			vkCmdBeginRenderPass(s_Data.commandBuffer->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBindPipeline(s_Data.commandBuffer->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipeline());
+
+			std::vector<VkBuffer> vertexBuffers;
+			std::vector<VkDeviceSize> offsets = { 0 };
+			uint32_t finalVertexCount = 0;
+
+			std::vector<VkBuffer> indexBuffers;
+			uint32_t finalIndexCount = 0;
+
+			for (int i = 0; i < m_VertexBuffers.size(); i++) {
+				vertexBuffers.push_back((VkBuffer)m_VertexBuffers[i]->GetVertexBufferHandle());
+				finalVertexCount += m_VertexBuffers[i]->GetVerticesSize();
+			}
+
+			if (!m_IndexBuffers.empty()) {
+				for (int i = 0; i < m_IndexBuffers.size(); i++) {
+					indexBuffers.push_back((VkBuffer)m_IndexBuffers[i]->GetIndexBufferHandle());
+					finalIndexCount += m_IndexBuffers[i]->GetIndicesSize();
+				}
+			}
+
+			vkCmdBindVertexBuffers(s_Data.commandBuffer->GetCommandBuffer(), 0, 1, vertexBuffers.data(), offsets.data());
+			vkCmdBindDescriptorSets(s_Data.commandBuffer->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipelineLayout(), 0, 1, &s_Data.descriptorSet->GetDescriptorSet()[imageIndex], 0, nullptr);
+			vkCmdPushConstants(s_Data.commandBuffer->GetCommandBuffer(), s_Data.graphicsPipeline->GetPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(RendererUniforms), &ubo);
+
+			if (m_IndexBuffers.empty()) {
+				vkCmdDraw(s_Data.commandBuffer->GetCommandBuffer(), finalVertexCount, 1, 0, 0);
+			}
+			else {
+				for (auto buffer : indexBuffers) {
+					vkCmdBindIndexBuffer(s_Data.commandBuffer->GetCommandBuffer(), buffer, 0, VK_INDEX_TYPE_UINT32);
+				}
+
+				vkCmdDrawIndexed(s_Data.commandBuffer->GetCommandBuffer(), finalIndexCount, 1, 0, 0, 0);
+			}
+
+			vkCmdEndRenderPass(s_Data.commandBuffer->GetCommandBuffer());
+			s_Data.commandBuffer->End();
 		}
-		s_Data.imagesInFlight[imageIndex] = s_Data.inFlightFences[s_Data.currentFrame];
 
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		VkSemaphore waitSemaphores[] = { s_Data.imageAvailableSemaphores[s_Data.currentFrame] };
+		VkSemaphore waitSemaphores[] = { s_Data.imageAvailableSemaphores };
 		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
 		submitInfo.pWaitDstStageMask = waitStages;
 
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &s_Data.commandBuffers[imageIndex]->GetCommandBuffer();
+		submitInfo.pCommandBuffers = &s_Data.commandBuffer->GetCommandBuffer();
 
-		VkSemaphore signalSemaphores[] = { s_Data.renderFinishedSemaphores[s_Data.currentFrame] };
+		VkSemaphore signalSemaphores[] = { s_Data.renderFinishedSemaphores };
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		vkResetFences(s_Data.m_Device->device(), 1, &s_Data.inFlightFences[s_Data.currentFrame]);
+		vkResetFences(s_Data.m_Device->device(), 1, &s_Data.renderFence);
 
-		if (vkQueueSubmit(s_Data.m_Device->graphics_queue()->queue(), 1, &submitInfo, s_Data.inFlightFences[s_Data.currentFrame]) != VK_SUCCESS) {
+		if (vkQueueSubmit(s_Data.m_Device->graphics_queue()->queue(), 1, &submitInfo, s_Data.renderFence) != VK_SUCCESS) {
 			throw std::runtime_error("failed to submit draw command buffer!");
 		}
 
@@ -204,75 +248,7 @@ namespace symphony
 	void VulkanRenderer::Prepare()
 	{
 		s_Data.descriptorSet = std::make_shared<DescriptorSet>();
-		s_Data.commandBuffers.resize(s_Data.m_SwapChain->swap_chain_framebuffers().size());
-
-		for (int i = 0; i < s_Data.commandBuffers.size(); i++) {
-			s_Data.commandBuffers[i] = std::make_unique<CommandBuffer>(s_Data.m_Device, s_Data.m_CommandPool, false);
-		}
-
-		for (size_t i = 0; i < s_Data.commandBuffers.size(); i++) {
-			s_Data.commandBuffers[i]->Begin(0);
-
-			std::array<VkClearValue, 2> clearColor;
-			clearColor[0].color = { s_Data.ClearColorR, s_Data.ClearColorG, s_Data.ClearColorB, s_Data.ClearColorA };
-			clearColor[1].depthStencil.depth = 1.0f;
-			clearColor[1].depthStencil.stencil = 0;
-
-			VkRenderPassBeginInfo renderPassInfo{};
-			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			renderPassInfo.renderPass = s_Data.m_RenderPass->render_pass();
-			renderPassInfo.framebuffer = s_Data.m_SwapChain->swap_chain_framebuffers()[i];
-			renderPassInfo.renderArea.offset = { 0, 0 };
-			renderPassInfo.renderArea.extent = s_Data.m_SwapChain->swap_chain_extent();
-			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearColor.size());
-			renderPassInfo.pClearValues = clearColor.data();
-
-			vkCmdBeginRenderPass(s_Data.commandBuffers[i]->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-			vkCmdBindPipeline(s_Data.commandBuffers[i]->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipeline());
-
-			std::vector<VkBuffer> vertexBuffers;
-			std::vector<VkDeviceSize> offsets = { 0 };
-			uint32_t finalVertexCount = 0;
-	
-			std::vector<VkBuffer> indexBuffers;
-			uint32_t finalIndexCount = 0;
-
-			for (int i = 0; i < m_VertexBuffers.size(); i++) {
-				vertexBuffers.push_back((VkBuffer)m_VertexBuffers[i]->GetVertexBufferHandle());
-				finalVertexCount += m_VertexBuffers[i]->GetVerticesSize();
-			}
-
-			if (!m_IndexBuffers.empty()) {
-				for (int i = 0; i < m_IndexBuffers.size(); i++) {
-					indexBuffers.push_back((VkBuffer)m_IndexBuffers[i]->GetIndexBufferHandle());
-					finalIndexCount += m_IndexBuffers[i]->GetIndicesSize();
-				}
-			}
-
-			vkCmdBindVertexBuffers(s_Data.commandBuffers[i]->GetCommandBuffer(), 0, 1, vertexBuffers.data(), offsets.data());
-			vkCmdBindDescriptorSets(s_Data.commandBuffers[i]->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipelineLayout(), 0, 1, &s_Data.descriptorSet->GetDescriptorSet()[i], 0, nullptr);
-
-			if (m_IndexBuffers.empty()) {
-				vkCmdDraw(s_Data.commandBuffers[i]->GetCommandBuffer(), finalVertexCount, 1, 0, 0);
-			}
-			else {
-				for (auto buffer : indexBuffers) {
-					vkCmdBindIndexBuffer(s_Data.commandBuffers[i]->GetCommandBuffer(), buffer, 0, VK_INDEX_TYPE_UINT32);
-				}
-
-				vkCmdDrawIndexed(s_Data.commandBuffers[i]->GetCommandBuffer(), finalIndexCount, 1, 0, 0, 0);
-			}
-
-			vkCmdEndRenderPass(s_Data.commandBuffers[i]->GetCommandBuffer());
-
-			s_Data.commandBuffers[i]->End();
-		}
-
-		s_Data.imageAvailableSemaphores.resize(s_Data.m_SwapChain->swap_chain_images().size());
-		s_Data.renderFinishedSemaphores.resize(s_Data.m_SwapChain->swap_chain_images().size());
-		s_Data.inFlightFences.resize(s_Data.m_SwapChain->swap_chain_images().size());
-		s_Data.imagesInFlight.resize(s_Data.m_SwapChain->swap_chain_images().size(), VK_NULL_HANDLE);
+		s_Data.commandBuffer = std::make_unique<CommandBuffer>(s_Data.m_Device, s_Data.m_CommandPool, false);
 
 		VkSemaphoreCreateInfo semaphoreInfo{};
 		semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -281,12 +257,10 @@ namespace symphony
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-		for (size_t i = 0; i < 2; i++) {
-			if (vkCreateSemaphore(s_Data.m_Device->device(), &semaphoreInfo, nullptr, &s_Data.imageAvailableSemaphores[i]) != VK_SUCCESS ||
-				vkCreateSemaphore(s_Data.m_Device->device(), &semaphoreInfo, nullptr, &s_Data.renderFinishedSemaphores[i]) != VK_SUCCESS ||
-				vkCreateFence(s_Data.m_Device->device(), &fenceInfo, nullptr, &s_Data.inFlightFences[i]) != VK_SUCCESS) {
-				throw VulkanException("failed to create synchronization objects for a frame!");
-			}
+		if (vkCreateSemaphore(s_Data.m_Device->device(), &semaphoreInfo, nullptr, &s_Data.imageAvailableSemaphores) != VK_SUCCESS ||
+			vkCreateSemaphore(s_Data.m_Device->device(), &semaphoreInfo, nullptr, &s_Data.renderFinishedSemaphores) != VK_SUCCESS ||
+			vkCreateFence(s_Data.m_Device->device(), &fenceInfo, nullptr, &s_Data.renderFence) != VK_SUCCESS) {
+			throw VulkanException("failed to create synchronization objects for a frame!");
 		}
 	}
 

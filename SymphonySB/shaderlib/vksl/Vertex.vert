@@ -2,7 +2,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout(std140, binding = 0) uniform UniformBufferObject {
+layout(push_constant) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;

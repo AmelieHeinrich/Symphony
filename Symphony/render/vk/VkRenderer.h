@@ -41,7 +41,7 @@ namespace symphony
 		std::shared_ptr<SwapChain> m_SwapChain;
 		std::shared_ptr<RenderPass> m_RenderPass;
 		std::shared_ptr<CommandPool> m_CommandPool;
-		std::vector<std::shared_ptr<CommandBuffer>> commandBuffers;
+		std::shared_ptr<CommandBuffer> commandBuffer;
 		std::shared_ptr<GraphicsPipeline> graphicsPipeline;
 
 		std::shared_ptr<DescriptorSetLayout> descriptorSetLayout;
@@ -54,10 +54,9 @@ namespace symphony
 
 		std::vector<std::shared_ptr<VulkanUniformBuffer>> uniformBuffers;
 
-		std::vector<VkSemaphore> imageAvailableSemaphores;
-		std::vector<VkSemaphore> renderFinishedSemaphores;
-		std::vector<VkFence> inFlightFences;
-		std::vector<VkFence> imagesInFlight;
+		VkSemaphore imageAvailableSemaphores;
+		VkSemaphore renderFinishedSemaphores;
+		VkFence renderFence;
 
 		uint32_t FBWidth;
 		uint32_t FBHeight;
