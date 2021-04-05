@@ -9,6 +9,8 @@
 
 namespace symphony
 {
+	class Mesh;
+
 	typedef std::pair<std::vector<Vertex>, std::vector<uint32_t>> ModelRendererResources;
 	struct ModelData
 	{
@@ -48,6 +50,8 @@ namespace symphony
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);
 		static void AddModelData(ModelData data);
+		static void AddMesh(Mesh mesh, const std::string& name);
+		static void SetMeshTransform(const std::string& name, const glm::mat4& matrix);
 	private:
 		static RenderAPI s_RenderAPI;
 	};

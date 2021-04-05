@@ -30,6 +30,7 @@ namespace symphony
 
 	void DX12IndexBuffer::Unbind() const
 	{
-
+		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		clist->IASetIndexBuffer(nullptr);
 	}
 }

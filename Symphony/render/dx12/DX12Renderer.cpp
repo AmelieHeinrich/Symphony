@@ -6,9 +6,7 @@
 namespace symphony
 {
 	DX12RendererData DX12Renderer::m_RendererData;
-	std::vector<std::shared_ptr<DX12VertexBuffer>> DX12Renderer::m_VertexBuffers;
-	std::vector<std::shared_ptr<DX12IndexBuffer>> DX12Renderer::m_IndexBuffers;
-	std::vector<std::shared_ptr<DX12Texture2D>> DX12Renderer::m_Textures;
+	std::unordered_map<std::string, std::shared_ptr<DX12Mesh>> DX12Renderer::m_Meshes;
 
 	void DX12Renderer::Init(Window* window)
 	{
@@ -93,25 +91,9 @@ namespace symphony
 
 	void DX12Renderer::Shutdown()
 	{
-		for (auto i : m_Textures) {
-			i.reset();
-		}
-		m_Textures.clear();
-
-		for (auto i : m_RendererData.RendererUniformBuffers) {
-			i.reset();
-		}
-		m_RendererData.RendererUniformBuffers.clear();
-
-		for (auto i : m_IndexBuffers) {
-			i.reset();
-		}
-		m_IndexBuffers.clear();
-
-		for (auto i : m_VertexBuffers) {
-			i.reset();
-		}
-		m_VertexBuffers.clear();
+		for (auto i : m_Meshes)
+			i.second.reset();
+		m_Meshes.clear();
 
 		m_RendererData.RendererDepthResource->Release();
 		m_RendererData.RendererDepthMemory.reset();
@@ -161,46 +143,20 @@ namespace symphony
 
 		RendererUniforms ubo{};
 		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
+		ubo.SceneProjection[1][1] *= -1;
 		ubo.SceneView = glm::mat4(1.0f);
-		ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -50.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, -1.0f, 0.0f));
 
-		for (int i = 0; i < 2; i++) {
-			m_RendererData.RendererUniformBuffers[i]->Bind();
-			m_RendererData.RendererUniformBuffers[i]->Update(ubo);
-		}
+		int i = 0;
+		for (auto mesh : m_Meshes) {
+			auto model = mesh.second;
 
-		for (auto i : m_Textures) {
-			i->Bind();
-		}
+			model->Draw();
 
-		uint32_t finalVertexSize = 0;
-		uint32_t finalIndexSize = 0;
-		for (auto i : m_VertexBuffers) {
-			finalVertexSize += i->GetVerticesSize();
+			ubo.SceneModel = model->GetModelMatrix();
+			m_RendererData.RendererUniformBuffers[m_RendererData.BufferIndex]->Bind();
+			m_RendererData.RendererUniformBuffers[m_RendererData.BufferIndex]->Update(ubo);
+			i++;
 		}
-		for (auto i : m_IndexBuffers) {
-			finalIndexSize += i->GetIndicesSize();
-		}
-
-		if (m_IndexBuffers.empty()) {
-			for (auto i : m_VertexBuffers) {
-				i->Bind();
-			}
-
-			m_RendererData.RendererCommand->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			m_RendererData.RendererCommand->GetCommandList()->DrawInstanced(finalVertexSize, 1, 0, 0);
-		}
-		else {
-			for (auto i : m_VertexBuffers) {
-				i->Bind();
-			}
-			for (auto i : m_IndexBuffers) {
-				i->Bind();
-			}
-			m_RendererData.RendererCommand->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			m_RendererData.RendererCommand->GetCommandList()->DrawIndexedInstanced(finalIndexSize, 1, 0, 0, 0);
-		}
-		// END
 
 		m_RendererData.RendererSwapChain->Present();
 		m_RendererData.RendererCommand->EndFrame(m_RendererData.BufferIndex);
@@ -208,16 +164,26 @@ namespace symphony
 
 	void DX12Renderer::AddVertexBuffer(const std::vector<Vertex>& vertices)
 	{
-		m_VertexBuffers.push_back(std::make_shared<DX12VertexBuffer>(vertices));
+		
 	}
 
 	void DX12Renderer::AddIndexBuffer(const std::vector<uint32_t>& indices)
 	{
-		m_IndexBuffers.push_back(std::make_shared<DX12IndexBuffer>(indices));
+		
 	}
 
 	void DX12Renderer::AddTexture2D(const char* filepath)
 	{
-		m_Textures.push_back(std::make_shared<DX12Texture2D>(filepath));
+		
+	}
+
+	void DX12Renderer::AddMesh(Mesh mesh, const std::string& name)
+	{
+		m_Meshes[name] = std::make_shared<DX12Mesh>(mesh.GetModelData());
+	}
+
+	void DX12Renderer::SetMeshTransform(const std::string& meshName, const glm::mat4& transform)
+	{
+		m_Meshes[meshName]->ModelMatrix = transform;
 	}
 }

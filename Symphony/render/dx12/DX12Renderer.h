@@ -13,8 +13,10 @@
 #include "DX12IndexBuffer.h"
 #include "DX12UniformBuffer.h"
 #include "DX12Texture2D.h"
+#include "DX12Mesh.h"
 #include "window/Window.h"
 #include <core/Log.h>
+#include <unordered_map>
 
 namespace symphony
 {
@@ -48,6 +50,7 @@ namespace symphony
 
 		uint32_t FBWidth;
 		uint32_t FBHeight;
+		uint32_t ConstantBufferAddress;
 	};
 
 	class DX12Renderer
@@ -63,6 +66,8 @@ namespace symphony
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);
+		static void AddMesh(Mesh mesh, const std::string& name);
+		static void SetMeshTransform(const std::string& meshName, const glm::mat4& transform);
 
 		static DX12RendererData GetRendererData() {
 			return m_RendererData;
@@ -77,8 +82,6 @@ namespace symphony
 		}
 	private:
 		static DX12RendererData m_RendererData;
-		static std::vector<std::shared_ptr<DX12VertexBuffer>> m_VertexBuffers;
-		static std::vector<std::shared_ptr<DX12IndexBuffer>> m_IndexBuffers;
-		static std::vector<std::shared_ptr<DX12Texture2D>> m_Textures;
+		static std::unordered_map<std::string, std::shared_ptr<DX12Mesh>> m_Meshes;
 	};
 }

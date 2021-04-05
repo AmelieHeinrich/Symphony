@@ -1,17 +1,15 @@
 #include "VkDescriptorSet.h"
 #include <vector>
 #include "VkRenderer.h"
-#include "VkTexture2D.h"
 
 namespace symphony
 {
-	DescriptorSet::DescriptorSet()
+	DescriptorSet::DescriptorSet(std::shared_ptr<VulkanTexture2D> t2d)
 	{
         auto nrImages = VulkanRenderer::GetData().m_SwapChain->swap_chain_images().size();
         auto descriptorSetLayout = VulkanRenderer::GetData().descriptorSetLayout->GetDescriptorSetLayout();
         auto descriptorPool = VulkanRenderer::GetData().descriptorPool->GetDescriptorPool();
         auto device = VulkanRenderer::GetData().m_Device->device();
-        auto textures = VulkanRenderer::GetRendererTextures();
 
         std::vector<VkDescriptorSetLayout> layouts(nrImages, descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
@@ -33,8 +31,8 @@ namespace symphony
 
             VkDescriptorImageInfo imageInfo{};
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            imageInfo.imageView = textures[0]->GetImageView();
-            imageInfo.sampler = textures[0]->GetSampler();
+            imageInfo.imageView = t2d->GetImageView();
+            imageInfo.sampler = t2d->GetSampler();
 
             std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
 

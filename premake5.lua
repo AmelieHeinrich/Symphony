@@ -69,7 +69,8 @@ project "Symphony"
 
     defines
     {
-        "_CRT_SECURE_NO_WARNINGS"
+        "_CRT_SECURE_NO_WARNINGS",
+        "SHADERC_ENABLE_SHARED_CRT"
     }
 
     filter "system:windows"
@@ -81,7 +82,6 @@ project "Symphony"
         links
         {
             "$(VULKAN_SDK)/lib/vulkan-1.lib",
-            "$(VULKAN_SDK)/lib/shaderc.lib",
             "$(VULKAN_SDK)/lib/shaderc_combined.lib",
             "$(VULKAN_SDK)/lib/glslang.lib",
             "gdi32",
@@ -142,11 +142,11 @@ project "SymphonySB"
     }
 
     filter "configurations:Debug"
-		buildoptions "/MTd"
+		buildoptions "/MDd"
         defines { "SYMPHONY_DEBUG" }
         symbols "On"
 
     filter "configurations:Release"
-        buildoptions "/MT"
+        buildoptions "/MD"
         defines { "SYMPHONY_RELEASE" }
         optimize "On"

@@ -9,6 +9,8 @@
 #include "GLTexture2D.h"
 #include <SDL.h>
 #include "core/DLLExport.h"
+#include "GLMesh.h"
+#include <unordered_map>
 
 namespace symphony
 {
@@ -25,18 +27,13 @@ namespace symphony
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);
-
-		static const std::vector<std::shared_ptr<GLTexture2D>>& GetTextures() {
-			return m_Textures;
-		}
+		static void AddMesh(Mesh mesh, const std::string& name);
+		static void SetMeshTransform(const std::string& meshName, const glm::mat4& transform);
 	private:
-		static std::vector<std::shared_ptr<GLVertexBuffer>> m_VertexBuffers;
-		static std::vector<std::shared_ptr<GLIndexBuffer>> m_IndexBuffers;
-		static std::vector<std::shared_ptr<GLTexture2D>> m_Textures;
+		static std::unordered_map<std::string, std::shared_ptr<GLMesh>> m_Meshes;
 		static std::shared_ptr<GLShader> m_RendererShader;
 		static std::shared_ptr<GLUniformBuffer> m_UniformBuffer;
 		static uint32_t FBWidth;
 		static uint32_t FBHeight;
-		static uint32_t m_RendererVAO;
 	};
 }

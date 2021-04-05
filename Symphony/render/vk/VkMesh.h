@@ -7,21 +7,23 @@
 #include <memory>
 #include "VkVertexBuffer.h"
 #include "VkIndexBuffer.h"
+#include "VkDescriptorSet.h"
+#include <render/Renderer.h>
+#include <render/Mesh.h>
 
 namespace symphony
 {
-	struct Material
+	class VulkanMesh : public Mesh
 	{
-		VkDescriptorSet MaterialDSET;
-		VkPipeline MaterialPipeline;
-		VkPipelineLayout MaterialPipelineLayout;
-	};
+	public:
+		VulkanMesh(ModelData data);
+		~VulkanMesh();
 
-	struct Mesh
-	{
-		glm::mat4 TransformMatrix;
-
+		void Draw(VkCommandBuffer buffer, uint32_t imageIndex);
+	private:
+		std::shared_ptr<DescriptorSet> MeshDSET;
 		std::shared_ptr<VulkanVertexBuffer> MeshVBO;
 		std::shared_ptr<VulkanIndexBuffer> MeshEBO;
+		std::shared_ptr<VulkanTexture2D> MeshT2D;
 	};
 }

@@ -15,11 +15,10 @@
 #include <thread>
 #include <mutex>
 #include <future>
+#include "Renderer.h"
 
 namespace symphony
 {
-	struct ModelData;
-
 	SymphonyClass MeshBuilder
 	{
 	public:

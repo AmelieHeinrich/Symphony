@@ -13,3 +13,4 @@
 // Renderer
 #include <render/Renderer.h>
 #include <render/MeshBuilder.h>
+#include <render/Mesh.h>

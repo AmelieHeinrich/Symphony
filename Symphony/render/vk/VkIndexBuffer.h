@@ -15,6 +15,10 @@ namespace symphony
 		virtual void* GetIndexBufferHandle() override {
 			return (void*)indexBuffer;
 		}
+
+		VkBuffer GetVulkanBuffer() {
+			return indexBuffer;
+		}
 	private:
 		VkBuffer indexBuffer;
 		VkDeviceMemory indexBufferMemory;

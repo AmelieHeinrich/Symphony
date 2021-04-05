@@ -2,13 +2,15 @@
 
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <memory>
+#include "VkTexture2D.h"
 
 namespace symphony
 {
 	class DescriptorSet
 	{
 	public:
-		DescriptorSet();
+		DescriptorSet(std::shared_ptr<VulkanTexture2D> t2d);
 		~DescriptorSet();
 
 		const std::vector<VkDescriptorSet>& GetDescriptorSet() const {

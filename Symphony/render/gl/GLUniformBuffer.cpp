@@ -31,24 +31,11 @@ namespace symphony
 
 	void GLUniformBuffer::SetUniformSampler(uint32_t program)
 	{
-		std::vector<int> gltextures;
-		auto textures = GLRenderer::GetTextures();
 		
-		for (int i = 0; i < 10; i++) {
-			if (i < textures.size()) {
-				gltextures.push_back(reinterpret_cast<uint32_t>(textures[i]->GetTextureBuffer()));
-			}
-			else {
-				gltextures.push_back(-1);
-			}
-		}
-
-		/*int loc = glGetUniformLocation(program, "RendererTextures");
-		glUniform1iv(loc, 10, gltextures.data());*/
 	}
 
 	void GLUniformBuffer::SetCurrentTexture(uint32_t program, uint32_t slot)
 	{
-		glUniform1i(glGetUniformLocation(program, "TextureSlot"), slot);
+		glUniform1i(glGetUniformLocation(program, "currentTexture"), slot);
 	}
 }

@@ -7,12 +7,9 @@
 
 namespace symphony
 {
-	std::vector<std::shared_ptr<GLVertexBuffer>> GLRenderer::m_VertexBuffers;
-	std::vector<std::shared_ptr<GLIndexBuffer>> GLRenderer::m_IndexBuffers;
-	std::vector<std::shared_ptr<GLTexture2D>> GLRenderer::m_Textures;
 	std::shared_ptr<GLShader> GLRenderer::m_RendererShader;
 	std::shared_ptr<GLUniformBuffer> GLRenderer::m_UniformBuffer;
-	uint32_t GLRenderer::m_RendererVAO = 0;
+	std::unordered_map<std::string, std::shared_ptr<GLMesh>> GLRenderer::m_Meshes;
 
 	uint32_t GLRenderer::FBWidth = 0;
 	uint32_t GLRenderer::FBHeight = 0;
@@ -44,8 +41,6 @@ namespace symphony
 
 		m_RendererShader = std::make_shared<GLShader>("shaderlib/glsl/Vertex.glsl", "shaderlib/glsl/Fragment.glsl");
 		m_UniformBuffer = std::make_shared<GLUniformBuffer>(reinterpret_cast<uint32_t>(m_RendererShader->GetLinkedProgram()));
-		glCreateVertexArrays(1, &m_RendererVAO);
-		glBindVertexArray(m_RendererVAO);
 
 		int w;
 		int h;
@@ -57,21 +52,6 @@ namespace symphony
 	void GLRenderer::Prepare()
 	{
 		m_RendererShader->Bind();
-		for (auto i : m_VertexBuffers) {
-			i->Bind();
-			// position attribute
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(0);
-			// color attribute
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)offsetof(Vertex, Color));
-			glEnableVertexAttribArray(1);
-			//texcoords
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)offsetof(Vertex, TexCoords));
-			glEnableVertexAttribArray(2);
-			i->Unbind();
-		}
-
-		m_UniformBuffer->SetUniformSampler(reinterpret_cast<uint32_t>(m_RendererShader->GetLinkedProgram()));
 		m_RendererShader->Unbind();
 
 		glEnable(GL_DEPTH_TEST);
@@ -79,13 +59,12 @@ namespace symphony
 
 	void GLRenderer::Shutdown()
 	{
+		for (auto i : m_Meshes)
+			i.second.reset();
+		m_Meshes.clear();
+
 		m_UniformBuffer.reset();
 		m_RendererShader.reset();
-		m_VertexBuffers.clear();
-		m_IndexBuffers.clear();
-		m_Textures.clear();
-
-		glDeleteVertexArrays(1, &m_RendererVAO);
 	}
 
 	void GLRenderer::ClearColor(float r, float g, float b, float a)
@@ -97,48 +76,20 @@ namespace symphony
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glBindVertexArray(m_RendererVAO);
 		m_RendererShader->Bind();
 
-		for (int i = 0; i < m_Textures.size(); i++)
-		{
-			m_Textures[i]->Bind(i);
-			m_UniformBuffer->SetCurrentTexture(reinterpret_cast<uint32_t>(m_RendererShader->GetLinkedProgram()), i);
-		}
+		for (auto mesh : m_Meshes) {
+			auto model = mesh.second;
 
-		if (m_IndexBuffers.empty()) 
-		{
-			for (auto i : m_VertexBuffers) {
-				i->Bind();
-				glDrawArrays(GL_TRIANGLES, 0, i->GetVerticesSize());
-				i->Unbind();
-			}
-		}
-		else
-		{
-			for (auto i : m_VertexBuffers) {
-				for (auto j : m_IndexBuffers) {
-					i->Bind();
-					j->Bind();
+			RendererUniforms ubo{};
+			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), FBWidth / (float)FBHeight, 0.01f, 1000.0f);
+			ubo.SceneView = glm::mat4(1.0f);
+			ubo.SceneModel = model->ModelMatrix;
 
-					glDrawElements(GL_TRIANGLES, i->GetVerticesSize() * sizeof(uint32_t), GL_UNSIGNED_INT, (void*)0);
+			glUniform1i(glGetUniformLocation(reinterpret_cast<uint32_t>(m_RendererShader->GetLinkedProgram()), "currentTexture"), 0);
+			m_UniformBuffer->Update(ubo);
 
-					j->Unbind();
-					i->Unbind();
-				}
-			}
-		}
-
-
-		RendererUniforms ubo{};
-		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), FBWidth / (float)FBHeight, 0.01f, 1000.0f);
-		ubo.SceneView = glm::mat4(1.0f);
-		ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -50.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, -1.0f, 0.0f));
-
-		m_UniformBuffer->Update(ubo);
-
-		for (auto i : m_Textures) {
-			i->Unbind();
+			model->Draw();
 		}
 
 		m_RendererShader->Unbind();
@@ -146,16 +97,26 @@ namespace symphony
 
 	void GLRenderer::AddVertexBuffer(const std::vector<Vertex>& vertices)
 	{
-		m_VertexBuffers.push_back(std::make_shared<GLVertexBuffer>(vertices));
+		
 	}
 
 	void GLRenderer::AddIndexBuffer(const std::vector<uint32_t>& indices)
 	{
-		m_IndexBuffers.push_back(std::make_shared<GLIndexBuffer>(indices));
+		
 	}
 
 	void GLRenderer::AddTexture2D(const char* filepath)
 	{
-		m_Textures.push_back(std::make_shared<GLTexture2D>(filepath));
+		
+	}
+
+	void GLRenderer::AddMesh(Mesh mesh, const std::string& name)
+	{
+		m_Meshes[name] = std::make_shared<GLMesh>(mesh.GetModelData());
+	}
+
+	void GLRenderer::SetMeshTransform(const std::string& meshName, const glm::mat4& transform)
+	{
+		m_Meshes[meshName]->ModelMatrix = transform;
 	}
 }

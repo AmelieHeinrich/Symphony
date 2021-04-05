@@ -13,7 +13,7 @@ namespace symphony
 		DX12UniformBuffer();
 		~DX12UniformBuffer();
 
-		void Bind();
+		void Bind(uint32_t offset = 0);
 		void Unbind();
 		void Update(RendererUniforms uniforms);
 

@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.h>
 #include <core/Log.h>
+#include <unordered_map>
 
 #include "VkCommandBuffer.h"
 #include "VkGraphicsPipeline.h"
@@ -22,10 +23,12 @@
 #include "VkDescriptorSet.h"
 #include "VkUniformBuffer.h"
 #include "VkTexture2D.h"
+#include "VkMesh.h"
 #include <memory>
 #include <vulkan/vulkan.h>
 #include <vector>
 #include "render/Renderer.h"
+#include "render/Mesh.h"
 
 #include "core/DLLExport.h"
 
@@ -47,7 +50,6 @@ namespace symphony
 
 		std::shared_ptr<DescriptorSetLayout> descriptorSetLayout;
 		std::shared_ptr<DescriptorPool> descriptorPool;
-		std::shared_ptr<DescriptorSet> descriptorSet;
 
 		VkImage DepthImage;
 		VkDeviceMemory DepthImageMemory;
@@ -84,17 +86,14 @@ namespace symphony
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);
-		static const std::vector<std::shared_ptr<VulkanTexture2D>>& GetRendererTextures() {
-			return m_Textures;
-		}
+		static void AddMesh(Mesh mesh, const std::string& name);
+		static void SetMeshTransform(const std::string& meshName, const glm::mat4& transform);
 
 		static const RendererData& GetData() {
 			return s_Data;
 		}
 	private:
-		static std::vector<std::shared_ptr<VulkanVertexBuffer>> m_VertexBuffers;
-		static std::vector<std::shared_ptr<VulkanIndexBuffer>> m_IndexBuffers;
-		static std::vector<std::shared_ptr<VulkanTexture2D>> m_Textures;
+		static std::unordered_map<std::string, std::shared_ptr<VulkanMesh>> m_Meshes;
 		static RendererData s_Data;
 		static Window* targetWindow;
 	};

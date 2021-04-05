@@ -4,6 +4,7 @@
 #include "dx11/DX11Renderer.h"
 #include "dx12/DX12Renderer.h"
 #include "window/Window.h"
+#include "Mesh.h"
 
 namespace symphony
 {
@@ -186,6 +187,44 @@ namespace symphony
 			DX12Renderer::AddVertexBuffer(data.RendererResources.first);
 			DX12Renderer::AddIndexBuffer(data.RendererResources.second);
 			DX12Renderer::AddTexture2D(data.TextureFilepath);
+			break;
+		}
+	}
+
+	void Renderer::AddMesh(Mesh mesh, const std::string& name)
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::Vulkan:
+			VulkanRenderer::AddMesh(mesh, name);
+			break;
+		case RenderAPI::OpenGL:
+			GLRenderer::AddMesh(mesh, name);
+			break;
+		case RenderAPI::DirectX11:
+			DX11Renderer::AddMesh(mesh, name);
+			break;
+		case RenderAPI::DirectX12:
+			DX12Renderer::AddMesh(mesh, name);
+			break;
+		}
+	}
+
+	void Renderer::SetMeshTransform(const std::string& name, const glm::mat4& matrix)
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::Vulkan:
+			VulkanRenderer::SetMeshTransform(name, matrix);
+			break;
+		case RenderAPI::OpenGL:
+			GLRenderer::SetMeshTransform(name, matrix);
+			break;
+		case RenderAPI::DirectX11:
+			DX11Renderer::SetMeshTransform(name, matrix);
+			break;
+		case RenderAPI::DirectX12:
+			DX12Renderer::SetMeshTransform(name, matrix);
 			break;
 		}
 	}

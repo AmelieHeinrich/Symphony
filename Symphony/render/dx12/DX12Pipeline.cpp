@@ -25,7 +25,7 @@ namespace symphony
 		rasterizerDesk.FillMode = D3D12_FILL_MODE_SOLID;
 		rasterizerDesk.CullMode = D3D12_CULL_MODE_BACK;
 		rasterizerDesk.DepthClipEnable = FALSE;
-		rasterizerDesk.FrontCounterClockwise = TRUE;
+		rasterizerDesk.FrontCounterClockwise = FALSE;
 		rasterizerDesk.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 		rasterizerDesk.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
 		rasterizerDesk.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;

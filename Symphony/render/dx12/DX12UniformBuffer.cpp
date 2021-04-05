@@ -49,10 +49,11 @@ namespace symphony
 		m_DescriptorHeap.reset();
 	}
 
-	void DX12UniformBuffer::Bind()
+	void DX12UniformBuffer::Bind(uint32_t offset)
 	{
+		auto frameIndex = DX12Renderer::GetRendererData().BufferIndex;
 		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
-		clist->SetGraphicsRootConstantBufferView(0, m_Resource->GetGPUVirtualAddress());
+		clist->SetGraphicsRootConstantBufferView(0, m_Resource->GetGPUVirtualAddress() + offset);
 	}
 
 	void DX12UniformBuffer::Unbind()
@@ -62,6 +63,8 @@ namespace symphony
 
 	void DX12UniformBuffer::Update(RendererUniforms uniforms)
 	{
+		auto frameIndex = DX12Renderer::GetRendererData().BufferIndex;
+
 		void* data;
 		m_Resource->Map(0, nullptr, reinterpret_cast<void**>(&data));
 		memcpy(data, &uniforms, sizeof(uniforms));

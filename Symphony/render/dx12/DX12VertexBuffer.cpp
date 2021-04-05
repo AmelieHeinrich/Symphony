@@ -31,6 +31,7 @@ namespace symphony
 
 	void DX12VertexBuffer::Unbind()
 	{
-
+		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		clist->IASetVertexBuffers(0, 1, nullptr);
 	}
 }

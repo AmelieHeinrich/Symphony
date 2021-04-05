@@ -51,6 +51,10 @@ namespace symphony
             return (void*)m_BufferHandle;
         }
 
+        VkBuffer GetVulkanBuffer() {
+            return m_BufferHandle;
+        }
+
         // Vulkan buffer specific stuff
         static void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         static void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);

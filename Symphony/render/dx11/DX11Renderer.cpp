@@ -9,9 +9,7 @@
 namespace symphony
 {
 	DirectXRendererData DX11Renderer::m_RendererData;
-	std::vector<std::shared_ptr<DX11VertexBuffer>> DX11Renderer::m_VertexBuffers;
-	std::vector<std::shared_ptr<DX11IndexBuffer>> DX11Renderer::m_IndexBuffers;
-	std::vector<std::shared_ptr<DX11Texture2D>> DX11Renderer::m_Textures;
+	std::unordered_map<std::string, std::shared_ptr<DX11Mesh>> DX11Renderer::m_Meshes;
 	std::shared_ptr<DX11Shader> DX11Renderer::RendererShader;
 	std::shared_ptr<DX11UniformBuffer> DX11Renderer::RendererUniformBuffer;
 
@@ -63,6 +61,8 @@ namespace symphony
 
 		m_RendererData.FBWidth = w;
 		m_RendererData.FBHeight = h;
+
+		RendererShader->Bind();
 	}
 
 	void DX11Renderer::Prepare()
@@ -72,20 +72,11 @@ namespace symphony
 
 	void DX11Renderer::Shutdown()
 	{
-		for (auto i : m_Textures) {
-			i.reset();
-		}
-		m_Textures.clear();
+		RendererShader->Unbind();
 
-		for (auto i : m_IndexBuffers) {
-			i.reset();
-		}
-		m_IndexBuffers.clear();
-
-		for (auto i : m_VertexBuffers) {
-			i.reset();
-		}
-		m_VertexBuffers.clear();
+		for (auto i : m_Meshes)
+			i.second.reset();
+		m_Meshes.clear();
 
 		RendererUniformBuffer.reset();
 		RendererShader.reset();
@@ -111,72 +102,45 @@ namespace symphony
 		m_RendererData.RendererContext->SetClearColor(m_RendererData.RendererSwapChain, m_RendererData.CCR, m_RendererData.CCG, m_RendererData.CCB, m_RendererData.CCA);
 		m_RendererData.Context->ClearDepthStencilView(m_RendererData.RendererSwapChain->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1, 0);
 
-		RendererShader->Bind();
 		RendererUniformBuffer->BindForShader(0);
 
-		for (int i = 0; i < m_Textures.size(); i++) {
-			m_Textures[i]->Bind(i);
+		for (auto mesh : m_Meshes) {
+			auto model = mesh.second;
+
+			RendererUniforms ubo{};
+			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
+			ubo.SceneView = glm::mat4(1.0f);
+			ubo.SceneModel = model->GetModelMatrix();
+			RendererUniformBuffer->Update(ubo);
+
+			model->Draw();
 		}
-
-		uint32_t finalVertexSize = 0;
-		uint32_t finalIndexCount = 0;
-
-		for (auto i : m_VertexBuffers) {
-			finalVertexSize += i->GetVerticesSize();
-		}
-
-		for (auto i : m_IndexBuffers) {
-			finalIndexCount += i->GetIndicesSize();
-		}
-
-		if (m_IndexBuffers.empty()) {
-			for (auto i : m_VertexBuffers) {
-				i->Bind();
-			}
-			m_RendererData.Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-			m_RendererData.Context->Draw(finalVertexSize, 0);
-		}
-		else {
-			for (auto i : m_VertexBuffers) {
-				i->Bind();
-			}
-			for (auto i : m_IndexBuffers) {
-				i->Bind();
-			}
-
-			m_RendererData.Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			m_RendererData.Context->DrawIndexed(finalIndexCount, 0, 0);
-		}
-
-		for (int i = 0; i < m_Textures.size(); i++) {
-			m_Textures[i]->Unbind(i);
-		}
-
-		RendererUniforms ubo{};
-		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
-		ubo.SceneView = glm::mat4(1.0f);
-		ubo.SceneModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -50.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, -1.0f, 0.0f));
-		RendererUniformBuffer->Update(ubo);
-
-		RendererShader->Unbind();
 
 		m_RendererData.RendererSwapChain->Present();
 	}
 
 	void DX11Renderer::AddVertexBuffer(const std::vector<Vertex>& vertices)
 	{
-		RendererShader->Bind();
-		m_VertexBuffers.push_back(std::make_shared<DX11VertexBuffer>(vertices));
-		RendererShader->Unbind();
+		
 	}
 
 	void DX11Renderer::AddIndexBuffer(const std::vector<uint32_t>& indices)
 	{
-		m_IndexBuffers.push_back(std::make_shared<DX11IndexBuffer>(indices));
+		
 	}
 
 	void DX11Renderer::AddTexture2D(const char* filepath)
 	{
-		m_Textures.push_back(std::make_shared<DX11Texture2D>(filepath));
+		
+	}
+
+	void DX11Renderer::AddMesh(Mesh mesh, const std::string& name)
+	{
+		m_Meshes[name] = std::make_shared<DX11Mesh>(mesh.GetModelData());
+	}
+
+	void DX11Renderer::SetMeshTransform(const std::string& meshName, const glm::mat4& transform)
+	{
+		m_Meshes[meshName]->ModelMatrix = transform;
 	}
 }
