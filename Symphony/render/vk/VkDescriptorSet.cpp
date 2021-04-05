@@ -22,7 +22,7 @@ namespace symphony
 
         m_DescriptorSet.resize(nrImages);
         if (vkAllocateDescriptorSets(device, &allocInfo, m_DescriptorSet.data()) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate descriptor sets!");
+            SY_CORE_ERROR("Vulkan: Failed to allocate descriptor sets!");
         }
 
         for (size_t i = 0; i < nrImages; i++) {

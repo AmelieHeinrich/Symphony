@@ -9,6 +9,7 @@
 #include "DX11UniformBuffer.h"
 #include "DX11Texture2D.h"
 #include <memory>
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -51,6 +52,14 @@ namespace symphony
 
 		static DirectXRendererData GetRendererData() {
 			return m_RendererData;
+		}
+
+		static void CheckIfFailed(HRESULT res, const char* msg)
+		{
+			if (FAILED(res))
+			{
+				SY_CORE_ERROR(msg);
+			}
 		}
 	private:
 		static DirectXRendererData m_RendererData;

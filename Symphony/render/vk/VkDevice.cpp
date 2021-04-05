@@ -1,5 +1,6 @@
 #include "VkDevice.h"
 #include "core/exception/VulkanException.h"
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -36,7 +37,7 @@ namespace symphony
 		createInfo.ppEnabledExtensionNames = DeviceExtensions.data();
 
 		if (vkCreateDevice(gpu, &createInfo, nullptr, &m_DeviceHandle) != VK_SUCCESS) {
-			throw VulkanException("Failed to create logical device");
+			SY_CORE_ERROR("Vulkan: Failed to create logical device!");
 		}
 
 		GraphicsQueue = std::make_shared<Queue>(m_DeviceHandle, indices.graphicsFamily.value());

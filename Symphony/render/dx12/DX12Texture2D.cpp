@@ -26,10 +26,12 @@ namespace symphony
 		textureDesc.SampleDesc.Quality = 0;
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
-		DX12Device::ThrowIfFailed(device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_TextureResource)));
+		auto res = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_TextureResource));
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create Texture2D resource!");
 	
 		const UINT64 textureUploadBufferSize = GetRequiredIntermediateSize(m_TextureResource, 0, 1);
-		DX12Device::ThrowIfFailed(device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(textureUploadBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_TextureUploadResource)));
+		res = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(textureUploadBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_TextureUploadResource));
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create Texture2D upload buffer!");
 		
 		D3D12_SUBRESOURCE_DATA textureData = {};
 		textureData.pData = image_Data.DataBuffer;
@@ -59,32 +61,32 @@ namespace symphony
 		Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 		if (FAILED(device->CreateFence(initialValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.ReleaseAndGetAddressOf()))))
 		{
-			throw(runtime_error{ "Error creating a fence." });
+			SY_CORE_ERROR("D3D12: Failed creating a fence!");
 		}
 
 		HANDLE fenceEventHandle{ CreateEvent(nullptr, FALSE, FALSE, nullptr) };
 		if (fenceEventHandle == NULL)
 		{
-			throw(runtime_error{ "Error creating a fence event." });
+			SY_CORE_ERROR("D3D12: Failed creating a fence event!");
 		}
 
 		// #14
 		if (FAILED(commandQueue->Signal(fence.Get(), 1)))
 		{
-			throw(runtime_error{ "Error siganalling buffer uploaded." });
+			SY_CORE_ERROR("D3D12: Failed signaling buffer upload!");
 		}
 
 		// #15
 		if (FAILED(fence->SetEventOnCompletion(1, fenceEventHandle)))
 		{
-			throw(runtime_error{ "Failed set event on completion." });
+			SY_CORE_ERROR("D3D12: Failed setting event complete!");
 		}
 
 		// #16
 		DWORD wait{ WaitForSingleObject(fenceEventHandle, INFINITE) };
 		if (wait != WAIT_OBJECT_0)
 		{
-			throw(runtime_error{ "Failed WaitForSingleObject()." });
+			SY_CORE_ERROR("D3D12: Failed WaitForSingleObject()!");
 		}
 
 		ImageData::FreeImageData(image_Data);

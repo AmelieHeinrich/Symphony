@@ -3,6 +3,7 @@
 #include "render/VertexBuffer.h"
 #include <d3d12.h>
 #include <wrl.h>
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -73,7 +74,7 @@ namespace symphony
 
 		if (FAILED(hr))
 		{
-			throw(runtime_error{ "Error creating a default buffer." });
+			SY_CORE_ERROR("D3D12: Failed creating a default buffer!");
 		}
 
 		heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -90,21 +91,21 @@ namespace symphony
 
 		if (FAILED(hr))
 		{
-			throw(runtime_error{ "Error creating an upload buffer." });
+			SY_CORE_ERROR("D3D12: Failed creating an upload buffer!");
 		}
 
 		// #5
 		ComPtr<ID3D12CommandAllocator> commandAllocator;
 		if (FAILED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator.ReleaseAndGetAddressOf()))))
 		{
-			throw(runtime_error{ "Error creating a command allocator." });
+			SY_CORE_ERROR("D3D12: Failed creating a command allocator!");
 		}
 
 		// #6
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 		if (FAILED(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(commandList.ReleaseAndGetAddressOf()))))
 		{
-			throw(runtime_error{ "Error creating a command list." });
+			SY_CORE_ERROR("D3D12: Failed creating a command list!");
 		}
 
 		// #7
@@ -118,14 +119,14 @@ namespace symphony
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 		if (FAILED(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(commandQueue.ReleaseAndGetAddressOf()))))
 		{
-			throw(runtime_error{ "Error creating a command queue." });
+			SY_CORE_ERROR("D3D12: Failed creating a command queue!");
 		}
 
 		// #8
 		void* pData;
 		if (FAILED(uploadBuffer->Map(0, NULL, &pData)))
 		{
-			throw(runtime_error{ "Failed map intermediate resource." });
+			SY_CORE_ERROR("D3D12: Failed creating an intermediate resource!");
 		}
 
 		memcpy(pData, data.data(), bufferSize);
@@ -156,33 +157,33 @@ namespace symphony
 		Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 		if (FAILED(device->CreateFence(initialValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.ReleaseAndGetAddressOf()))))
 		{
-			throw(runtime_error{ "Error creating a fence." });
+			SY_CORE_ERROR("D3D12: Failed creating a fence!");
 		}
 
 		// #13
 		HANDLE fenceEventHandle{ CreateEvent(nullptr, FALSE, FALSE, nullptr) };
 		if (fenceEventHandle == NULL)
 		{
-			throw(runtime_error{ "Error creating a fence event." });
+			SY_CORE_ERROR("D3D12: Failed creating a fence event!");
 		}
 
 		// #14
 		if (FAILED(commandQueue->Signal(fence.Get(), 1)))
 		{
-			throw(runtime_error{ "Error siganalling buffer uploaded." });
+			SY_CORE_ERROR("D3D12: Failed signaling the upload buffer!");
 		}
 
 		// #15
 		if (FAILED(fence->SetEventOnCompletion(1, fenceEventHandle)))
 		{
-			throw(runtime_error{ "Failed set event on completion." });
+			SY_CORE_ERROR("D3D12: Failed setting the event complete");
 		}
 
 		// #16
 		DWORD wait{ WaitForSingleObject(fenceEventHandle, 10000) };
 		if (wait != WAIT_OBJECT_0)
 		{
-			throw(runtime_error{ "Failed WaitForSingleObject()." });
+			SY_CORE_ERROR("D3D12: Failed WaitForSingleObject()!");
 		}
 
 		return defaultBuffer;

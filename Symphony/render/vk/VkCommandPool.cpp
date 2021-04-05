@@ -1,5 +1,6 @@
 #include "VkCommandPool.h"
 #include "core/exception/VulkanException.h"
+#include "VkRenderer.h"
 
 namespace symphony
 {
@@ -12,7 +13,7 @@ namespace symphony
 		poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; 
 
 		if (vkCreateCommandPool(device, &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS) {
-			throw VulkanException("failed to create command pool!");
+			SY_CORE_ERROR("Vulkan: Failed to create command pool!");
 		}
 	}
 

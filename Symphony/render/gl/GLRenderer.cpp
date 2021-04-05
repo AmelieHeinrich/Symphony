@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -24,7 +25,13 @@ namespace symphony
 		const char* message,
 		const void* userParam)
 	{
-		std::cout << message << std::endl;
+		switch (severity)
+		{
+		case GL_DEBUG_SEVERITY_HIGH:         SY_CORE_CRITICAL(message); return;
+		case GL_DEBUG_SEVERITY_MEDIUM:       SY_CORE_ERROR(message); return;
+		case GL_DEBUG_SEVERITY_LOW:          SY_CORE_WARN(message); return;
+		case GL_DEBUG_SEVERITY_NOTIFICATION: SY_CORE_TRACE(message); return;
+		}
 	}
 
 	void GLRenderer::Init(Window* window)

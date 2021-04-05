@@ -13,7 +13,8 @@ namespace symphony
 		rtvHeapDesc.Flags = flags;
 		rtvHeapDesc.NodeMask = NULL;
 
-		DX12Device::ThrowIfFailed(device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&descriptorHeap)));
+		auto res = device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create descriptor heap!");
 	}
 
 	DX12Memory::~DX12Memory()

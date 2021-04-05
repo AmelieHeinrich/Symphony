@@ -70,7 +70,7 @@ namespace symphony
 		clearValueDs.DepthStencil.Depth = 1.0f;
 		clearValueDs.DepthStencil.Stencil = 0;
 
-		m_RendererData.RendererDevice->GetDevice()->CreateCommittedResource(
+		auto res = m_RendererData.RendererDevice->GetDevice()->CreateCommittedResource(
 			&dsHeapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&dsResDesc,
@@ -78,6 +78,7 @@ namespace symphony
 			&clearValueDs,
 			IID_PPV_ARGS(&m_RendererData.RendererDepthResource)
 		);
+		CheckIfFailed(res, "D3D12: Failed to create depth stencil view!");
 
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsViewDesk = {};
 		ZeroMemory(&dsViewDesk, sizeof(D3D12_DEPTH_STENCIL_VIEW_DESC));

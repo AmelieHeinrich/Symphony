@@ -21,7 +21,7 @@ namespace symphony
         poolInfo.maxSets = static_cast<uint32_t>(nrImages);
 
         if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &m_Pool) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create descriptor pool!");
+            SY_CORE_ERROR("Vulkan: Failed to create descriptor pool!");
         }
 	}
 

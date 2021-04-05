@@ -2,6 +2,7 @@
 #include <SDL_vulkan.h>
 #include <vector>
 #include "core/exception/VulkanException.h"
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -17,7 +18,7 @@ namespace symphony
 
         unsigned int count;
         if (!SDL_Vulkan_GetInstanceExtensions(window, &count, nullptr)) {
-            throw VulkanException("Failed to fetch extension count");
+            SY_CORE_ERROR("Vulkan: Failed to fetch vk extensions!");
         }
 
         std::vector<const char*> extensions = {
@@ -27,7 +28,7 @@ namespace symphony
         extensions.resize(additional_extension_count + count);
 
         if (!SDL_Vulkan_GetInstanceExtensions(window, &count, extensions.data() + additional_extension_count)) {
-            throw VulkanException("Failed to fetch extension data");
+            SY_CORE_ERROR("Vulkan: Failed to fetch vk extensions!");
         }
 
         auto layers = std::vector<const char*>{ "VK_LAYER_KHRONOS_validation" };
@@ -42,7 +43,7 @@ namespace symphony
 
 
         if (vkCreateInstance(&createInfo, nullptr, &m_Instance) != VK_SUCCESS) {
-            throw VulkanException("Failed to fetch extension data");
+            SY_CORE_ERROR("Vulkan: Failed to create instance!");
         }
     }
 

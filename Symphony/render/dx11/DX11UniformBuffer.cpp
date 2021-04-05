@@ -20,7 +20,8 @@ namespace symphony
 		D3D11_SUBRESOURCE_DATA init_data = {};
 		init_data.pSysMem = &ubo;
 
-		DX11Renderer::GetRendererData().Device->CreateBuffer(&buff_desc, &init_data, &m_BufferHandle);
+		auto res = DX11Renderer::GetRendererData().Device->CreateBuffer(&buff_desc, &init_data, &m_BufferHandle);
+		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create UBO!");
 	}
 
 	DX11UniformBuffer::~DX11UniformBuffer()

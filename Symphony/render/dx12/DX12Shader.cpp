@@ -90,8 +90,11 @@ namespace symphony
 
 			ID3DBlob* signature;
 			ID3DBlob* error;
-			DX12Device::ThrowIfFailed(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
-			DX12Device::ThrowIfFailed(device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
+			auto res = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
+			DX12Renderer::CheckIfFailed(res, "D3D12: Failed to serialize root signature!");
+
+			res = device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+			DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create root signature!");
 		}
 
 		{
@@ -126,7 +129,8 @@ namespace symphony
 	{
 		ID3DBlob* shaderBlob;
 		ID3DBlob* errorBlob;
-		DX12Device::ThrowIfFailed(D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, main.c_str(), profile.c_str(), 0, 0, &shaderBlob, &errorBlob));
+		auto res = D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, main.c_str(), profile.c_str(), 0, 0, &shaderBlob, &errorBlob);
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to compile shaders!");
 		return shaderBlob;
 	}
 }

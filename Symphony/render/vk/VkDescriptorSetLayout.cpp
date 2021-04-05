@@ -28,7 +28,7 @@ namespace symphony
         layoutInfo.pBindings = bindings.data();
 
         if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &m_DescriptorSetLayout) != VK_SUCCESS) {
-            throw VulkanException("failed to create descriptor set layout!");
+            SY_CORE_ERROR("Vulkan: Failed to create descriptor set layout!");
         }
 	}
 

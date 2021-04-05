@@ -53,7 +53,7 @@ namespace symphony
         samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
         if (vkCreateSampler(device, &samplerInfo, nullptr, &m_TextureSampler) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create texture sampler!");
+            SY_CORE_ERROR("Vulkan: Failed to create texture sampler!");
         }
 	}
 
@@ -87,7 +87,7 @@ namespace symphony
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create image!");
+            SY_CORE_ERROR("Vulkan: Failed to create image!");
         }
 
         VkMemoryRequirements memRequirements;
@@ -99,7 +99,7 @@ namespace symphony
         allocInfo.memoryTypeIndex = VulkanRenderer::FindMemoryType(memRequirements.memoryTypeBits, properties);
 
         if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate image memory!");
+            SY_CORE_ERROR("Vulkan: Failed to allocate image memory!");
         }
 
         vkBindImageMemory(device, image, imageMemory, 0);
@@ -218,7 +218,7 @@ namespace symphony
 
         VkImageView imageView;
         if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create texture image view!");
+            SY_CORE_ERROR("Vulkan: Failed to create image view!");
         }
 
         return imageView;
@@ -240,7 +240,7 @@ namespace symphony
             }
         }
 
-        throw std::runtime_error("failed to find supported format!");
+        SY_CORE_ERROR("Vulkan: Failed to find supported format!");
     }
 
     VkFormat VulkanTexture2D::FindDepthFormat()

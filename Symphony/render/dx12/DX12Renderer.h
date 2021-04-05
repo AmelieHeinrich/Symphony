@@ -14,6 +14,7 @@
 #include "DX12UniformBuffer.h"
 #include "DX12Texture2D.h"
 #include "window/Window.h"
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -65,6 +66,14 @@ namespace symphony
 
 		static DX12RendererData GetRendererData() {
 			return m_RendererData;
+		}
+
+		static void CheckIfFailed(HRESULT res, const char* msg)
+		{
+			if (FAILED(res))
+			{
+				SY_CORE_ERROR(msg);
+			}
 		}
 	private:
 		static DX12RendererData m_RendererData;

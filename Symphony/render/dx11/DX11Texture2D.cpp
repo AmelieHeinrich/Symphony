@@ -26,9 +26,7 @@ namespace symphony
 		desc.SampleDesc.Count = 1;
 
 		HRESULT res = device->CreateTexture2D(&desc, &initData, &m_Texture);
-		if (FAILED(res)) {
-			throw std::runtime_error("Failed to create Texture2D");
-		}
+		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create Texture2D!");
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 		ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
@@ -37,9 +35,7 @@ namespace symphony
 		srvDesc.Texture2D.MipLevels = desc.MipLevels;
 
 		res = device->CreateShaderResourceView(m_Texture, &srvDesc, &m_ShaderResourceView);
-		if (FAILED(res)) {
-			throw std::runtime_error("Failed to create Texture2D");
-		}
+		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create Texture2D shader resource view!");
 
 		D3D11_SAMPLER_DESC sdesc{};
 		sdesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -51,9 +47,7 @@ namespace symphony
 		sdesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 
 		res = device->CreateSamplerState(&sdesc, &m_SamplerState);
-		if (FAILED(res)) {
-			throw std::runtime_error("Failed to create Texture2D");
-		}
+		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create Texture2D sampler state!");
 
 		ImageData::FreeImageData(imageData);
 	}

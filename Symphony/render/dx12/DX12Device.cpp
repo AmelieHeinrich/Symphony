@@ -1,5 +1,6 @@
 #include "DX12Device.h"
 #include <stdexcept>
+#include "DX12Renderer.h"
 
 namespace symphony
 {
@@ -8,17 +9,21 @@ namespace symphony
 	{
 		if (DebugEnabled)
 		{
-			ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debug)));
+			auto res = D3D12GetDebugInterface(IID_PPV_ARGS(&debug));
+			DX12Renderer::CheckIfFailed(res, "D3D12: Failed to acquire debug interface!");
 			debug->EnableDebugLayer();
 			debug->SetEnableGPUBasedValidation(true);
 		}
 
-		ThrowIfFailed(CreateDXGIFactory(IID_PPV_ARGS(&factory)));
-		ThrowIfFailed(D3D12CreateDevice(NULL, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&device)));
+		auto res = CreateDXGIFactory(IID_PPV_ARGS(&factory));
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create DXGI factory!");
+		res = D3D12CreateDevice(NULL, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&device));
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create device!");
 
 		if (DebugEnabled)
 		{
-			ThrowIfFailed(device->QueryInterface(IID_PPV_ARGS(&debugDevice)));
+			res = device->QueryInterface(IID_PPV_ARGS(&debugDevice));
+			DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create debug device!");
 		}
 	}
 

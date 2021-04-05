@@ -35,14 +35,14 @@ namespace symphony
 			vertCode = readFile(vertexFile);
 		}
 		catch (std::runtime_error& e) {
-			std::cout << e.what() << std::endl;
+			SY_CORE_ERROR(e.what());
 		}
 
 		try {
 			fragCode = readFile(fragmentFile);
 		}
 		catch (std::runtime_error& e) {
-			std::cout << e.what() << std::endl;
+			SY_CORE_ERROR(e.what());
 		}
 
 		shaderc::Compiler compiler;
@@ -54,14 +54,14 @@ namespace symphony
 
 		shaderc::SpvCompilationResult vertResult = compiler.CompileGlslToSpv(vertCode.c_str(), shaderc_shader_kind::shaderc_glsl_vertex_shader, "vs", options);
 		if (vertResult.GetCompilationStatus() != shaderc_compilation_status_success) {
-			throw VulkanException("Failed to compile vertex shader!");
+			SY_CORE_ERROR("Vulkan: Failed to compile vertex shader!");
 		}
 		std::vector<uint32_t> vertexSPRV;
 		vertexSPRV.assign(vertResult.cbegin(), vertResult.cend());
 
 		shaderc::SpvCompilationResult fragResult = compiler.CompileGlslToSpv(fragCode.c_str(), shaderc_shader_kind::shaderc_glsl_fragment_shader, "fs", options);
 		if (fragResult.GetCompilationStatus() != shaderc_compilation_status_success) {
-			throw VulkanException("Failed to compile fragment shader!");
+			SY_CORE_ERROR("Vulkan: Failed to compile fragment shader!");
 		}
 		std::vector<uint32_t> fragmentSPRV;
 		fragmentSPRV.assign(fragResult.cbegin(), fragResult.cend());
@@ -72,7 +72,7 @@ namespace symphony
 		vertCreateInfo.pCode = reinterpret_cast<const uint32_t*>(vertexSPRV.data());
 
 		if (vkCreateShaderModule(m_DeviceCopy, &vertCreateInfo, nullptr, &m_VertexShader) != VK_SUCCESS) {
-			throw VulkanException("failed to create shader module!");
+			SY_CORE_ERROR("Vulkan: Failed to create vertex shader module!");
 		}
 
 		VkShaderModuleCreateInfo fragCreateInfo{};
@@ -81,7 +81,7 @@ namespace symphony
 		fragCreateInfo.pCode = reinterpret_cast<const uint32_t*>(fragmentSPRV.data());
 
 		if (vkCreateShaderModule(m_DeviceCopy, &fragCreateInfo, nullptr, &m_FragmentShader) != VK_SUCCESS) {
-			throw VulkanException("failed to create shader module!");
+			SY_CORE_ERROR("Vulkan: Failed to create fragment shader module!");
 		}
 	}
 

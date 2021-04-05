@@ -68,7 +68,8 @@ namespace symphony
 		psoDesk.SampleDesc.Count = 1;
 		psoDesk.SampleDesc.Quality = 0;
 
-		DX12Device::ThrowIfFailed(device->CreateGraphicsPipelineState(&psoDesk, IID_PPV_ARGS(&m_PSO)));
+		auto res = device->CreateGraphicsPipelineState(&psoDesk, IID_PPV_ARGS(&m_PSO));
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create graphics pipeline state!");
 	}
 
 	DX12Pipeline::~DX12Pipeline()

@@ -2,6 +2,7 @@
 #include "core/exception/VulkanException.h"
 #include "VkTexture2D.h"
 #include <array>
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -61,7 +62,7 @@ namespace symphony
 		renderPassInfo.pDependencies = &dependency;
 
 		if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
-			throw VulkanException("failed to create render pass!");
+			SY_CORE_ERROR("Vulkan: Failed to create render pass!");
 		}
 	}
 

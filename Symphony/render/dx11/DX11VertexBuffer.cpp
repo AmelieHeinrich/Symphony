@@ -85,8 +85,10 @@ namespace symphony
 		}
 
 		const DX11Shader* shader = DX11Shader::CurrentlyBound();
-		DX11Renderer::GetRendererData().Device->CreateInputLayout(desc, static_cast<uint32_t>(Layout.size()), shader->GetData().VertexBlob->GetBufferPointer(), shader->GetData().VertexBlob->GetBufferSize(), &m_InputLayout);
+		auto res = DX11Renderer::GetRendererData().Device->CreateInputLayout(desc, static_cast<uint32_t>(Layout.size()), shader->GetData().VertexBlob->GetBufferPointer(), shader->GetData().VertexBlob->GetBufferSize(), &m_InputLayout);
 		delete[] desc;
+
+		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create VBO input layout!");
 
 		// ACTUAL BUFFER CREATION
 
@@ -100,7 +102,8 @@ namespace symphony
 		D3D11_SUBRESOURCE_DATA init_data = {};
 		init_data.pSysMem = vertices.data();
 
-		DX11Renderer::GetRendererData().Device->CreateBuffer(&m_BufferDesc, &init_data, &m_Buffer);
+		res = DX11Renderer::GetRendererData().Device->CreateBuffer(&m_BufferDesc, &init_data, &m_Buffer);
+		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create VBO!");
 	}
 
 	DX11VertexBuffer::~DX11VertexBuffer()

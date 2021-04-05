@@ -1,32 +1,33 @@
-#include <window/Window.h>
+#include <Symphony.h>
 #include <iostream>
-#include <core/PlatformDetection.h>
-#include <core/Assert.h>
-#include <render/Renderer.h>
 #include <memory>
-#include <render/MeshBuilder.h>
-#undef main
 
 using namespace symphony;
 
-int main()
+class SymphonySandbox : public Application
 {
-	Window VKWindow(1280, 720, "Symphony Vulkan 1.0", RenderAPI::Vulkan);
+public:
+	SymphonySandbox()
+		: Application(RenderAPI::Vulkan, "Symphony Sandbox")
+	{
+		Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		ModelData gun = MeshBuilder::LoadModelDataAsync("resources/low.obj", "resources/gun_texture.png");
 
-	Renderer::Init(&VKWindow);
-	Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-	ModelData gun = MeshBuilder::LoadModelDataAsync("resources/low.obj", "resources/gun_texture.png");
-
-	Renderer::AddModelData(gun);
-	Renderer::Prepare();
-
-	while (VKWindow.IsWindowOpen()) {
-		VKWindow.Update();
-		Renderer::Draw();
+		Renderer::AddModelData(gun);
+		Renderer::Prepare();
 	}
 
-	Renderer::Shutdown();
+	void Run() override
+	{
+		while (m_Window->IsWindowOpen())
+		{
+			m_Window->Update();
+			Renderer::Draw();
+		}
+	}
+};
 
-	return 0;
+Application* symphony::CreateApplication()
+{
+	return new SymphonySandbox();
 }

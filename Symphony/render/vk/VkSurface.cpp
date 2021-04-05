@@ -1,5 +1,6 @@
 ﻿#include "VkSurface.h"
 #include "core/exception/VulkanException.h"
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -7,7 +8,7 @@ namespace symphony
 		: instCopy(instance)
 	{
 		if (!SDL_Vulkan_CreateSurface(window, instance, &m_Surface)) {
-			throw VulkanException("Failed to create window surface");
+			SY_CORE_ERROR("Vulkan: Failed to create window surface!");
 		}
 	}
 

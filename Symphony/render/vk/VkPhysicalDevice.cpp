@@ -1,4 +1,5 @@
 #include "VkPhysicalDevice.h"
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -9,7 +10,7 @@ namespace symphony
         vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 
         if (deviceCount == 0) {
-            throw std::runtime_error("failed to find GPUs with Vulkan support!");
+            SY_CORE_ERROR("Vulkan: Failed to fetch a suitable GPU!");
         }
 
         std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -23,7 +24,7 @@ namespace symphony
         }
 
         if (m_GPU == VK_NULL_HANDLE) {
-            throw std::runtime_error("failed to find a suitable GPU!");
+            SY_CORE_ERROR("Vulkan: Failed to fetch a suitable GPU!");
         }
     }
 

@@ -38,8 +38,11 @@ namespace symphony
 		swapDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-		DX12Device::ThrowIfFailed(factory->CreateSwapChain(commandQueue, &swapDesc, &swapChain));
-		factory->MakeWindowAssociation(windowRaw, DXGI_MWA_NO_ALT_ENTER);
+		auto res = factory->CreateSwapChain(commandQueue, &swapDesc, &swapChain);
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create swap chain!");
+
+		res = factory->MakeWindowAssociation(windowRaw, DXGI_MWA_NO_ALT_ENTER);
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to make window assocation with swap chain!");
 
 		UINT uiDescHeapSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
@@ -68,6 +71,7 @@ namespace symphony
 
 	void DX12SwapChain::Present()
 	{
-		DX12Device::ThrowIfFailed(swapChain->Present(0, 0));
+		auto res = swapChain->Present(0, 0);
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to present swap chain!");
 	}
 }

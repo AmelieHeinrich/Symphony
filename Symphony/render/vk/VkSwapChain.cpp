@@ -50,7 +50,7 @@ namespace symphony
         createInfo.oldSwapchain = VK_NULL_HANDLE;
 
         if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &m_SwapChain) != VK_SUCCESS) {
-            throw VulkanException("failed to create swap chain!");
+            SY_CORE_ERROR("Vulkan: Failed to create swap chain!");
         }
 
         vkGetSwapchainImagesKHR(device, m_SwapChain, &imageCount, nullptr);
@@ -103,7 +103,7 @@ namespace symphony
             framebufferInfo.layers = 1;
 
             if (vkCreateFramebuffer(m_DeviceCopy, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]) != VK_SUCCESS) {
-                throw std::runtime_error("failed to create framebuffer!");
+                SY_CORE_ERROR("Vulkan: Failed to create framebuffer!");
             }
         }
     }

@@ -260,7 +260,7 @@ namespace symphony
 		if (vkCreateSemaphore(s_Data.m_Device->device(), &semaphoreInfo, nullptr, &s_Data.imageAvailableSemaphores) != VK_SUCCESS ||
 			vkCreateSemaphore(s_Data.m_Device->device(), &semaphoreInfo, nullptr, &s_Data.renderFinishedSemaphores) != VK_SUCCESS ||
 			vkCreateFence(s_Data.m_Device->device(), &fenceInfo, nullptr, &s_Data.renderFence) != VK_SUCCESS) {
-			throw VulkanException("failed to create synchronization objects for a frame!");
+			SY_CORE_ERROR("Vulkan: Failed to create synchronized objects!");
 		}
 	}
 

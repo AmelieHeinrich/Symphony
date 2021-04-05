@@ -13,9 +13,12 @@ namespace symphony
 		queDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		queDesc.NodeMask = NULL;
 
-		DX12Device::ThrowIfFailed(device->CreateCommandQueue(&queDesc, IID_PPV_ARGS(&commandQueue)));
-		DX12Device::ThrowIfFailed(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)));
-		DX12Device::ThrowIfFailed(device->CreateCommandList(NULL, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, NULL, IID_PPV_ARGS(&commandList)));
+		auto res = device->CreateCommandQueue(&queDesc, IID_PPV_ARGS(&commandQueue));
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create command queue!");
+		res = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create command allocator!");
+		res = device->CreateCommandList(NULL, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, NULL, IID_PPV_ARGS(&commandList));
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create command list!");
 
 		uiDescHeapSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	}

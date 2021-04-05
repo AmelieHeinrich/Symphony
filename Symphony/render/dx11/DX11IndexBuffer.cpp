@@ -17,7 +17,9 @@ namespace symphony
 		D3D11_SUBRESOURCE_DATA ibInitData;
 		ibInitData.pSysMem = indices.data();
 
-		DX11Renderer::GetRendererData().Device->CreateBuffer(&ibd, &ibInitData, &m_Handle);
+		auto res = DX11Renderer::GetRendererData().Device->CreateBuffer(&ibd, &ibInitData, &m_Handle);
+
+		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create Index Buffer object!");
 	}
 
 	DX11IndexBuffer::~DX11IndexBuffer()

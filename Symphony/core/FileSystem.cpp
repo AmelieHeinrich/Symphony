@@ -1,6 +1,7 @@
 #include "FileSystem.h"
 #include <vector>
 #include <sstream>
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -9,7 +10,7 @@ namespace symphony
 		std::ifstream file(filepath, std::ios::ate | std::ios::binary);
 
 		if (!file.is_open()) {
-			throw std::runtime_error("failed to open file!");
+			SY_CORE_ERROR("Failed to open file!");
 		}
 
 		size_t fileSize = (size_t)file.tellg();

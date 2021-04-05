@@ -14,7 +14,7 @@ namespace symphony
 		commandBufferAllocateInfo.commandBufferCount = 1;
 
 		if (vkAllocateCommandBuffers(m_DeviceCopy->device(), &commandBufferAllocateInfo, &commandBuffer) != VK_SUCCESS) {
-			throw VulkanException("Failed to allocate command buffers!");
+			SY_CORE_ERROR("Vulkan: Failed to allocate command buffers!");
 		}
 	}
 
@@ -31,14 +31,14 @@ namespace symphony
 		beginInfo.flags = usage;
 
 		if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-			throw VulkanException("Failed to begin command buffer!");
+			SY_CORE_ERROR("Vulkan: Failed to begin command buffers!");
 		}
 	}
 
 	void CommandBuffer::End()
 	{
 		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-			throw VulkanException("Failed to end command buffer!");
+			SY_CORE_ERROR("Vulkan: Failed to end command buffers!");
 		}
 	}
 
@@ -59,7 +59,7 @@ namespace symphony
 			vkResetFences(m_DeviceCopy->device(), 1, &fence) &&
 			vkQueueSubmit(queueSelected, 1, &submitInfo, fence) &&
 			vkWaitForFences(m_DeviceCopy->device(), 1, &fence, VK_TRUE, std::numeric_limits<uint64_t>::max())) {
-			throw VulkanException("Failed to submit idle fence");
+			SY_CORE_ERROR("Vulkan: Failed to submit idle fence!");
 		}
 
 		vkDestroyFence(m_DeviceCopy->device(), fence, nullptr);

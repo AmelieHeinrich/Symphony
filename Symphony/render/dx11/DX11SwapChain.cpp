@@ -23,26 +23,17 @@ namespace symphony {
 
 		HRESULT result = DX11Renderer::GetRendererData().DXGIFactory->CreateSwapChain(device, &swapChainInfo, &m_Handle);
 
-		if (FAILED(result))
-		{
-			__debugbreak();
-		}
+		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create Swap chain object!");
 
 		ID3D11Texture2D* buffer = NULL;
 		result = m_Handle->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer);
 
-		if (FAILED(result))
-		{
-			__debugbreak();
-		}
+		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create swap chain texture object!");
 
 		result = device->CreateRenderTargetView(buffer, NULL, &m_RenderTargetView);
 		buffer->Release();
 
-		if (FAILED(result))
-		{
-			__debugbreak();
-		}
+		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create swap chain render target view object!");
 
 		D3D11_TEXTURE2D_DESC depthStencilDesc;
 		depthStencilDesc.Width = width;
@@ -58,10 +49,7 @@ namespace symphony {
 		depthStencilDesc.MiscFlags = 0;
 
 		result = device->CreateTexture2D(&depthStencilDesc, NULL, &m_DepthStencilBuffer);
-		if (FAILED(result))
-		{
-			__debugbreak();
-		}
+		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create swap chain texture object!");
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
 		depthStencilViewDesc.Format = depthStencilDesc.Format;
@@ -70,10 +58,7 @@ namespace symphony {
 		depthStencilViewDesc.Texture2D.MipSlice = 0;
 
 		result = device->CreateDepthStencilView(m_DepthStencilBuffer, &depthStencilViewDesc, &m_DepthStencilView);
-		if (FAILED(result))
-		{
-			__debugbreak();
-		}
+		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create depth stencil view!");
 
 		D3D11_DEPTH_STENCIL_DESC depthstencildesc = {};
 		depthstencildesc.DepthEnable = true;
@@ -81,20 +66,14 @@ namespace symphony {
 		depthstencildesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
 
 		result = device->CreateDepthStencilState(&depthstencildesc, &m_DepthStencilState);
-		if (FAILED(result))
-		{
-			__debugbreak();
-		}
+		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to depth stencil state!");
 
 		D3D11_RASTERIZER_DESC rasterizerDesc = {};
 		rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
 		rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
 		rasterizerDesc.FrontCounterClockwise = true;
 		result = device->CreateRasterizerState(&rasterizerDesc, &m_RasterizerState);
-		if (FAILED(result))
-		{
-			__debugbreak();
-		}
+		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create rasterizer state!");
 
 		D3D11_SAMPLER_DESC sampDesc = {};
 		sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -105,10 +84,7 @@ namespace symphony {
 		sampDesc.MinLOD = 0;
 		sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 		result = device->CreateSamplerState(&sampDesc, &m_SamplerState); //Create sampler state
-		if (FAILED(result))
-		{
-			__debugbreak();
-		}
+		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create sampler state!");
 
 		DX11Renderer::GetRendererData().Context->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
 		DX11Renderer::GetRendererData().Context->OMSetDepthStencilState(m_DepthStencilState, 0);

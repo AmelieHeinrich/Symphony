@@ -49,7 +49,7 @@ namespace symphony
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create buffer!");
+            SY_CORE_ERROR("Vulkan: Failed to create buffer!");
         }
 
         VkMemoryRequirements memRequirements;
@@ -61,7 +61,7 @@ namespace symphony
         allocInfo.memoryTypeIndex = VulkanRenderer::FindMemoryType(memRequirements.memoryTypeBits, properties);
 
         if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate buffer memory!");
+            SY_CORE_ERROR("Vulkan: Failed to allocate buffer memory!");
         }
 
         vkBindBufferMemory(device, buffer, bufferMemory, 0);

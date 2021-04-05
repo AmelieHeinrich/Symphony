@@ -7,7 +7,8 @@ namespace symphony
 	{
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
 
-		DX12Device::ThrowIfFailed(device->CreateFence(uiFence, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
+		auto res = device->CreateFence(uiFence, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create fence!");
 	}
 
 	DX12Fence::~DX12Fence()

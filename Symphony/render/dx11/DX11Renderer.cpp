@@ -46,10 +46,7 @@ namespace symphony
 			++i;
 		}
 
-		if (FAILED(success))
-		{
-			__debugbreak();
-		}
+		DX11Renderer::CheckIfFailed(success, "D3D11: Failed to initialise D3D11 Context!");
 
 		m_RendererData.RendererContext = std::make_shared<DX11RenderContext>(m_RendererData.Context);
 

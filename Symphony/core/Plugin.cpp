@@ -1,12 +1,13 @@
 #include "Plugin.h"
 #include <iostream>
+#include <core/Log.h>
 
 namespace symphony {
 	IDLLPlugin::IDLLPlugin(const char* path) {
 		m_WinInstance = LoadLibraryA(path);
 
 		if (!m_WinInstance) {
-			std::cout << "Failed to load DLL plugin with path " << path << std::endl;
+			SY_CORE_ERROR("Failed to load DLL plugin!");
 		}
 	}
 
@@ -19,7 +20,7 @@ namespace symphony {
 	{
 		T* funcPTR = GetProcAddress(m_WinInstance, name);
 		if (!funcPTR) {
-			std::cout << "Unable to find function name!" << std::endl;
+			SY_CORE_ERROR("Failed to load function pointer!");
 			return nullptr;
 		}
 

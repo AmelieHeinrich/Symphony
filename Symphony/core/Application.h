@@ -1,0 +1,34 @@
+#pragma once
+
+#include <window/Window.h>
+#include <core/Assert.h>
+#include <core/DLLExport.h>
+#undef main
+
+int main(int argc, char** argv);
+
+namespace symphony
+{
+	SymphonyClass Application
+	{
+	public:
+		Application(RenderAPI renderAPI, const std::string& name = "Symphony App");
+		virtual ~Application();
+
+		Window& GetWindow() { return *m_Window; }
+
+		void Close();
+
+		static Application& Get() { return *s_Instance; }
+	protected:
+		virtual void Run() = 0;
+	protected:
+		std::unique_ptr<Window> m_Window;
+		bool m_Running = true;
+	private:
+		static Application* s_Instance;
+		friend int ::main(int argc, char** argv);
+	};
+
+	Application* CreateApplication();
+}

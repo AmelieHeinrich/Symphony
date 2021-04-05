@@ -1,6 +1,8 @@
 #include "DX11Shader.h"
 #include <fstream>
 #include "DX11Renderer.h"
+#include <core/Log.h>
+#include <sstream>
 
 namespace symphony
 {
@@ -20,12 +22,12 @@ namespace symphony
 			}
 			else
 			{
-				__debugbreak();
+				SY_CORE_ERROR("Failed to read file buffer!");
 			}
 		}
 		else
 		{
-			__debugbreak();
+			SY_CORE_ERROR("Failed to open file!");
 		}
 
 		return result;
@@ -74,9 +76,11 @@ namespace symphony
 		if (errorBlob)
 		{
 			info.Profile += profile + "\n";
+			std::stringstream ss;
 			if (errorBlob->GetBufferSize())
-				std::cout << "Shader Compile Errors" << std::endl << (const char*)errorBlob->GetBufferPointer() << std::endl;
+				ss << "Shader Compile Errors" << std::endl << (const char*)errorBlob->GetBufferPointer() << std::endl;
 			errorBlob->Release();
+			SY_CORE_ERROR(ss.str());
 		}
 		if (status == S_OK)
 			return shaderBlob;

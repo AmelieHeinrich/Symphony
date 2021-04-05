@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
+#include <core/Log.h>
 
 #include "VkCommandBuffer.h"
 #include "VkGraphicsPipeline.h"

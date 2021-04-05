@@ -2,6 +2,7 @@
 #include "core/exception/VulkanException.h"
 #include "VkVertexBuffer.h"
 #include "render/Renderer.h"
+#include <core/Log.h>
 
 namespace symphony
 {
@@ -116,14 +117,14 @@ namespace symphony
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 
 		if (vkCreatePipelineLayout(deviceCopy, &pipelineLayoutInfo, nullptr, &graphicsPipelineLayout) != VK_SUCCESS) {
-			throw VulkanException("failed to create pipeline layout!");
+			SY_CORE_ERROR("Vulkan: Failed to create pipeline layout!");
 		}
 
 		VkPipelineCacheCreateInfo cacheInfo{};
 		cacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 
 		if (vkCreatePipelineCache(deviceCopy, &cacheInfo, nullptr, &graphicsPipelineCache) != VK_SUCCESS) {
-			throw VulkanException("Failed to create pipeline cache!");
+			SY_CORE_ERROR("Vulkan: Failed to create pipeline cache!");
 		}
 
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -143,7 +144,7 @@ namespace symphony
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
 		if (vkCreateGraphicsPipelines(deviceCopy, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
-			throw VulkanException("failed to create graphics pipeline!");
+			SY_CORE_ERROR("Vulkan: Failed to create graphics pipeline!");
 		}
 	}
 
