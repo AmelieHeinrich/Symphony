@@ -15,6 +15,16 @@ namespace std {
 
 namespace symphony
 {
+    static std::mutex s_MeshesMutex;
+
+    ModelData MeshBuilder::MultiThreadedLoadMesh(const char* filepath, const char* texturePath)
+    {
+        auto mesh = MeshBuilder::LoadModelData(filepath, texturePath);
+
+        std::lock_guard<std::mutex> lock(s_MeshesMutex);
+        return mesh;
+    }
+
 	std::pair<std::vector<Vertex>, std::vector<uint32_t>> MeshBuilder::CreateModelFromOBJ(const char* filepath)
 	{
         std::vector<Vertex> vertices;
@@ -103,5 +113,11 @@ namespace symphony
         returnData.RendererResources = MeshBuilder::CreateModelFromOBJ(meshFile);
         returnData.TextureFilepath = textureFile;
         return returnData;
+    }
+
+    ModelData MeshBuilder::LoadModelDataAsync(const char* meshFile, const char* textureFile)
+    {
+        std::future<ModelData> result = std::async(std::launch::async, MultiThreadedLoadMesh, meshFile, textureFile);
+        return result.get();
     }
 }

@@ -12,6 +12,9 @@
 #include <utility>
 #include "core/DLLExport.h"
 #include <unordered_map>
+#include <thread>
+#include <mutex>
+#include <future>
 
 namespace symphony
 {
@@ -24,5 +27,8 @@ namespace symphony
 		static std::pair<std::vector<Vertex>, std::vector<uint32_t>> CreateModelFromOBJ(const char* filepath);
 		static std::vector<Vertex> CreateModelFromOBJVertexOnly(const char* filepath);
 		static ModelData LoadModelData(const char* meshFile, const char* textureFile);
+		static ModelData LoadModelDataAsync(const char* meshFile, const char* textureFile);
+	private:
+		static ModelData MultiThreadedLoadMesh(const char* filepath, const char* texturePath);
 	};
 }

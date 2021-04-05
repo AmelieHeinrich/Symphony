@@ -16,7 +16,7 @@ int main()
 	Renderer::Init(&VKWindow);
 	Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	ModelData gun = MeshBuilder::LoadModelData("resources/low.obj", "resources/gun_texture.png");
+	ModelData gun = MeshBuilder::LoadModelDataAsync("resources/low.obj", "resources/gun_texture.png");
 
 	Renderer::AddModelData(gun);
 	Renderer::Prepare();
