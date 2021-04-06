@@ -47,12 +47,23 @@ namespace symphony
 		static void Draw();
 
 		static void PrintRendererInfo();
+		static void PrintRendererStats();
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);
 		static void AddModelData(ModelData data);
 		static void AddMesh(Mesh mesh, const std::string& name);
 		static void SetMeshTransform(const std::string& name, const glm::mat4& matrix);
+
+		struct Statistics
+		{
+			uint32_t DrawCalls = 0;
+			uint32_t NumTriangles = 0;
+
+			uint32_t GetTotalVertexCount() const { return NumTriangles * 3; }
+			uint32_t GetTotalIndexCount() const { return NumTriangles * 6; }
+		};
+		static Renderer::Statistics Stats;
 	private:
 		static RenderAPI s_RenderAPI;
 	};

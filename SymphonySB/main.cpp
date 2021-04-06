@@ -2,6 +2,7 @@
 #include <iostream>
 #include <memory>
 #include <SDL.h>
+#include <stdlib.h>
 
 using namespace symphony;
 
@@ -9,7 +10,7 @@ class SymphonySandbox : public Application
 {
 public:
 	SymphonySandbox()
-		: Application(RenderAPI::DirectX11, "Symphony Sandbox")
+		: Application(RenderAPI::Vulkan, "Symphony Sandbox")
 	{
 		Renderer::PrintRendererInfo();
 

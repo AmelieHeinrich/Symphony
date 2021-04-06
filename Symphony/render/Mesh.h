@@ -18,6 +18,11 @@ namespace symphony
 			return ModelMatrix;
 		}
 
+		uint32_t GetNumberOfVertices()
+		{
+			return m_Data.RendererResources.first.size();
+		}
+
 		ModelData GetModelData() { return m_Data; }
 	private:
 		ModelData m_Data;

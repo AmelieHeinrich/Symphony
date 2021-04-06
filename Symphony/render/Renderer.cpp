@@ -10,6 +10,8 @@ namespace symphony
 {
 	RenderAPI Renderer::s_RenderAPI;
 
+	Renderer::Statistics Renderer::Stats;
+
 	void Renderer::Init(Window* window)
 	{
 		s_RenderAPI = window->GetWindowRenderAPI();
@@ -243,5 +245,13 @@ namespace symphony
 			DX11Renderer::PrintRendererInfo();
 			break;
 		}
+	}
+
+	void Renderer::PrintRendererStats()
+	{
+		SY_CORE_INFO("Renderer Triangles: " + std::to_string(Stats.NumTriangles));
+		SY_CORE_INFO("Renderer Draw Calls: " + std::to_string(Stats.DrawCalls));
+		SY_CORE_INFO("Renderer Vertices: " + std::to_string(Stats.GetTotalVertexCount()));
+		SY_CORE_INFO("Renderer Indices: " + std::to_string(Stats.GetTotalIndexCount()));
 	}
 }

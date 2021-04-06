@@ -78,6 +78,8 @@ namespace symphony
 
 		m_RendererShader->Bind();
 
+		int numTris = 0;
+		int drawCalls = 0;
 		for (auto mesh : m_Meshes) {
 			auto model = mesh.second;
 
@@ -90,7 +92,13 @@ namespace symphony
 			m_UniformBuffer->Update(ubo);
 
 			model->Draw();
+			numTris += model->GetNumberOfVertices() / 3;
+			drawCalls++;
 		}
+		Renderer::Stats.NumTriangles = numTris;
+		Renderer::Stats.DrawCalls = drawCalls;
+		numTris = 0;
+		drawCalls = 0;
 
 		m_RendererShader->Unbind();
 	}

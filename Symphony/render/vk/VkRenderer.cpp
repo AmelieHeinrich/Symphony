@@ -133,6 +133,8 @@ namespace symphony
 			vkCmdBeginRenderPass(s_Data.commandBuffer->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 			vkCmdBindPipeline(s_Data.commandBuffer->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipeline());
 
+			int numTris = 0;
+			int drawCalls = 0;
 			for (auto mesh : m_Meshes) {
 				auto model = mesh.second;
 				RendererUniforms ubo{};
@@ -144,8 +146,15 @@ namespace symphony
 				vkCmdPushConstants(s_Data.commandBuffer->GetCommandBuffer(), s_Data.graphicsPipeline->GetPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(RendererUniforms), &ubo);
 				model->Draw(s_Data.commandBuffer->GetCommandBuffer(), imageIndex);
 
+				numTris += model->GetNumberOfVertices() / 3;
+				drawCalls++;
+
 				//s_Data.uniformBuffers[imageIndex]->Update(ubo);
 			}
+			Renderer::Stats.NumTriangles = numTris;
+			Renderer::Stats.DrawCalls = drawCalls;
+			numTris = 0;
+			drawCalls = 0;
 
 			vkCmdEndRenderPass(s_Data.commandBuffer->GetCommandBuffer());
 			s_Data.commandBuffer->End();
