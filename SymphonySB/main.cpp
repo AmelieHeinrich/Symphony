@@ -9,8 +9,10 @@ class SymphonySandbox : public Application
 {
 public:
 	SymphonySandbox()
-		: Application(RenderAPI::OpenGL, "Symphony Sandbox")
+		: Application(RenderAPI::DirectX11, "Symphony Sandbox")
 	{
+		Renderer::PrintRendererInfo();
+
 		Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		Mesh gunMesh(MeshBuilder::LoadModelDataAsync("resources/low.obj", "resources/gun_texture.png"));
 		Mesh monkeyMesh(MeshBuilder::LoadModelDataAsync("resources/suzanne.obj", "resources/marble.jpg"));

@@ -24,6 +24,7 @@ namespace symphony
 		static void ClearColor(float r, float g, float b, float a);
 		static void Draw();
 
+		static void PrintRendererInfo();
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);

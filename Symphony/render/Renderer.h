@@ -46,6 +46,7 @@ namespace symphony
 		// Present
 		static void Draw();
 
+		static void PrintRendererInfo();
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);

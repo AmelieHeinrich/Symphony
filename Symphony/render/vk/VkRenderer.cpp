@@ -246,4 +246,17 @@ namespace symphony
 	{
 		m_Meshes[meshName]->ModelMatrix = transform;
 	}
+
+	void VulkanRenderer::PrintRendererInfo()
+	{
+		auto info = s_Data.m_PhysicalDevice->gpu();
+		VkPhysicalDeviceProperties props;
+		vkGetPhysicalDeviceProperties(info, &props);
+
+		SY_CORE_INFO("Vulkan API Version: " + std::to_string(props.apiVersion));
+		SY_CORE_INFO("Vulkan Driver Verison: " + std::to_string(props.driverVersion));
+		SY_CORE_INFO("Vulkan Vendor ID: " + std::to_string(props.vendorID));
+		SY_CORE_INFO("Vulkan Device ID: " + std::to_string(props.deviceID));
+		SY_CORE_INFO("Vulkan Device Name: " + std::string(props.deviceName));
+	}
 }

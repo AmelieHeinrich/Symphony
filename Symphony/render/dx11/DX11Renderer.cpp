@@ -143,4 +143,18 @@ namespace symphony
 	{
 		m_Meshes[meshName]->ModelMatrix = transform;
 	}
+
+	void DX11Renderer::PrintRendererInfo()
+	{
+		DXGI_ADAPTER_DESC desc{};
+		m_RendererData.DXGIAdapter->GetDesc(&desc);
+
+		std::wstring deviceName = desc.Description;
+
+		SY_CORE_INFO("D3D11 Device Description: " + std::string(deviceName.begin(), deviceName.end()));
+		SY_CORE_INFO("D3D11 Vendor ID: " + std::to_string(desc.VendorId));
+		SY_CORE_INFO("D3D11 Device ID: " + std::to_string(desc.DeviceId));
+		SY_CORE_INFO("D3D11 Sub System ID: " + std::to_string(desc.SubSysId));
+		SY_CORE_INFO("D3D11 Revision: " + std::to_string(desc.Revision));
+	}
 }

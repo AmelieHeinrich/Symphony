@@ -41,7 +41,6 @@ namespace symphony
 		std::shared_ptr<DX12SwapChain> RendererSwapChain;
 		std::shared_ptr<DX12Shader> RendererShader;
 		std::shared_ptr<DX12Pipeline> RendererGraphicsPipeline;
-		std::vector<std::shared_ptr<DX12UniformBuffer>> RendererUniformBuffers;
 
 		std::shared_ptr<DX12Memory> RendererDepthMemory;
 		ID3D12Resource* RendererDepthResource;

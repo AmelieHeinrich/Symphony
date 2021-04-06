@@ -228,4 +228,20 @@ namespace symphony
 			break;
 		}
 	}
+
+	void Renderer::PrintRendererInfo()
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::Vulkan:
+			VulkanRenderer::PrintRendererInfo();
+			break;
+		case RenderAPI::OpenGL:
+			GLRenderer::PrintRendererInfo();
+			break;
+		case RenderAPI::DirectX11:
+			DX11Renderer::PrintRendererInfo();
+			break;
+		}
+	}
 }

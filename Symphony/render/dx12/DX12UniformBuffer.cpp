@@ -58,16 +58,20 @@ namespace symphony
 
 	void DX12UniformBuffer::Unbind()
 	{
-
+		auto frameIndex = DX12Renderer::GetRendererData().BufferIndex;
+		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		clist->SetGraphicsRootConstantBufferView(0, 0);
 	}
 
 	void DX12UniformBuffer::Update(RendererUniforms uniforms)
 	{
 		auto frameIndex = DX12Renderer::GetRendererData().BufferIndex;
+		UINT constDataSizeAligned = (sizeof(RendererUniforms) + 255) & ~255;
 
-		void* data;
-		m_Resource->Map(0, nullptr, reinterpret_cast<void**>(&data));
-		memcpy(data, &uniforms, sizeof(uniforms));
+		D3D12_RANGE readRange = { 0, 0 };
+		uint8_t* cbvDataBegin;
+		m_Resource->Map(0, &readRange, reinterpret_cast<void**>(&cbvDataBegin));
+		memcpy(&cbvDataBegin[frameIndex * constDataSizeAligned], &uniforms, sizeof(uniforms));
 		m_Resource->Unmap(0, nullptr);
 	}
 }

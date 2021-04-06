@@ -119,4 +119,15 @@ namespace symphony
 	{
 		m_Meshes[meshName]->ModelMatrix = transform;
 	}
+
+	void GLRenderer::PrintRendererInfo()
+	{
+		const GLubyte* renderer = glGetString(GL_RENDERER);
+		const GLubyte* vendor = glGetString(GL_VENDOR);
+		const GLubyte* version = glGetString(GL_VERSION);
+
+		SY_CORE_INFO("GL Vendor: " + std::string((const char*)vendor));
+		SY_CORE_INFO("GL Renderer: " + std::string((const char*)renderer));
+		SY_CORE_INFO("GL Version: " + std::string((const char*)version));
+	}
 }

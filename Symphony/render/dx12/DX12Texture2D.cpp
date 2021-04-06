@@ -106,4 +106,12 @@ namespace symphony
 		clist->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		clist->SetGraphicsRootDescriptorTable(1, m_TextureDescriptorHeap->GetGPUHandle());
 	}
+
+	void DX12Texture2D::Unbind()
+	{
+		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		ID3D12DescriptorHeap* descriptorHeaps[] = { m_TextureDescriptorHeap->GetDescriptorHeap() };
+		clist->SetDescriptorHeaps(0, nullptr);
+		clist->SetGraphicsRootDescriptorTable(1, {});
+	}
 }

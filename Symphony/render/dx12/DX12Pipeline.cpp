@@ -12,7 +12,7 @@ namespace symphony
 		ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
 		depthStencilDesc.DepthEnable = TRUE;
 		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 		depthStencilDesc.StencilEnable = FALSE;
 		depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
 		depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
@@ -25,7 +25,7 @@ namespace symphony
 		rasterizerDesk.FillMode = D3D12_FILL_MODE_SOLID;
 		rasterizerDesk.CullMode = D3D12_CULL_MODE_BACK;
 		rasterizerDesk.DepthClipEnable = FALSE;
-		rasterizerDesk.FrontCounterClockwise = FALSE;
+		rasterizerDesk.FrontCounterClockwise = TRUE;
 		rasterizerDesk.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 		rasterizerDesk.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
 		rasterizerDesk.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
@@ -85,6 +85,7 @@ namespace symphony
 
 	void DX12Pipeline::Unbind()
 	{
-		
+		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		clist->SetPipelineState(nullptr);
 	}
 }

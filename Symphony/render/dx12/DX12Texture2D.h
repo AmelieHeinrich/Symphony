@@ -22,6 +22,7 @@ namespace symphony
 		}
 
 		void Bind();
+		void Unbind();
 	private:
 		ID3D12Resource* m_TextureResource;
 		ID3D12Resource* m_TextureUploadResource;

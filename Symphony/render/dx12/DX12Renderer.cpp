@@ -34,11 +34,6 @@ namespace symphony
 		pci.PipelineShader = m_RendererData.RendererShader;
 		m_RendererData.RendererGraphicsPipeline = std::make_shared<DX12Pipeline>(pci);
 
-		m_RendererData.RendererUniformBuffers.resize(2);
-		for (int i = 0; i < 2; i++) {
-			m_RendererData.RendererUniformBuffers[i] = std::make_shared<DX12UniformBuffer>();
-		}
-
 		m_RendererData.RendererDepthMemory = std::make_shared<DX12Memory>(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 1);
 		D3D12_HEAP_PROPERTIES dsHeapProperties;
 		ZeroMemory(&dsHeapProperties, sizeof(&dsHeapProperties));
@@ -141,21 +136,14 @@ namespace symphony
 		m_RendererData.RendererGraphicsPipeline->Bind();
 		m_RendererData.RendererShader->Bind();
 
-		RendererUniforms ubo{};
-		ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
-		ubo.SceneProjection[1][1] *= -1;
-		ubo.SceneView = glm::mat4(1.0f);
-
-		int i = 0;
 		for (auto mesh : m_Meshes) {
 			auto model = mesh.second;
 
-			model->Draw();
+			RendererUniforms ubo{};
+			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
+			ubo.SceneView = glm::mat4(1.0f);
 
-			ubo.SceneModel = model->GetModelMatrix();
-			m_RendererData.RendererUniformBuffers[m_RendererData.BufferIndex]->Bind();
-			m_RendererData.RendererUniformBuffers[m_RendererData.BufferIndex]->Update(ubo);
-			i++;
+			model->Draw(ubo);
 		}
 
 		m_RendererData.RendererSwapChain->Present();
