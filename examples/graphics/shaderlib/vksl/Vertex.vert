@@ -2,7 +2,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout(std140, binding = 0) uniform UniformBufferObject {
+layout(push_constant) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;
@@ -14,11 +14,6 @@ layout(location = 2) in vec2 inTexCoord;
 
 layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec2 fragTexCoord;
-
-out gl_PerVertex 
-{
-    vec4 gl_Position;   
-};
 
 void main() {
     gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);

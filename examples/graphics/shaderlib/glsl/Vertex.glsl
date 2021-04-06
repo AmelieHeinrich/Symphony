@@ -7,7 +7,7 @@ layout (location = 2) in vec2 TexCoords;
 out vec3 passColor;
 out vec2 passTexCoords;
 
-layout (std140, binding = 0) uniform RendererUniforms
+layout (binding = 0, std140) uniform RendererUniforms
 {
 	mat4 Projection;
 	mat4 View;

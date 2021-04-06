@@ -1,44 +1,53 @@
-#include <window/Window.h>
+#include <Symphony.h>
 #include <iostream>
-#include <core/PlatformDetection.h>
-#include <core/Assert.h>
-#include <render/Renderer.h>
 #include <memory>
-#include <render/MeshBuilder.h>
-#undef main
+#include <SDL.h>
+#include <stdlib.h>
 
 using namespace symphony;
 
-int main()
+class SymphonySandbox : public Application
 {
-    RenderAPI api = RenderAPI::Vulkan; // Pick whatever API you want (OpenGL 4.5, Vulkan, DirectX11, DirectX12)
+public:
+	// Choose the API you want (D3D11, GL 4.5 or Vulkan)
+	SymphonySandbox()
+		: Application(RenderAPI::Vulkan, "Symphony Sandbox")
+	{
+		// Print the renderer info (DX12 not supported yet)
+		Renderer::PrintRendererInfo();
 
-    // Create the render window with the size you want
-	Window window(1280, 720, "Symphony Graphics", api);
+		// Clear color and load the meshes (3D models are loaded on another thread)
+		Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		Mesh gunMesh(MeshBuilder::LoadModelDataAsync("resources/low.obj", "resources/gun_texture.png"));
+		Mesh monkeyMesh(MeshBuilder::LoadModelDataAsync("resources/suzanne.obj", "resources/marble.jpg"));
 
-    // Initialise the renderer and clear the color buffer
-	Renderer::Init(&window);
-	Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    // Load the OBJ model (pair is std::pair<std::vector<Vertex>, std::vector<uint32_t>>)
-	auto pair = MeshBuilder::CreateModelFromOBJ("resources/low.obj");
-
-    // Add the resources to the renderer
-	Renderer::AddTexture2D("resources/gun_texture.png");
-	Renderer::AddVertexBuffer(pair.first);
-	Renderer::AddIndexBuffer(pair.second);
-
-    // Prepare the renderer for drawing
-	Renderer::Prepare();
-
-	while (window.IsWindowOpen()) {
-        // Update the window and draw
-		window.Update();
-		Renderer::Draw();
+		// Send the meshes to the renderer and prepare the renderer for drawing
+		Renderer::AddMesh(gunMesh, "Gun");
+		Renderer::AddMesh(monkeyMesh, "Suzanne");
+		Renderer::Prepare();
 	}
 
-    // Shutdown renderer (clears resources, window automatically destroys at the end of the loop as well)
-	Renderer::Shutdown();
+	void Run() override
+	{
+		// Game loop
+		while (m_Window->IsWindowOpen())
+		{
+			// Update the meshes's transform
+			glm::mat4 newMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-25.0f, 0.5f, -70.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 monkeyMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.3f, -5.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+			Renderer::SetMeshTransform("Gun", newMatrix);
+			Renderer::SetMeshTransform("Suzanne", monkeyMatrix);
 
-    return 0;
+			m_Window->Update();
+			
+			// Draw
+			Renderer::Draw();
+		}
+	}
+};
+
+// Entry point defined in client
+Application* symphony::CreateApplication()
+{
+	return new SymphonySandbox();
 }
