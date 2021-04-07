@@ -24,6 +24,8 @@ namespace symphony {
 		ID3D11DepthStencilState* GetDepthStencilState() const { return m_DepthStencilState; }
 		ID3D11RasterizerState* GetRasterizerState() const { return m_RasterizerState; }
 	private:
+		void ReloadBuffers(uint32_t width, uint32_t height);
+
 		IDXGISwapChain* m_Handle;
 		ID3D11RenderTargetView* m_RenderTargetView;
 		ID3D11Texture2D* m_DepthStencilBuffer;

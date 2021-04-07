@@ -164,7 +164,10 @@ namespace symphony
 
 	void DX11Renderer::Resize(uint32_t width, uint32_t height)
 	{
+		m_RendererData.FBWidth = width;
+		m_RendererData.FBHeight = height;
 		m_RendererData.RendererSwapChain->RecreateRenderTargetView(width, height);
+		Draw();
 	}
 
 	void DX11Renderer::PrintRendererInfo()

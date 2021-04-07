@@ -1,7 +1,7 @@
-[23:09:39] [info] SYMPHONY: Application created!
-[23:09:39] [info] SYMPHONY: Vulkan API Version: 4202638
-[23:09:39] [info] SYMPHONY: Vulkan Driver Verison: 1913765888
-[23:09:39] [info] SYMPHONY: Vulkan Vendor ID: 4318
-[23:09:39] [info] SYMPHONY: Vulkan Device ID: 8593
-[23:09:39] [info] SYMPHONY: Vulkan Device Name: GeForce GTX 1660 Ti
-[23:10:08] [info] SYMPHONY: Application destroyed!
+[23:40:56] [info] SYMPHONY: Application created!
+[23:40:56] [info] SYMPHONY: D3D11 Device Description: NVIDIA GeForce GTX 1660 Ti
+[23:40:56] [info] SYMPHONY: D3D11 Vendor ID: 4318
+[23:40:56] [info] SYMPHONY: D3D11 Device ID: 8593
+[23:40:56] [info] SYMPHONY: D3D11 Sub System ID: 323162149
+[23:40:56] [info] SYMPHONY: D3D11 Revision: 161
+[23:41:13] [info] SYMPHONY: Application destroyed!
