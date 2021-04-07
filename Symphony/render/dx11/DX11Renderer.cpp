@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "window/Window.h"
 #include <SDL.h>
+#include "DX11Gui.h"
 
 namespace symphony
 {
@@ -62,6 +63,8 @@ namespace symphony
 		m_RendererData.FBWidth = w;
 		m_RendererData.FBHeight = h;
 
+		DX11Gui::Init();
+
 		RendererShader->Bind();
 	}
 
@@ -72,6 +75,8 @@ namespace symphony
 
 	void DX11Renderer::Shutdown()
 	{
+		DX11Gui::Shutdown();
+
 		RendererShader->Unbind();
 
 		for (auto i : m_Meshes)
@@ -125,6 +130,10 @@ namespace symphony
 		numTris = 0;
 		drawCalls = 0;
 
+		DX11Gui::BeginGUI();
+		ImGui::ShowDemoWindow();
+		DX11Gui::EndGUI();
+
 		m_RendererData.RendererSwapChain->Present();
 	}
 
@@ -151,6 +160,11 @@ namespace symphony
 	void DX11Renderer::SetMeshTransform(const std::string& meshName, const glm::mat4& transform)
 	{
 		m_Meshes[meshName]->ModelMatrix = transform;
+	}
+
+	void DX11Renderer::Resize(uint32_t width, uint32_t height)
+	{
+		m_RendererData.RendererSwapChain->RecreateRenderTargetView(width, height);
 	}
 
 	void DX11Renderer::PrintRendererInfo()

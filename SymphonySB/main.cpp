@@ -16,7 +16,7 @@ public:
 
 		Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		Mesh gunMesh(MeshBuilder::LoadModelDataAsync("resources/low.obj", "resources/gun_texture.png"));
-		Mesh monkeyMesh(MeshBuilder::LoadModelDataAsync("resources/suzanne.obj", "resources/marble.jpg"));
+		Mesh monkeyMesh(MeshBuilder::LoadModelDataAsync("resources/suzanne.obj", "resources/darkMarble.jpg"));
 
 		Renderer::AddMesh(gunMesh, "Gun");
 		Renderer::AddMesh(monkeyMesh, "Suzanne");

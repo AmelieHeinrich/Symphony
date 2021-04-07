@@ -12,6 +12,8 @@ namespace symphony {
 		void Clear() override;
 		void ClearColor(float r, float g, float b, float a) override;
 		void ResizeBuffers(int x, int y, int w, int h) override;
+
+		SDL_GLContext GetGLContext() { return m_GLContext; }
 	private:
 		SDL_Window* m_TargetWindow;
 		SDL_GLContext m_GLContext;

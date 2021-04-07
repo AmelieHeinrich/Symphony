@@ -2,10 +2,15 @@
 #include "DX11RenderSurface.h"
 #include "DX11Renderer.h"
 
+#include <wrl.h>
+#include <SDL_syswm.h>
+#include "core/Application.h"
+
 namespace symphony {
 	DX11SwapChain::DX11SwapChain(HWND hwnd, uint32_t width, uint32_t height)
 	{
 		auto device = DX11Renderer::GetRendererData().Device;
+		auto factory = DX11Renderer::GetRendererData().DXGIFactory;
 
 		DXGI_SWAP_CHAIN_DESC swapChainInfo;
 		ZeroMemory(&swapChainInfo, sizeof(swapChainInfo));
@@ -97,6 +102,16 @@ namespace symphony {
 		vp.TopLeftX = 0;
 		vp.TopLeftY = 0;
 		DX11Renderer::GetRendererData().Context->RSSetViewports(1, &vp);
+
+		SDL_Window* window = Application::Get().GetWindow().GetWindowHandle();
+
+		SDL_SysWMinfo wmInfo;
+		SDL_VERSION(&wmInfo.version);
+		SDL_GetWindowWMInfo(window, &wmInfo);
+		HWND windowRaw = wmInfo.info.win.window;
+
+		result = factory->MakeWindowAssociation(windowRaw, DXGI_MWA_NO_ALT_ENTER);
+		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to make window assocation with swap chain!");
 	}
 
 	DX11SwapChain::~DX11SwapChain()
@@ -112,12 +127,12 @@ namespace symphony {
 
 	void DX11SwapChain::Present()
 	{
-		m_Handle->Present(1, 0);
+		m_Handle->Present(0, 0);
 	}
 
 	void DX11SwapChain::RecreateRenderTargetView(uint32_t width, uint32_t height)
 	{
-		if (m_Handle != nullptr)
+		if (m_Handle)
 		{
 			DX11Renderer::GetRendererData().Context->OMSetRenderTargets(0, 0, 0);
 			m_RenderTargetView->Release();
@@ -125,18 +140,16 @@ namespace symphony {
 			HRESULT hr;
 			hr = m_Handle->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 
-			if (FAILED(hr))
-				__debugbreak();
+			DX11Renderer::CheckIfFailed(hr, "D3D11: Failed to resize swap chain images!");
 
 			ID3D11Texture2D* buffer = NULL;
 			hr = m_Handle->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer);
 
-			if (FAILED(hr))
-			{
-				__debugbreak();
-			}
+			DX11Renderer::CheckIfFailed(hr, "D3D11: Failed to get swap chain RTV id!");
 
 			hr = DX11Renderer::GetRendererData().Device->CreateRenderTargetView(buffer, NULL, &m_RenderTargetView);
+			DX11Renderer::CheckIfFailed(hr, "D3D11: Failed to recreate swap chain RTV!");
+
 			buffer->Release();
 
 			DX11Renderer::GetRendererData().Context->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);

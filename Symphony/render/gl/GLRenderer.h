@@ -30,6 +30,7 @@ namespace symphony
 		static void AddTexture2D(const char* filepath);
 		static void AddMesh(Mesh mesh, const std::string& name);
 		static void SetMeshTransform(const std::string& meshName, const glm::mat4& transform);
+		static void Resize(uint32_t width, uint32_t height);
 	private:
 		static std::unordered_map<std::string, std::shared_ptr<GLMesh>> m_Meshes;
 		static std::shared_ptr<GLShader> m_RendererShader;

@@ -19,6 +19,7 @@ namespace symphony
 		VulkanMesh(ModelData data);
 		~VulkanMesh();
 
+		void Recreate(uint32_t width, uint32_t height);
 		void Draw(VkCommandBuffer buffer, uint32_t imageIndex);
 	private:
 		std::shared_ptr<DescriptorSet> MeshDSET;

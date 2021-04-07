@@ -31,6 +31,10 @@ namespace symphony {
 		const RenderAPI& GetWindowRenderAPI() const {
 			return m_API;
 		}
+
+		RenderSurface* GetRenderSurface() {
+			return m_WindowSurface;
+		}
 	private:
 		RenderAPI m_API;
 		RenderSurface* m_WindowSurface = nullptr;

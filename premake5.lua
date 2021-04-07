@@ -34,6 +34,10 @@ project "Symphony"
         "vendor/imgui/examples/imgui_impl_sdl.cpp",
         "vendor/imgui/examples/imgui_impl_vulkan.h",
         "vendor/imgui/examples/imgui_impl_vulkan.cpp",
+        "vendor/imgui/examples/imgui_impl_opengl3.h",
+        "vendor/imgui/examples/imgui_impl_opengl3.cpp",
+        "vendor/imgui/examples/imgui_impl_dx11.h",
+        "vendor/imgui/examples/imgui_impl_dx11.cpp", -- dx12 can fuck off for now
         "vendor/stb/stb_image.h",
         "vendor/tinyobjloader/tiny_obj_loader.h"
     }

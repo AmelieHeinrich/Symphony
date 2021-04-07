@@ -20,6 +20,12 @@ namespace symphony
 		MeshDSET.reset();
 	}
 
+	void VulkanMesh::Recreate(uint32_t width, uint32_t height)
+	{
+		MeshDSET.reset();
+		MeshDSET = std::make_shared<DescriptorSet>(MeshT2D);
+	}
+
 	void VulkanMesh::Draw(VkCommandBuffer buffer, uint32_t imageIndex)
 	{
 		auto s_Data = VulkanRenderer::GetData();

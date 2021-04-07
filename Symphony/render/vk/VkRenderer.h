@@ -89,6 +89,7 @@ namespace symphony
 		static void AddTexture2D(const char* filepath);
 		static void AddMesh(Mesh mesh, const std::string& name);
 		static void SetMeshTransform(const std::string& meshName, const glm::mat4& transform);
+		static void Resize(unsigned int width, unsigned int height);
 
 		static const RendererData& GetData() {
 			return s_Data;

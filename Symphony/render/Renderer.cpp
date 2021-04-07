@@ -193,6 +193,22 @@ namespace symphony
 		}
 	}
 
+	void Renderer::Resize(uint32_t width, uint32_t height)
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::Vulkan:
+			VulkanRenderer::Resize(width, height);
+			break;
+		case RenderAPI::OpenGL:
+			GLRenderer::Resize(width, height);
+			break;
+		case RenderAPI::DirectX11:
+			DX11Renderer::Resize(width, height);
+			break;
+		}
+	}
+
 	void Renderer::AddMesh(Mesh mesh, const std::string& name)
 	{
 		switch (s_RenderAPI)

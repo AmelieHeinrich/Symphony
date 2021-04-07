@@ -7,6 +7,9 @@
 #include "render/gl/GLRenderSurface.h"
 #include "render/vk/VKRenderSurface.h"
 #include "render/dx12/DX12RenderSurface.h"
+#include "render/vk/VkRenderer.h"
+#include <imgui.h>
+#include <examples/imgui_impl_sdl.h>
 
 static bool GLFWInitialized = false;
 
@@ -15,7 +18,7 @@ namespace symphony {
 	Window::Window(int width, int height, const char* title, RenderAPI api)
 		: m_API(api)
 	{	
-		SDL_WindowFlags flag{};
+		SDL_WindowFlags flag;
 	
 		switch (api)
 		{
@@ -40,6 +43,8 @@ namespace symphony {
 		}
 
 		m_RawHandle = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flag);
+
+		SDL_SetWindowResizable(m_RawHandle, SDL_TRUE);
 
 		if (m_RawHandle == NULL) {
 			__debugbreak();
@@ -67,6 +72,8 @@ namespace symphony {
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
+			ImGui_ImplSDL2_ProcessEvent(&event);
+
 			switch (event.type)
 			{
 			case SDL_QUIT:
@@ -74,7 +81,7 @@ namespace symphony {
 				break;
 			case SDL_WINDOWEVENT:
 				if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-					m_WindowSurface->ResizeBuffers(0, 0, event.window.data1, event.window.data2);
+					Renderer::Resize(event.window.data1, event.window.data2);
 				}
 			}
 		}

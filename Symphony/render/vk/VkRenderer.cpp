@@ -2,6 +2,7 @@
 #include "window/Window.h"
 #include <chrono>
 #include "render/Renderer.h"
+#include "VkGui.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -60,6 +61,55 @@ namespace symphony
 		}
 
 		s_Data.descriptorPool = std::make_shared<DescriptorPool>();
+
+		VulkanGUI::Init();
+	}
+
+	void VulkanRenderer::Resize(unsigned int width, unsigned int height)
+	{
+		vkDeviceWaitIdle(s_Data.m_Device->device());
+
+		s_Data.FBWidth = width;
+		s_Data.FBHeight = height;
+
+		vkDestroyImageView(s_Data.m_Device->device(), s_Data.DepthImageView, nullptr);
+		vkDestroyImage(s_Data.m_Device->device(), s_Data.DepthImage, nullptr);
+		vkFreeMemory(s_Data.m_Device->device(), s_Data.DepthImageMemory, nullptr);
+		
+		s_Data.m_SwapChain.reset();
+		s_Data.commandBuffer.reset();
+		s_Data.graphicsPipeline.reset();
+		s_Data.m_RenderPass.reset();
+		s_Data.descriptorPool.reset();
+
+		s_Data.m_SwapChain = std::make_shared<SwapChain>(s_Data.m_PhysicalDevice->gpu(), s_Data.m_Surface->surface(), s_Data.m_Device->device());
+		s_Data.m_RenderPass = std::make_shared<RenderPass>(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain_image_format());
+
+		std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>("shaderlib/vksl/Vertex.vert", "shaderlib/vksl/Fragment.frag");
+
+		GraphicsPipelineCreateInfo info;
+		info.Width = s_Data.FBWidth;
+		info.Height = s_Data.FBHeight;
+		info.PipelineDescriptorSetLayout = s_Data.descriptorSetLayout->GetDescriptorSetLayout();
+		info.PipelineShader = shader;
+		info.PipelineRenderPass = s_Data.m_RenderPass;
+		info.SwapChainExtent = s_Data.m_SwapChain->swap_chain_extent();
+
+		s_Data.graphicsPipeline = std::make_shared<GraphicsPipeline>(s_Data.m_Device->device(), info);
+
+		shader.reset();
+
+		VkFormat depthFormat = VulkanTexture2D::FindDepthFormat();
+		VulkanTexture2D::CreateImage(s_Data.FBWidth, s_Data.FBHeight, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, s_Data.DepthImage, s_Data.DepthImageMemory);
+		s_Data.DepthImageView = VulkanTexture2D::CreateImageView(s_Data.DepthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+		VulkanTexture2D::TransitionImageLayout(s_Data.DepthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+		s_Data.m_SwapChain->InitFramebuffers(s_Data.m_RenderPass->render_pass());
+
+		s_Data.descriptorPool = std::make_shared<DescriptorPool>();
+		s_Data.commandBuffer = std::make_shared<CommandBuffer>(s_Data.m_Device, s_Data.m_CommandPool, false);
+
+		for (auto mesh : m_Meshes)
+			mesh.second->Recreate(width, height);
 	}
 
 	void VulkanRenderer::Shutdown()
@@ -77,6 +127,8 @@ namespace symphony
 		vkDestroyImageView(s_Data.m_Device->device(), s_Data.DepthImageView, nullptr);
 		vkDestroyImage(s_Data.m_Device->device(), s_Data.DepthImage, nullptr);
 		vkFreeMemory(s_Data.m_Device->device(), s_Data.DepthImageMemory, nullptr);
+
+		VulkanGUI::Shutdown();
 
 		s_Data.commandBuffer.reset();
 		s_Data.m_CommandPool.reset();
@@ -155,6 +207,10 @@ namespace symphony
 			Renderer::Stats.DrawCalls = drawCalls;
 			numTris = 0;
 			drawCalls = 0;
+
+			VulkanGUI::BeginGUI();
+			ImGui::ShowDemoWindow();
+			VulkanGUI::EndGUI();
 
 			vkCmdEndRenderPass(s_Data.commandBuffer->GetCommandBuffer());
 			s_Data.commandBuffer->End();

@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <core/Log.h>
+#include "GLGui.h"
 
 namespace symphony
 {
@@ -55,16 +56,27 @@ namespace symphony
 		m_RendererShader->Unbind();
 
 		glEnable(GL_DEPTH_TEST);
+
+		GLGui::Init();
 	}
 
 	void GLRenderer::Shutdown()
 	{
+		GLGui::Shutdown();
+
 		for (auto i : m_Meshes)
 			i.second.reset();
 		m_Meshes.clear();
 
 		m_UniformBuffer.reset();
 		m_RendererShader.reset();
+	}
+
+	void GLRenderer::Resize(uint32_t width, uint32_t height)
+	{
+		FBWidth = width;
+		FBHeight = height;
+		glViewport(0, 0, width, height);
 	}
 
 	void GLRenderer::ClearColor(float r, float g, float b, float a)
@@ -101,6 +113,10 @@ namespace symphony
 		drawCalls = 0;
 
 		m_RendererShader->Unbind();
+
+		GLGui::BeginGUI();
+		ImGui::ShowDemoWindow();
+		GLGui::EndGUI();
 	}
 
 	void GLRenderer::AddVertexBuffer(const std::vector<Vertex>& vertices)

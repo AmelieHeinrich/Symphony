@@ -54,6 +54,7 @@ namespace symphony
 		static void AddModelData(ModelData data);
 		static void AddMesh(Mesh mesh, const std::string& name);
 		static void SetMeshTransform(const std::string& name, const glm::mat4& matrix);
+		static void Resize(uint32_t width, uint32_t height);
 
 		struct Statistics
 		{

@@ -10,16 +10,8 @@ namespace symphony
 		ImageData imageData = ImageData::LoadImageData(filepath, 2);
 		
 		GLenum internalFormat = 0, dataFormat = 0;
-		if (imageData.Channels == 4)
-		{
-			internalFormat = GL_RGBA8;
-			dataFormat = GL_RGBA;
-		}
-		else if (imageData.Channels == 3)
-		{
-			internalFormat = GL_RGBA8;
-			dataFormat = GL_RGBA;
-		}
+		internalFormat = GL_RGBA8;
+		dataFormat = GL_RGBA;
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RenderID);
 		glTextureStorage2D(m_RenderID, 1, internalFormat, imageData.Width, imageData.Height);
