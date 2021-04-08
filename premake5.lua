@@ -37,7 +37,9 @@ project "Symphony"
         "vendor/imgui/examples/imgui_impl_opengl3.h",
         "vendor/imgui/examples/imgui_impl_opengl3.cpp",
         "vendor/imgui/examples/imgui_impl_dx11.h",
-        "vendor/imgui/examples/imgui_impl_dx11.cpp", -- dx12 can fuck off for now
+        "vendor/imgui/examples/imgui_impl_dx11.cpp", 
+        "vendor/imgui/examples/imgui_impl_dx12.h",
+        "vendor/imgui/examples/imgui_impl_dx12.cpp", 
         "vendor/stb/stb_image.h",
         "vendor/tinyobjloader/tiny_obj_loader.h"
     }
@@ -130,14 +132,16 @@ project "SymphonySB"
         "$(VULKAN_SDK)/include",
         "vendor/glm",
         "vendor/entt/single_include/",
-        "vendor/spdlog/include"
+        "vendor/spdlog/include",
+        "vendor/imgui"
     }
 
     links
     {
         "Symphony",
         "$(VULKAN_SDK)/lib/vulkan-1.lib",
-        "sdl2"
+        "sdl2",
+        "imgui"
     }
 
     defines

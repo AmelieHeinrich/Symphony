@@ -206,6 +206,9 @@ namespace symphony
 		case RenderAPI::DirectX11:
 			DX11Renderer::Resize(width, height);
 			break;
+		case RenderAPI::DirectX12:
+			DX12Renderer::Resize(width, height);
+			break;
 		}
 	}
 
@@ -259,6 +262,9 @@ namespace symphony
 			break;
 		case RenderAPI::DirectX11:
 			DX11Renderer::PrintRendererInfo();
+			break;
+		case RenderAPI::DirectX12:
+			DX12Renderer::PrintRendererInfo();
 			break;
 		}
 	}

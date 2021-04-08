@@ -17,7 +17,10 @@ namespace symphony
 
 		auto res = CreateDXGIFactory(IID_PPV_ARGS(&factory));
 		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create DXGI factory!");
-		res = D3D12CreateDevice(NULL, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&device));
+
+		factory->EnumAdapters(1, &adapter);
+
+		res = D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&device));
 		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create device!");
 
 		if (DebugEnabled)
@@ -25,12 +28,15 @@ namespace symphony
 			res = device->QueryInterface(IID_PPV_ARGS(&debugDevice));
 			DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create debug device!");
 		}
+
+		adapter->GetParent(__uuidof(IDXGIFactory), (void**)&factory);
 	}
 
 	DX12Device::~DX12Device()
 	{
 		device->Release();
 		factory->Release();
+		adapter->Release();
 
 		if (DebugEnabled)
 		{

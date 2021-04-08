@@ -6,6 +6,7 @@
 #include "VertexBuffer.h"
 #include <glm/glm.hpp>
 #include <utility>
+#include <functional>
 
 namespace symphony
 {

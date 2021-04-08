@@ -17,6 +17,7 @@
 #include "window/Window.h"
 #include <core/Log.h>
 #include <unordered_map>
+#include "DX12HeapManager.h"
 
 namespace symphony
 {
@@ -37,12 +38,10 @@ namespace symphony
 		std::shared_ptr<DX12Device> RendererDevice;
 		std::shared_ptr<DX12Fence> RendererFence;
 		std::shared_ptr<DX12Command> RendererCommand;
-		std::shared_ptr<DX12Memory> RendererMemory;
 		std::shared_ptr<DX12SwapChain> RendererSwapChain;
 		std::shared_ptr<DX12Shader> RendererShader;
 		std::shared_ptr<DX12Pipeline> RendererGraphicsPipeline;
 
-		std::shared_ptr<DX12Memory> RendererDepthMemory;
 		ID3D12Resource* RendererDepthResource;
 
 		uint32_t BufferIndex = 0;
@@ -62,13 +61,18 @@ namespace symphony
 		static void ClearColor(float r, float g, float b, float a);
 		static void Draw();
 
+		static void PrintRendererInfo();
 		static void AddVertexBuffer(const std::vector<Vertex>& vertices);
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);
 		static void AddMesh(Mesh mesh, const std::string& name);
 		static void SetMeshTransform(const std::string& meshName, const glm::mat4& transform);
+		static void Resize(uint32_t width, uint32_t height);
+		static uint32_t GetNumMeshes() {
+			return m_Meshes.size();
+		}
 
-		static DX12RendererData GetRendererData() {
+		static DX12RendererData& GetRendererData() {
 			return m_RendererData;
 		}
 

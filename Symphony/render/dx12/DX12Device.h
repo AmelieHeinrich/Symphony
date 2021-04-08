@@ -23,6 +23,10 @@ namespace symphony
 			return device;
 		}
 
+		IDXGIAdapter* GetAdapter() {
+			return adapter;
+		}
+
 		ID3D12Debug1* GetDebug() {
 			if (DebugEnabled)
 				return debug;
@@ -37,7 +41,9 @@ namespace symphony
 				return nullptr;
 		}
 	private:
+		IDXGIDevice* dxgiDevice = nullptr;
 		IDXGIFactory* factory = nullptr;
+		IDXGIAdapter* adapter = nullptr;
 		ID3D12Device* device = nullptr;
 
 		ID3D12Debug1* debug = nullptr;

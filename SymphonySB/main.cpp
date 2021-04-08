@@ -3,6 +3,7 @@
 #include <memory>
 #include <SDL.h>
 #include <stdlib.h>
+#include <imgui.h>
 
 using namespace symphony;
 
@@ -10,11 +11,11 @@ class SymphonySandbox : public Application
 {
 public:
 	SymphonySandbox()
-		: Application(RenderAPI::DirectX11, "Symphony Sandbox")
+		: Application(RenderAPI::DirectX12, "Symphony Sandbox")
 	{
 		Renderer::PrintRendererInfo();
 
-		Renderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		Renderer::ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		Mesh gunMesh(MeshBuilder::LoadModelDataAsync("resources/low.obj", "resources/gun_texture.png"));
 		Mesh monkeyMesh(MeshBuilder::LoadModelDataAsync("resources/suzanne.obj", "resources/darkMarble.jpg"));
 

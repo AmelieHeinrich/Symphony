@@ -86,8 +86,8 @@ namespace symphony
 	void DX12Command::Clear(uint32_t bufferIndex)
 	{
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
-		auto memory = DX12Renderer::GetRendererData().RendererMemory->GetHeapHandle();
-		auto depthMemory = DX12Renderer::GetRendererData().RendererDepthMemory->GetHeapHandle();
+		auto memory = DX12HeapManager::RenderTargetViewHeap->GetHeapHandle();
+		auto depthMemory = DX12HeapManager::DepthResourceHeap->GetHeapHandle();
 		memory.ptr += (SIZE_T)uiDescHeapSizeRTV * bufferIndex;
 
 		static FLOAT clearColorValues[4] = { ccr, ccg, ccb, cca };

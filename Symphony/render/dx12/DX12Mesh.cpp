@@ -6,10 +6,7 @@ namespace symphony
 	DX12Mesh::DX12Mesh(ModelData data)
 		: Mesh(data)
 	{
-		MeshVBO = std::make_shared<DX12VertexBuffer>(data.RendererResources.first);
-		MeshEBO = std::make_shared<DX12IndexBuffer>(data.RendererResources.second);
-		MeshT2D = std::make_shared<DX12Texture2D>(data.TextureFilepath);
-		MeshUBO = std::make_shared<DX12UniformBuffer>();
+		
 	}
 
 	DX12Mesh::~DX12Mesh()
@@ -20,23 +17,32 @@ namespace symphony
 		MeshVBO.reset();
 	}
 
+	void DX12Mesh::CreateResources()
+	{
+		MeshVBO = std::make_shared<DX12VertexBuffer>(m_Data.RendererResources.first);
+		MeshEBO = std::make_shared<DX12IndexBuffer>(m_Data.RendererResources.second);
+		MeshT2D = std::make_shared<DX12Texture2D>(m_Data.TextureFilepath);
+		MeshUBO = std::make_shared<DX12UniformBuffer>();
+	}
+
+	void DX12Mesh::UpdateUBO(RendererUniforms ubo)
+	{
+		
+	}
+
 	void DX12Mesh::Draw(RendererUniforms ubo)
 	{
 		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
 		auto command = DX12Renderer::GetRendererData().RendererCommand;
+
 		ubo.SceneModel = ModelMatrix;
 
+		MeshT2D->Bind();
 		MeshUBO->Bind();
 		MeshVBO->Bind();
 		MeshEBO->Bind();
-		MeshT2D->Bind();
 
-		clist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		clist->DrawIndexedInstanced(MeshEBO->GetIndicesSize(), 1, 0, 0, 0);
 		MeshUBO->Update(ubo);
-
-		MeshEBO->Unbind();
-		MeshVBO->Unbind();
-		MeshUBO->Unbind();
+		clist->DrawIndexedInstanced(MeshEBO->GetIndicesSize(), 1, 0, 0, 0);
 	}
 }

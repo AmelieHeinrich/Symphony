@@ -24,7 +24,7 @@ namespace symphony
 		}
 
 		ModelData GetModelData() { return m_Data; }
-	private:
+	protected:
 		ModelData m_Data;
 	};
 }

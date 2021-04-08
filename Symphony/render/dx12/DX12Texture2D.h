@@ -17,15 +17,10 @@ namespace symphony
 			return m_TextureResource;
 		}
 
-		std::shared_ptr<DX12Memory> GetDescriptorHeap() {
-			return m_TextureDescriptorHeap;
-		}
-
 		void Bind();
 		void Unbind();
 	private:
 		ID3D12Resource* m_TextureResource;
 		ID3D12Resource* m_TextureUploadResource;
-		std::shared_ptr<DX12Memory> m_TextureDescriptorHeap;
 	};
 }

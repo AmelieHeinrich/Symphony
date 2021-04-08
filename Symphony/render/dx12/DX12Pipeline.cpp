@@ -12,7 +12,7 @@ namespace symphony
 		ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
 		depthStencilDesc.DepthEnable = TRUE;
 		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
 		depthStencilDesc.StencilEnable = FALSE;
 		depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
 		depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
@@ -22,7 +22,7 @@ namespace symphony
 
 		D3D12_RASTERIZER_DESC rasterizerDesk;
 		ZeroMemory(&rasterizerDesk, sizeof(D3D12_RASTERIZER_DESC));
-		rasterizerDesk.FillMode = D3D12_FILL_MODE_SOLID;
+		rasterizerDesk.FillMode = D3D12_FILL_MODE_WIREFRAME;
 		rasterizerDesk.CullMode = D3D12_CULL_MODE_BACK;
 		rasterizerDesk.DepthClipEnable = FALSE;
 		rasterizerDesk.FrontCounterClockwise = TRUE;

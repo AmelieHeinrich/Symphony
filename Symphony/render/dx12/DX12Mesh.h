@@ -14,6 +14,8 @@ namespace symphony
 		DX12Mesh(ModelData data);
 		~DX12Mesh();
 
+		void CreateResources();
+		void UpdateUBO(RendererUniforms ubo);
 		void Draw(RendererUniforms ubo);
 	private:
 		std::shared_ptr<DX12VertexBuffer> MeshVBO;

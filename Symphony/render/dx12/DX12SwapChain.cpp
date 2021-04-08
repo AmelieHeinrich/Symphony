@@ -3,6 +3,8 @@
 
 #include <wrl.h>
 #include <SDL_syswm.h>
+#include "core/Application.h"
+#include <examples/imgui_impl_dx12.h>
 
 namespace symphony
 {
@@ -11,7 +13,7 @@ namespace symphony
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
 		auto factory = DX12Renderer::GetRendererData().RendererDevice->GetFactory();
 		auto commandQueue = DX12Renderer::GetRendererData().RendererCommand->GetCommandQueue();
-		auto memory = DX12Renderer::GetRendererData().RendererMemory->GetHeapHandle();
+		auto memory = DX12HeapManager::RenderTargetViewHeap->GetHeapHandle();
 
 		SDL_SysWMinfo wmInfo;
 		SDL_VERSION(&wmInfo.version);
@@ -21,7 +23,7 @@ namespace symphony
 		int w, h;
 		SDL_GetWindowSize(window->GetWindowHandle(), &w, &h);
 
-		DXGI_SWAP_CHAIN_DESC swapDesc;
+		DXGI_SWAP_CHAIN_DESC swapDesc{};
 		swapDesc.BufferDesc.Width = w;
 		swapDesc.BufferDesc.Height = h;
 		swapDesc.BufferDesc.RefreshRate.Numerator = 60;
@@ -73,5 +75,63 @@ namespace symphony
 	{
 		auto res = swapChain->Present(0, 0);
 		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to present swap chain!");
+	}
+
+	void DX12SwapChain::Resize(uint32_t width, uint32_t height)
+	{
+		if (swapChain)
+		{
+			DX12Renderer::GetRendererData().RendererCommand->SignalFence(DX12Renderer::GetRendererData().RendererFence);
+			DX12Renderer::GetRendererData().RendererFence->WaitEvents();
+
+			ImGui_ImplDX12_InvalidateDeviceObjects();
+
+			auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
+			auto factory = DX12Renderer::GetRendererData().RendererDevice->GetFactory();
+			auto commandQueue = DX12Renderer::GetRendererData().RendererCommand->GetCommandQueue();
+			auto memory = DX12HeapManager::RenderTargetViewHeap->GetHeapHandle();
+
+			SDL_Window* window = Application::Get().GetWindow().GetWindowHandle();
+
+			SDL_SysWMinfo wmInfo;
+			SDL_VERSION(&wmInfo.version);
+			SDL_GetWindowWMInfo(window, &wmInfo);
+			HWND windowRaw = wmInfo.info.win.window;
+
+			DXGI_SWAP_CHAIN_DESC desc = {};
+			swapChain->GetDesc(&desc);
+			desc.BufferDesc.Width = width;
+			desc.BufferDesc.Height = height;
+			swapChain->ResizeBuffers(1, width, height, desc.BufferDesc.Format, desc.Flags);
+
+			UINT uiDescHeapSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+			factory->MakeWindowAssociation(windowRaw, DXGI_MWA_NO_ALT_ENTER);
+
+			for (int i = 0; i < 2; i++) {
+				backBuffers[i]->Release();
+				backBuffers[i] = nullptr;
+
+				swapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
+				device->CreateRenderTargetView(backBuffers[i], NULL, memory);
+
+				memory.ptr += uiDescHeapSizeRTV;
+			}
+
+			ImGui_ImplDX12_CreateDeviceObjects();
+
+			D3D12_VIEWPORT view{};
+			view.Width = width;
+			view.Height = height;
+			view.MaxDepth = 1.0f;
+			view.MinDepth = 0.0f;
+
+			D3D12_RECT scissor{ 0 };
+			scissor.right = view.Width;
+			scissor.bottom = view.Height;
+
+			DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->RSSetViewports(1, &view);
+			DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->RSSetScissorRects(1, &scissor);
+		}
 	}
 }

@@ -8,9 +8,7 @@ namespace symphony
 	DX12UniformBuffer::DX12UniformBuffer()
 	{
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
-		auto mainDescriptorHeap = DX12Renderer::GetRendererData().RendererMemory->GetHeapHandle();
-
-		m_DescriptorHeap = std::make_shared<DX12Memory>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
+		auto mainDescriptorHeap = DX12HeapManager::RenderTargetViewHeap->GetHeapHandle();
 
 		D3D12_HEAP_PROPERTIES props{};
 		props.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -40,13 +38,12 @@ namespace symphony
 
 		m_View.BufferLocation = m_Resource->GetGPUVirtualAddress();
 		m_View.SizeInBytes = 256;
-		device->CreateConstantBufferView(&m_View, m_DescriptorHeap->GetHeapHandle());
+		device->CreateConstantBufferView(&m_View, DX12HeapManager::ShaderHeap->GetHeapHandle());
 	}
 
 	DX12UniformBuffer::~DX12UniformBuffer()
 	{
 		m_Resource->Release();
-		m_DescriptorHeap.reset();
 	}
 
 	void DX12UniformBuffer::Bind(uint32_t offset)
@@ -58,20 +55,16 @@ namespace symphony
 
 	void DX12UniformBuffer::Unbind()
 	{
-		auto frameIndex = DX12Renderer::GetRendererData().BufferIndex;
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
-		clist->SetGraphicsRootConstantBufferView(0, 0);
+		//auto frameIndex = DX12Renderer::GetRendererData().BufferIndex;
+		//auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		//clist->SetGraphicsRootConstantBufferView(0, 0);
 	}
 
 	void DX12UniformBuffer::Update(RendererUniforms uniforms)
 	{
-		auto frameIndex = DX12Renderer::GetRendererData().BufferIndex;
-		UINT constDataSizeAligned = (sizeof(RendererUniforms) + 255) & ~255;
-
-		D3D12_RANGE readRange = { 0, 0 };
-		uint8_t* cbvDataBegin;
-		m_Resource->Map(0, &readRange, reinterpret_cast<void**>(&cbvDataBegin));
-		memcpy(&cbvDataBegin[frameIndex * constDataSizeAligned], &uniforms, sizeof(uniforms));
+		void* data;
+		m_Resource->Map(0, nullptr, reinterpret_cast<void**>(&data));
+		memcpy(data, &uniforms, sizeof(uniforms));
 		m_Resource->Unmap(0, nullptr);
 	}
 }
