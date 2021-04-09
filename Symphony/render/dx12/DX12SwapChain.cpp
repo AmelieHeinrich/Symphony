@@ -23,6 +23,7 @@ namespace symphony
 		int w, h;
 		SDL_GetWindowSize(window->GetWindowHandle(), &w, &h);
 
+		IDXGISwapChain* temp;
 		DXGI_SWAP_CHAIN_DESC swapDesc{};
 		swapDesc.BufferDesc.Width = w;
 		swapDesc.BufferDesc.Height = h;
@@ -40,7 +41,8 @@ namespace symphony
 		swapDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-		auto res = factory->CreateSwapChain(commandQueue, &swapDesc, &swapChain);
+		auto res = factory->CreateSwapChain(commandQueue, &swapDesc, &temp);
+		swapChain = static_cast<IDXGISwapChain3*>(temp);
 		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create swap chain!");
 
 		res = factory->MakeWindowAssociation(windowRaw, DXGI_MWA_NO_ALT_ENTER);

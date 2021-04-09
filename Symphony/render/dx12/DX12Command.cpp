@@ -1,5 +1,6 @@
 #include "DX12Command.h"
 #include "DX12Renderer.h"
+#include "dx12ext/d3dx12.h"
 
 namespace symphony
 {
@@ -58,29 +59,14 @@ namespace symphony
 	void DX12Command::BeginFrame(uint32_t bufferIndex)
 	{
 		auto ptrsBackBuffers = DX12Renderer::GetRendererData().RendererSwapChain->GetBackBuffers();
-
-		D3D12_RESOURCE_BARRIER baPresentToRtv;
-		baPresentToRtv.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		baPresentToRtv.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		baPresentToRtv.Transition.pResource = ptrsBackBuffers[bufferIndex];
-		baPresentToRtv.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		baPresentToRtv.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-		baPresentToRtv.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		commandList->ResourceBarrier(1, &baPresentToRtv);
+		commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(ptrsBackBuffers[bufferIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 	}
 
 	void DX12Command::EndFrame(uint32_t bufferIndex)
 	{
 		auto ptrsBackBuffers = DX12Renderer::GetRendererData().RendererSwapChain->GetBackBuffers();
 
-		D3D12_RESOURCE_BARRIER baRtvToPresent;
-		baRtvToPresent.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		baRtvToPresent.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		baRtvToPresent.Transition.pResource = ptrsBackBuffers[bufferIndex];
-		baRtvToPresent.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		baRtvToPresent.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		baRtvToPresent.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-		commandList->ResourceBarrier(1, &baRtvToPresent);
+		commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(ptrsBackBuffers[bufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	}
 
 	void DX12Command::Clear(uint32_t bufferIndex)
@@ -91,7 +77,7 @@ namespace symphony
 		memory.ptr += (SIZE_T)uiDescHeapSizeRTV * bufferIndex;
 
 		static FLOAT clearColorValues[4] = { ccr, ccg, ccb, cca };
-		commandList->OMSetRenderTargets(1, &memory, FALSE, &depthMemory);
+		commandList->OMSetRenderTargets(1, &memory, TRUE, &depthMemory);
 		commandList->ClearRenderTargetView(memory, clearColorValues, 0, NULL);
 		commandList->ClearDepthStencilView(depthMemory, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
 	}

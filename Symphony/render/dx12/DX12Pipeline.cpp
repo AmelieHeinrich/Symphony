@@ -22,7 +22,7 @@ namespace symphony
 
 		D3D12_RASTERIZER_DESC rasterizerDesk;
 		ZeroMemory(&rasterizerDesk, sizeof(D3D12_RASTERIZER_DESC));
-		rasterizerDesk.FillMode = D3D12_FILL_MODE_WIREFRAME;
+		rasterizerDesk.FillMode = D3D12_FILL_MODE_SOLID;
 		rasterizerDesk.CullMode = D3D12_CULL_MODE_BACK;
 		rasterizerDesk.DepthClipEnable = FALSE;
 		rasterizerDesk.FrontCounterClockwise = TRUE;

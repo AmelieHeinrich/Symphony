@@ -22,7 +22,7 @@ namespace symphony
 
 		SDL_Window* window = Application::Get().GetWindow().GetWindowHandle();
 
-		auto s_ImGuiSamplerHeap = DX12HeapManager::SamplerHeap;
+		auto s_ImGuiSamplerHeap = DX12HeapManager::ImGuiHeap;
 
 		ImGui_ImplSDL2_InitForD3D(window);
 		ImGui_ImplDX12_Init(data.RendererDevice->GetDevice(), 2,

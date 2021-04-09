@@ -17,5 +17,6 @@ namespace symphony
 		static std::shared_ptr<DX12Memory> DepthResourceHeap;
 		static std::shared_ptr<DX12Memory> ConstantBufferHeap;
 		static std::shared_ptr<DX12Memory> SamplerHeap;
+		static std::shared_ptr<DX12Memory> ImGuiHeap;
 	};
 }

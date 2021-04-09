@@ -127,6 +127,10 @@ namespace symphony
 		m_RendererData.RendererCommand->BeginFrame(m_RendererData.BufferIndex);
 
 		// DRAW
+		m_RendererData.RendererCommand->Clear(m_RendererData.BufferIndex);
+		m_RendererData.RendererGraphicsPipeline->Bind();
+		m_RendererData.RendererShader->Bind();
+
 		D3D12_VIEWPORT view{};
 		view.Width = m_RendererData.FBWidth;
 		view.Height = m_RendererData.FBHeight;
@@ -139,14 +143,11 @@ namespace symphony
 
 		m_RendererData.RendererCommand->GetCommandList()->RSSetViewports(1, &view);
 		m_RendererData.RendererCommand->GetCommandList()->RSSetScissorRects(1, &scissor);
-		m_RendererData.RendererCommand->Clear(m_RendererData.BufferIndex);
-		m_RendererData.RendererGraphicsPipeline->Bind();
-		m_RendererData.RendererShader->Bind();
 
 		auto descriptorHeap = DX12HeapManager::SamplerHeap;
 		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap->GetDescriptorHeap() };
-		m_RendererData.RendererCommand->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
-		m_RendererData.RendererCommand->GetCommandList()->SetGraphicsRootDescriptorTable(1, descriptorHeap->GetGPUHandle());
+		DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
+		DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->SetGraphicsRootDescriptorTable(1, descriptorHeap->GetGPUHandle());
 
 		for (auto mesh : m_Meshes) {
 			auto model = mesh.second;
@@ -159,21 +160,21 @@ namespace symphony
 			model->Draw(ubo);
 		}
 
-		DX12Gui::BeginGUI();
+		/*DX12Gui::BeginGUI();
 		ImGui::ShowDemoWindow();
 		ImGui::Render();
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), DX12Renderer::GetRendererData().RendererCommand->GetCommandList());
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), DX12Renderer::GetRendererData().RendererCommand->GetCommandList());*/
+
+		m_RendererData.RendererCommand->EndFrame(m_RendererData.BufferIndex);
 
 		m_RendererData.RendererCommand->CloseCommandList();
 		m_RendererData.RendererCommand->ExecuteCommandList();
-
-		m_RendererData.RendererCommand->EndFrame(m_RendererData.BufferIndex);
 		m_RendererData.RendererSwapChain->Present();
 
+		m_RendererData.BufferIndex = m_RendererData.RendererSwapChain->GetSwapChain()->GetCurrentBackBufferIndex();
 		m_RendererData.RendererCommand->SignalFence(m_RendererData.RendererFences[m_RendererData.BufferIndex]);
 		m_RendererData.RendererFences[m_RendererData.BufferIndex]->WaitEvents();
 		m_RendererData.RendererFences[m_RendererData.BufferIndex]->UpdateFence();
-		m_RendererData.BufferIndex = (m_RendererData.BufferIndex + 1) % 2;
 	}
 
 	void DX12Renderer::Resize(uint32_t width, uint32_t height)

@@ -39,6 +39,7 @@ namespace symphony
 		MeshUBO->Bind();
 		MeshVBO->Bind();
 		MeshEBO->Bind();
+		MeshT2D->Bind();
 
 		MeshUBO->Update(ubo);
 		clist->DrawIndexedInstanced(MeshEBO->GetIndicesSize(), 1, 0, 0, 0);

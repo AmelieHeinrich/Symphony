@@ -1,7 +1,7 @@
 #pragma once
 
 #include <d3d12.h>
-#include <dxgi.h>
+#include <dxgi1_4.h>
 #include <vector>
 #include "window/Window.h"
 
@@ -18,7 +18,7 @@ namespace symphony
 		void Present();
 		void Resize(uint32_t width, uint32_t height);
 
-		IDXGISwapChain* GetSwapChain() {
+		IDXGISwapChain3* GetSwapChain() {
 			return swapChain;
 		}
 
@@ -26,7 +26,7 @@ namespace symphony
 			return backBuffers;
 		}
 	private:
-		IDXGISwapChain* swapChain;
+		IDXGISwapChain3* swapChain;
 		std::vector<ID3D12Resource*> backBuffers;
 	};
 }
