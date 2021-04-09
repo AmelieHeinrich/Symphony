@@ -5,7 +5,8 @@ namespace symphony
 {
 	std::shared_ptr<DX12Memory> DX12HeapManager::RenderTargetViewHeap;
 	std::shared_ptr<DX12Memory> DX12HeapManager::DepthResourceHeap;
-	std::shared_ptr<DX12Memory> DX12HeapManager::ShaderHeap;
+	std::shared_ptr<DX12Memory> DX12HeapManager::SamplerHeap;
+	std::shared_ptr<DX12Memory> DX12HeapManager::ConstantBufferHeap;
 
 	void DX12HeapManager::Init()
 	{
@@ -15,13 +16,15 @@ namespace symphony
 
 	void DX12HeapManager::Release()
 	{
-		ShaderHeap.reset();
+		ConstantBufferHeap.reset();
+		SamplerHeap.reset();
 		DepthResourceHeap.reset();
-		ShaderHeap.reset();
+		RenderTargetViewHeap.reset();
 	}
 
 	void DX12HeapManager::InitMeshHeap()
 	{
-		ShaderHeap = std::make_shared<DX12Memory>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, DX12Renderer::GetNumMeshes());
+		ConstantBufferHeap = std::make_shared<DX12Memory>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, DX12Renderer::GetNumMeshes());
+		SamplerHeap = std::make_shared<DX12Memory>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, DX12Renderer::GetNumMeshes());
 	}
 }

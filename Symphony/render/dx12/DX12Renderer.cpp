@@ -12,7 +12,9 @@ namespace symphony
 	void DX12Renderer::Init(Window* window)
 	{
 		m_RendererData.RendererDevice = std::make_shared<DX12Device>(true);
-		m_RendererData.RendererFence = std::make_shared<DX12Fence>();
+		m_RendererData.RendererFences.resize(2);
+		for (int i = 0; i < 2; i++)
+			m_RendererData.RendererFences[i] = std::make_shared<DX12Fence>();
 		m_RendererData.RendererCommand = std::make_shared<DX12Command>();
 		
 		DX12HeapManager::Init();
@@ -108,7 +110,9 @@ namespace symphony
 		m_RendererData.RendererSwapChain->ReleaseBackBuffers();
 		m_RendererData.RendererSwapChain->ReleaseSwapChain();
 		m_RendererData.RendererCommand.reset();
-		m_RendererData.RendererFence.reset();
+		for (auto fence : m_RendererData.RendererFences)
+			fence.reset();
+		m_RendererData.RendererFences.clear();
 		m_RendererData.RendererDevice.reset();
 	}
 
@@ -129,7 +133,7 @@ namespace symphony
 		view.MaxDepth = 1.0f;
 		view.MinDepth = 0.0f;
 
-		D3D12_RECT scissor{0};
+		D3D12_RECT scissor{ 0 };
 		scissor.right = view.Width;
 		scissor.bottom = view.Height;
 
@@ -139,7 +143,7 @@ namespace symphony
 		m_RendererData.RendererGraphicsPipeline->Bind();
 		m_RendererData.RendererShader->Bind();
 
-		auto descriptorHeap = DX12HeapManager::ShaderHeap;
+		auto descriptorHeap = DX12HeapManager::SamplerHeap;
 		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap->GetDescriptorHeap() };
 		m_RendererData.RendererCommand->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 		m_RendererData.RendererCommand->GetCommandList()->SetGraphicsRootDescriptorTable(1, descriptorHeap->GetGPUHandle());
@@ -166,9 +170,9 @@ namespace symphony
 		m_RendererData.RendererCommand->EndFrame(m_RendererData.BufferIndex);
 		m_RendererData.RendererSwapChain->Present();
 
-		m_RendererData.RendererCommand->SignalFence(m_RendererData.RendererFence);
-		m_RendererData.RendererFence->WaitEvents();
-		m_RendererData.RendererFence->UpdateFence();
+		m_RendererData.RendererCommand->SignalFence(m_RendererData.RendererFences[m_RendererData.BufferIndex]);
+		m_RendererData.RendererFences[m_RendererData.BufferIndex]->WaitEvents();
+		m_RendererData.RendererFences[m_RendererData.BufferIndex]->UpdateFence();
 		m_RendererData.BufferIndex = (m_RendererData.BufferIndex + 1) % 2;
 	}
 

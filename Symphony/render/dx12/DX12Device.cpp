@@ -18,7 +18,7 @@ namespace symphony
 		auto res = CreateDXGIFactory(IID_PPV_ARGS(&factory));
 		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create DXGI factory!");
 
-		factory->EnumAdapters(1, &adapter);
+		factory->EnumAdapters(0, &adapter);
 
 		res = D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&device));
 		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create device!");

@@ -38,7 +38,7 @@ namespace symphony
 
 		m_View.BufferLocation = m_Resource->GetGPUVirtualAddress();
 		m_View.SizeInBytes = 256;
-		device->CreateConstantBufferView(&m_View, DX12HeapManager::ShaderHeap->GetHeapHandle());
+		device->CreateConstantBufferView(&m_View, DX12HeapManager::ConstantBufferHeap->GetHeapHandle());
 	}
 
 	DX12UniformBuffer::~DX12UniformBuffer()

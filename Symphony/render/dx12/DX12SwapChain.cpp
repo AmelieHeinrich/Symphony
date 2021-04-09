@@ -81,8 +81,8 @@ namespace symphony
 	{
 		if (swapChain)
 		{
-			DX12Renderer::GetRendererData().RendererCommand->SignalFence(DX12Renderer::GetRendererData().RendererFence);
-			DX12Renderer::GetRendererData().RendererFence->WaitEvents();
+			DX12Renderer::GetRendererData().RendererCommand->SignalFence(DX12Renderer::GetRendererData().RendererFences[DX12Renderer::GetRendererData().BufferIndex]);
+			DX12Renderer::GetRendererData().RendererFences[DX12Renderer::GetRendererData().BufferIndex]->WaitEvents();
 
 			ImGui_ImplDX12_InvalidateDeviceObjects();
 

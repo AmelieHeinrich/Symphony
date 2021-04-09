@@ -13,7 +13,7 @@ namespace symphony
 		using namespace std;
 		using namespace Microsoft::WRL;
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
-		auto descriptorHeap = DX12HeapManager::ShaderHeap;
+		auto descriptorHeap = DX12HeapManager::SamplerHeap;
 
 		ImageData image_Data = ImageData::LoadImageData(filepath, 2);
 
@@ -37,7 +37,7 @@ namespace symphony
 		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create Texture2D upload buffer!");
 		
 		D3D12_SUBRESOURCE_DATA textureData = {};
-		textureData.pData = &image_Data.DataBuffer[0];
+		textureData.pData = image_Data.DataBuffer;
 		textureData.RowPitch = 4 * textureDesc.Width; // size of all our triangle vertex data
 		textureData.SlicePitch = 4 * textureDesc.Height; // also the size of our triangle vertex data
 
@@ -58,9 +58,8 @@ namespace symphony
 		ID3D12CommandList* ppCommandLists[] = { commandList };
 		commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
-		auto fence = DX12Renderer::GetRendererData().RendererFence->GetFence();
-		auto fenceValue = DX12Renderer::GetRendererData().RendererFence->GetUIFence();
-		fenceValue++;
+		UINT fenceValue = 0;
+		ID3D12Fence* fence;
 		if (FAILED(device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence))))
 		{
 			SY_CORE_ERROR("D3D12: Failed creating a fence!");

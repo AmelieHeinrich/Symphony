@@ -17,6 +17,7 @@
 #include "window/Window.h"
 #include <core/Log.h>
 #include <unordered_map>
+#include <vector>
 #include "DX12HeapManager.h"
 
 namespace symphony
@@ -36,7 +37,7 @@ namespace symphony
 	struct DX12RendererData
 	{
 		std::shared_ptr<DX12Device> RendererDevice;
-		std::shared_ptr<DX12Fence> RendererFence;
+		std::vector<std::shared_ptr<DX12Fence>> RendererFences;
 		std::shared_ptr<DX12Command> RendererCommand;
 		std::shared_ptr<DX12SwapChain> RendererSwapChain;
 		std::shared_ptr<DX12Shader> RendererShader;
