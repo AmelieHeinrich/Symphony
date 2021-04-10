@@ -8,6 +8,8 @@
 
 namespace symphony
 {
+	uint32_t DX12Texture2D::m_TextureCreationIndex = 0;
+
 	DX12Texture2D::DX12Texture2D(const char* filepath)
 	{
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
@@ -46,12 +48,18 @@ namespace symphony
 		UpdateSubresources(commandList, m_TextureResource, m_TextureUploadResource, 0, 0, 1, &textureData);
 		commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_TextureResource, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 	
+		auto heapHandle = descriptorHeap->GetHeapHandle();
+
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = {};
+		handle.ptr = (UINT64)heapHandle.ptr + GetAllocationByteOffset();
+
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		srvDesc.Format = textureDesc.Format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
-		device->CreateShaderResourceView(m_TextureResource, &srvDesc, descriptorHeap->GetHeapHandle());
+		device->CreateShaderResourceView(m_TextureResource, &srvDesc, handle);
+		m_TextureCreationIndex++;
 
 		commandList->Close();
 		ID3D12CommandList* ppCommandLists[] = { commandList };
@@ -82,5 +90,12 @@ namespace symphony
 	void DX12Texture2D::Unbind()
 	{
 		
+	}
+
+	UINT64 DX12Texture2D::GetAllocationByteOffset()
+	{
+		UINT64 uploadSize = DX12Renderer::GetRendererData().RendererDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		
+		return uploadSize * m_TextureCreationIndex;
 	}
 }

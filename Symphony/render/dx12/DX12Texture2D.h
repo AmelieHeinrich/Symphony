@@ -20,7 +20,10 @@ namespace symphony
 		void Bind();
 		void Unbind();
 	private:
+		UINT64 GetAllocationByteOffset();
+
 		ID3D12Resource* m_TextureResource;
 		ID3D12Resource* m_TextureUploadResource;
+		static uint32_t m_TextureCreationIndex;
 	};
 }

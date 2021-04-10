@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d12.h>
+#include <cstdint>
 
 namespace symphony
 {
@@ -14,9 +15,10 @@ namespace symphony
 			return descriptorHeap;
 		}
 
-		D3D12_CPU_DESCRIPTOR_HANDLE GetHeapHandle();
-		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle();
+		D3D12_CPU_DESCRIPTOR_HANDLE& GetHeapHandle();
+		D3D12_GPU_DESCRIPTOR_HANDLE& GetGPUHandle();
 	private:
 		ID3D12DescriptorHeap* descriptorHeap = nullptr;
+		D3D12_DESCRIPTOR_HEAP_TYPE m_Type;
 	};
 }

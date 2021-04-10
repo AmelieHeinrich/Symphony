@@ -9,6 +9,11 @@ namespace symphony
 	DX12RendererData DX12Renderer::m_RendererData;
 	std::unordered_map<std::string, std::shared_ptr<DX12Mesh>> DX12Renderer::m_Meshes;
 
+	static UINT64 GetTextureBindingOffset(int textureIndex)
+	{
+		return (UINT64)DX12Renderer::GetRendererData().RendererDevice->GetDescriptorSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * textureIndex;
+	}
+
 	void DX12Renderer::Init(Window* window)
 	{
 		m_RendererData.RendererDevice = std::make_shared<DX12Device>(true);
@@ -147,8 +152,8 @@ namespace symphony
 		auto descriptorHeap = DX12HeapManager::SamplerHeap;
 		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap->GetDescriptorHeap() };
 		DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
-		DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->SetGraphicsRootDescriptorTable(1, descriptorHeap->GetGPUHandle());
 
+		int textureIndex = 0;
 		for (auto mesh : m_Meshes) {
 			auto model = mesh.second;
 
@@ -156,8 +161,13 @@ namespace symphony
 			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
 			ubo.SceneView = glm::mat4(1.0f);
 
+			D3D12_GPU_DESCRIPTOR_HANDLE handle = {};
+			handle.ptr = descriptorHeap->GetGPUHandle().ptr + GetTextureBindingOffset(textureIndex);
+			DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->SetGraphicsRootDescriptorTable(1, handle);
 			m_RendererData.RendererCommand->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			model->Draw(ubo);
+			
+			textureIndex++;
 		}
 
 		/*DX12Gui::BeginGUI();
