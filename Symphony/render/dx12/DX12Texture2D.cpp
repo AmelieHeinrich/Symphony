@@ -50,6 +50,8 @@ namespace symphony
 		allocator->Release();
 
 		UpdateSubresources(clist, m_TextureResource, m_TextureUploadResource, 0, 0, 1, &textureData);
+
+		ImageData::FreeImageData(image_Data);
 	
 		auto heapHandle = descriptorHeap->GetHeapHandle();
 
@@ -68,18 +70,7 @@ namespace symphony
 
 		clist->Close();
 		ID3D12CommandList* ppCommandLists[] = { clist };
-		commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
-
-		auto fence = DX12Renderer::GetRendererData().RendererFences[DX12Renderer::GetRendererData().BufferIndex];
-		auto fenceValue = DX12Renderer::GetRendererData().RendererFences[DX12Renderer::GetRendererData().BufferIndex]->GetUIFence();
-
-		ImageData::FreeImageData(image_Data);
-
-		if (FAILED(commandQueue->Signal(fence->GetFence(), ++fenceValue)))
-		{
-			SY_CORE_ERROR("D3D12: Failed signaling buffer upload!");
-		}
-		fence->WaitEvents();
+		commandQueue->ExecuteCommandLists(1, ppCommandLists);
 	}
 
 	DX12Texture2D::~DX12Texture2D()

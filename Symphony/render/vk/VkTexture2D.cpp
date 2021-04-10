@@ -211,10 +211,10 @@ namespace symphony
         viewInfo.subresourceRange.levelCount = 1;
         viewInfo.subresourceRange.baseArrayLayer = 0;
         viewInfo.subresourceRange.layerCount = 1;
-        viewInfo.components.r = VK_COMPONENT_SWIZZLE_R;
-        viewInfo.components.g = VK_COMPONENT_SWIZZLE_G;
-        viewInfo.components.b = VK_COMPONENT_SWIZZLE_B;
-        viewInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+        viewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        viewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        viewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        viewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
 
         VkImageView imageView;
         if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {

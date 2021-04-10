@@ -5,6 +5,7 @@
 #include "DX12Texture2D.h"
 #include "DX12UniformBuffer.h"
 #include <render/Mesh.h>
+#include <array>
 
 namespace symphony
 {
@@ -15,12 +16,11 @@ namespace symphony
 		~DX12Mesh();
 
 		void CreateResources();
-		void UpdateUBO(RendererUniforms ubo);
 		void Draw(RendererUniforms ubo);
 	private:
 		std::shared_ptr<DX12VertexBuffer> MeshVBO;
 		std::shared_ptr<DX12IndexBuffer> MeshEBO;
 		std::shared_ptr<DX12Texture2D> MeshT2D;
-		std::shared_ptr<DX12UniformBuffer> MeshUBO;
+		std::array<std::shared_ptr<DX12UniformBuffer>, 2> MeshUBOS;
 	};
 }

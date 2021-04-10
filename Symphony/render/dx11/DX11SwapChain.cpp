@@ -86,7 +86,7 @@ namespace symphony {
 
 		D3D11_RASTERIZER_DESC rasterizerDesc = {};
 		rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
-		rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
+		rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
 		rasterizerDesc.FrontCounterClockwise = true;
 		result = device->CreateRasterizerState(&rasterizerDesc, &m_RasterizerState);
 		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create rasterizer state!");

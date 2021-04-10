@@ -12,11 +12,11 @@ namespace symphony
 	public:
 		DX12SwapChain(Window* window);
 		
-		void ReleaseBackBuffers();
 		void ReleaseSwapChain();
 
 		void Present();
 		void Resize(uint32_t width, uint32_t height);
+		void CreateDepthBuffer();
 
 		IDXGISwapChain3* GetSwapChain() {
 			return swapChain;
@@ -26,6 +26,7 @@ namespace symphony
 			return backBuffers;
 		}
 	private:
+		ID3D12Resource* DepthResource;
 		IDXGISwapChain3* swapChain;
 		std::vector<ID3D12Resource*> backBuffers;
 	};

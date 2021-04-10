@@ -62,53 +62,7 @@ namespace symphony
 		pci.PipelineShader = m_RendererData.RendererShader;
 		m_RendererData.RendererGraphicsPipeline = std::make_shared<DX12Pipeline>(pci);
 
-		D3D12_HEAP_PROPERTIES dsHeapProperties;
-		ZeroMemory(&dsHeapProperties, sizeof(&dsHeapProperties));
-		dsHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-		dsHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		dsHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		dsHeapProperties.CreationNodeMask = NULL;
-		dsHeapProperties.VisibleNodeMask = NULL;
-
-		D3D12_RESOURCE_DESC dsResDesc;
-		ZeroMemory(&dsResDesc, sizeof(D3D12_RESOURCE_DESC));
-		dsResDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		dsResDesc.Alignment = 0;
-		dsResDesc.Width = m_RendererData.FBWidth;
-		dsResDesc.Height = m_RendererData.FBHeight;
-		dsResDesc.DepthOrArraySize = 1;
-		dsResDesc.MipLevels = 1;
-		dsResDesc.Format = DXGI_FORMAT_D32_FLOAT;
-		dsResDesc.SampleDesc.Count = 1;
-		dsResDesc.SampleDesc.Quality = 0;
-		dsResDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-		dsResDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-		D3D12_CLEAR_VALUE clearValueDs = {};
-		ZeroMemory(&clearValueDs, sizeof(D3D12_CLEAR_VALUE));
-		clearValueDs.Format = DXGI_FORMAT_D32_FLOAT;
-		clearValueDs.DepthStencil.Depth = 1.0f;
-		clearValueDs.DepthStencil.Stencil = 0;
-
-		auto res = m_RendererData.RendererDevice->GetDevice()->CreateCommittedResource(
-			&dsHeapProperties,
-			D3D12_HEAP_FLAG_NONE,
-			&dsResDesc,
-			D3D12_RESOURCE_STATE_DEPTH_WRITE,
-			&clearValueDs,
-			IID_PPV_ARGS(&m_RendererData.RendererDepthResource)
-		);
-		CheckIfFailed(res, "D3D12: Failed to create depth stencil view!");
-
-		D3D12_DEPTH_STENCIL_VIEW_DESC dsViewDesk = {};
-		ZeroMemory(&dsViewDesk, sizeof(D3D12_DEPTH_STENCIL_VIEW_DESC));
-		dsViewDesk.Format = DXGI_FORMAT_D32_FLOAT;
-		dsViewDesk.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-		dsViewDesk.Flags = D3D12_DSV_FLAG_NONE;
-		dsViewDesk.Texture2D.MipSlice = 0;
-
-		D3D12_CPU_DESCRIPTOR_HANDLE heapHandleDsv = DX12HeapManager::DepthResourceHeap->GetHeapHandle();
-		m_RendererData.RendererDevice->GetDevice()->CreateDepthStencilView(m_RendererData.RendererDepthResource, &dsViewDesk, heapHandleDsv);
+		m_RendererData.RendererSwapChain->CreateDepthBuffer();
 
 		DX12HeapManager::InitMeshHeap();
 
@@ -128,11 +82,9 @@ namespace symphony
 			i.second.reset();
 		m_Meshes.clear();
 
-		m_RendererData.RendererDepthResource->Release();
 		DX12HeapManager::Release();
 		m_RendererData.RendererGraphicsPipeline.reset();
 		m_RendererData.RendererShader.reset();
-		m_RendererData.RendererSwapChain->ReleaseBackBuffers();
 		m_RendererData.RendererSwapChain->ReleaseSwapChain();
 
 		for (auto command : m_RendererData.RendererCommands)
@@ -161,8 +113,6 @@ namespace symphony
 
 		// DRAW
 		GetCurrentCommand()->Clear(m_RendererData.BufferIndex);
-		m_RendererData.RendererGraphicsPipeline->Bind();
-		m_RendererData.RendererShader->Bind();
 
 		D3D12_VIEWPORT view{};
 		view.Width = m_RendererData.FBWidth;
@@ -176,6 +126,9 @@ namespace symphony
 
 		GetCurrentCommand()->GetCommandList()->RSSetViewports(1, &view);
 		GetCurrentCommand()->GetCommandList()->RSSetScissorRects(1, &scissor);
+
+		m_RendererData.RendererGraphicsPipeline->Bind();
+		m_RendererData.RendererShader->Bind();
 
 		auto descriptorHeap = DX12HeapManager::SamplerHeap;
 		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap->GetDescriptorHeap() };
@@ -194,19 +147,15 @@ namespace symphony
 			GetCurrentCommand()->GetCommandList()->SetGraphicsRootDescriptorTable(1, handle);
 			GetCurrentCommand()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			model->Draw(ubo);
-			
+
 			textureIndex++;
 		}
-
-		/*DX12Gui::BeginGUI();
-		ImGui::ShowDemoWindow();
-		ImGui::Render();
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), DX12Renderer::GetRendererData().RendererCommand->GetCommandList());*/
 
 		GetCurrentCommand()->EndFrame(m_RendererData.BufferIndex);
 
 		GetCurrentCommand()->CloseCommandList();
 		GetCurrentCommand()->ExecuteCommandList();
+
 		m_RendererData.RendererSwapChain->Present();
 
 		GetCurrentCommand()->SignalFence(m_RendererData.RendererFences[m_RendererData.BufferIndex]);
@@ -217,54 +166,6 @@ namespace symphony
 		m_RendererData.FBWidth = width;
 		m_RendererData.FBHeight = height;
 
-		m_RendererData.RendererDepthResource->Release();
-		D3D12_HEAP_PROPERTIES dsHeapProperties;
-		ZeroMemory(&dsHeapProperties, sizeof(&dsHeapProperties));
-		dsHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-		dsHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		dsHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		dsHeapProperties.CreationNodeMask = NULL;
-		dsHeapProperties.VisibleNodeMask = NULL;
-
-		D3D12_RESOURCE_DESC dsResDesc;
-		ZeroMemory(&dsResDesc, sizeof(D3D12_RESOURCE_DESC));
-		dsResDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		dsResDesc.Alignment = 0;
-		dsResDesc.Width = m_RendererData.FBWidth;
-		dsResDesc.Height = m_RendererData.FBHeight;
-		dsResDesc.DepthOrArraySize = 1;
-		dsResDesc.MipLevels = 1;
-		dsResDesc.Format = DXGI_FORMAT_D32_FLOAT;
-		dsResDesc.SampleDesc.Count = 1;
-		dsResDesc.SampleDesc.Quality = 0;
-		dsResDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-		dsResDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-		D3D12_CLEAR_VALUE clearValueDs = {};
-		ZeroMemory(&clearValueDs, sizeof(D3D12_CLEAR_VALUE));
-		clearValueDs.Format = DXGI_FORMAT_D32_FLOAT;
-		clearValueDs.DepthStencil.Depth = 1.0f;
-		clearValueDs.DepthStencil.Stencil = 0;
-
-		auto res = m_RendererData.RendererDevice->GetDevice()->CreateCommittedResource(
-			&dsHeapProperties,
-			D3D12_HEAP_FLAG_NONE,
-			&dsResDesc,
-			D3D12_RESOURCE_STATE_DEPTH_WRITE,
-			&clearValueDs,
-			IID_PPV_ARGS(&m_RendererData.RendererDepthResource)
-		);
-		CheckIfFailed(res, "D3D12: Failed to create depth stencil view!");
-
-		D3D12_DEPTH_STENCIL_VIEW_DESC dsViewDesk = {};
-		ZeroMemory(&dsViewDesk, sizeof(D3D12_DEPTH_STENCIL_VIEW_DESC));
-		dsViewDesk.Format = DXGI_FORMAT_D32_FLOAT;
-		dsViewDesk.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-		dsViewDesk.Flags = D3D12_DSV_FLAG_NONE;
-		dsViewDesk.Texture2D.MipSlice = 0;
-
-		D3D12_CPU_DESCRIPTOR_HANDLE heapHandleDsv = DX12HeapManager::DepthResourceHeap->GetHeapHandle();
-		m_RendererData.RendererDevice->GetDevice()->CreateDepthStencilView(m_RendererData.RendererDepthResource, &dsViewDesk, heapHandleDsv);
 		m_RendererData.RendererSwapChain->Resize(width, height);
 	}
 

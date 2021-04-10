@@ -200,17 +200,15 @@ namespace symphony
 
 				numTris += model->GetNumberOfVertices() / 3;
 				drawCalls++;
-
-				//s_Data.uniformBuffers[imageIndex]->Update(ubo);
 			}
 			Renderer::Stats.NumTriangles = numTris;
 			Renderer::Stats.DrawCalls = drawCalls;
 			numTris = 0;
 			drawCalls = 0;
 
-			VulkanGUI::BeginGUI();
+			/*VulkanGUI::BeginGUI();
 			ImGui::ShowDemoWindow();
-			VulkanGUI::EndGUI();
+			VulkanGUI::EndGUI();*/
 
 			vkCmdEndRenderPass(s_Data.commandBuffer->GetCommandBuffer());
 			s_Data.commandBuffer->End();

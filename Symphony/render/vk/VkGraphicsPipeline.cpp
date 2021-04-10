@@ -64,7 +64,7 @@ namespace symphony
 		rasterizer.rasterizerDiscardEnable = VK_FALSE;
 		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 		rasterizer.lineWidth = 1.0f;
-		rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+		rasterizer.cullMode = VK_CULL_MODE_NONE;
 		rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 		rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -99,10 +99,6 @@ namespace symphony
 		colorBlending.logicOp = VK_LOGIC_OP_COPY;
 		colorBlending.attachmentCount = 1;
 		colorBlending.pAttachments = &color_blend_attachment;
-		colorBlending.blendConstants[0] = 0.0f;
-		colorBlending.blendConstants[1] = 0.0f;
-		colorBlending.blendConstants[2] = 0.0f;
-		colorBlending.blendConstants[3] = 0.0f;
 
 		VkPushConstantRange push_constant;
 		push_constant.offset = 0;
@@ -142,6 +138,7 @@ namespace symphony
 		pipelineInfo.subpass = 0;
 		pipelineInfo.pDepthStencilState = &depthStencil;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+		pipelineInfo.basePipelineIndex = -1;
 
 		if (vkCreateGraphicsPipelines(deviceCopy, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 			SY_CORE_ERROR("Vulkan: Failed to create graphics pipeline!");

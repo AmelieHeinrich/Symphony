@@ -12,7 +12,6 @@ namespace symphony
 			auto res = D3D12GetDebugInterface(IID_PPV_ARGS(&debug));
 			DX12Renderer::CheckIfFailed(res, "D3D12: Failed to acquire debug interface!");
 			debug->EnableDebugLayer();
-			debug->SetEnableGPUBasedValidation(true);
 		}
 
 		auto res = CreateDXGIFactory(IID_PPV_ARGS(&factory));
@@ -32,7 +31,7 @@ namespace symphony
 		adapter->GetParent(__uuidof(IDXGIFactory), (void**)&factory);
 
 
-		
+		if (DebugEnabled)
 		{
 			ID3D12InfoQueue* infoQueue = 0;
 			device->QueryInterface(IID_PPV_ARGS(&infoQueue));
@@ -40,7 +39,6 @@ namespace symphony
 			// Break on severities
 			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
 			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
-			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
 
 			// Suppress Messages
 
