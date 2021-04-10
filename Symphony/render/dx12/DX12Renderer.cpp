@@ -131,6 +131,7 @@ namespace symphony
 		m_RendererData.RendererShader->Bind();
 
 		auto descriptorHeap = DX12HeapManager::SamplerHeap;
+		auto imguiHeap = DX12HeapManager::ImGuiHeap->GetDescriptorHeap();
 		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap->GetDescriptorHeap() };
 		GetCurrentCommand()->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 
@@ -150,6 +151,12 @@ namespace symphony
 
 			textureIndex++;
 		}
+
+		GetCurrentCommand()->GetCommandList()->SetDescriptorHeaps(1, &imguiHeap);
+
+		DX12Gui::BeginGUI();
+		ImGui::ShowDemoWindow();
+		DX12Gui::EndGUI();
 
 		GetCurrentCommand()->EndFrame(m_RendererData.BufferIndex);
 
