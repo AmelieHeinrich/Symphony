@@ -12,7 +12,7 @@ namespace symphony
 	{
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
 		auto factory = DX12Renderer::GetRendererData().RendererDevice->GetFactory();
-		auto commandQueue = DX12Renderer::GetRendererData().RendererCommand->GetCommandQueue();
+		auto commandQueue = DX12Renderer::GetRendererData().CommandQueue;
 		auto memory = DX12HeapManager::RenderTargetViewHeap->GetHeapHandle();
 
 		SDL_SysWMinfo wmInfo;
@@ -83,14 +83,14 @@ namespace symphony
 	{
 		if (swapChain)
 		{
-			DX12Renderer::GetRendererData().RendererCommand->SignalFence(DX12Renderer::GetRendererData().RendererFences[DX12Renderer::GetRendererData().BufferIndex]);
+			DX12Renderer::GetCurrentCommand()->SignalFence(DX12Renderer::GetRendererData().RendererFences[DX12Renderer::GetRendererData().BufferIndex]);
 			DX12Renderer::GetRendererData().RendererFences[DX12Renderer::GetRendererData().BufferIndex]->WaitEvents();
 
 			ImGui_ImplDX12_InvalidateDeviceObjects();
 
 			auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
 			auto factory = DX12Renderer::GetRendererData().RendererDevice->GetFactory();
-			auto commandQueue = DX12Renderer::GetRendererData().RendererCommand->GetCommandQueue();
+			auto commandQueue = DX12Renderer::GetRendererData().CommandQueue;
 			auto memory = DX12HeapManager::RenderTargetViewHeap->GetHeapHandle();
 
 			SDL_Window* window = Application::Get().GetWindow().GetWindowHandle();
@@ -132,8 +132,8 @@ namespace symphony
 			scissor.right = view.Width;
 			scissor.bottom = view.Height;
 
-			DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->RSSetViewports(1, &view);
-			DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->RSSetScissorRects(1, &scissor);
+			DX12Renderer::GetCurrentCommand()->GetCommandList()->RSSetViewports(1, &view);
+			DX12Renderer::GetCurrentCommand()->GetCommandList()->RSSetScissorRects(1, &scissor);
 		}
 	}
 }

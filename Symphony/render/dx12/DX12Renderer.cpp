@@ -18,13 +18,31 @@ namespace symphony
 	{
 		m_RendererData.RendererDevice = std::make_shared<DX12Device>(true);
 		m_RendererData.RendererFences.resize(2);
+		m_RendererData.RendererCommands.resize(2);
+
+		D3D12_COMMAND_QUEUE_DESC queDesc;
+		queDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		queDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+		queDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+		queDesc.NodeMask = NULL;
+
+		auto res = m_RendererData.RendererDevice->GetDevice()->CreateCommandQueue(&queDesc, IID_PPV_ARGS(&m_RendererData.CommandQueue));
+		CheckIfFailed(res, "D3D12: Failed to create command queue!");
+
+		DX12HeapManager::Init();
+		m_RendererData.RendererSwapChain = std::make_shared<DX12SwapChain>(window);
+
 		for (int i = 0; i < 2; i++)
 			m_RendererData.RendererFences[i] = std::make_shared<DX12Fence>();
-		m_RendererData.RendererCommand = std::make_shared<DX12Command>();
-		
-		DX12HeapManager::Init();
 
-		m_RendererData.RendererSwapChain = std::make_shared<DX12SwapChain>(window);
+		for (int i = 0; i < 2; i++)
+			m_RendererData.RendererCommands[i] = std::make_shared<DX12Command>();
+
+		for (auto command : m_RendererData.RendererCommands)
+		{
+			command->GetCommandList()->Close();
+			command->GetCommandAllocator()->Reset();
+		}
 
 		int w;
 		int h;
@@ -102,6 +120,8 @@ namespace symphony
 
 	void DX12Renderer::Shutdown()
 	{
+		m_RendererData.RendererFences[m_RendererData.BufferIndex]->WaitEvents();
+
 		DX12Gui::Shutdown();
 
 		for (auto i : m_Meshes)
@@ -114,7 +134,12 @@ namespace symphony
 		m_RendererData.RendererShader.reset();
 		m_RendererData.RendererSwapChain->ReleaseBackBuffers();
 		m_RendererData.RendererSwapChain->ReleaseSwapChain();
-		m_RendererData.RendererCommand.reset();
+
+		for (auto command : m_RendererData.RendererCommands)
+			command.reset();
+		m_RendererData.CommandQueue->Release();
+
+		m_RendererData.RendererCommands.clear();
 		for (auto fence : m_RendererData.RendererFences)
 			fence.reset();
 		m_RendererData.RendererFences.clear();
@@ -123,16 +148,19 @@ namespace symphony
 
 	void DX12Renderer::ClearColor(float r, float g, float b, float a)
 	{
-		m_RendererData.RendererCommand->ClearColor(r, g, b, a);
+		DX12Renderer::GetCurrentCommand()->ClearColor(r, g, b, a);
 	}
 
 	void DX12Renderer::Draw()
 	{
-		m_RendererData.RendererCommand->ResetCommandAllocatorAndList();
-		m_RendererData.RendererCommand->BeginFrame(m_RendererData.BufferIndex);
+		m_RendererData.BufferIndex = m_RendererData.RendererSwapChain->GetSwapChain()->GetCurrentBackBufferIndex();
+		m_RendererData.RendererFences[m_RendererData.BufferIndex]->WaitEvents();
+
+		GetCurrentCommand()->ResetCommandAllocatorAndList();
+		GetCurrentCommand()->BeginFrame(m_RendererData.BufferIndex);
 
 		// DRAW
-		m_RendererData.RendererCommand->Clear(m_RendererData.BufferIndex);
+		GetCurrentCommand()->Clear(m_RendererData.BufferIndex);
 		m_RendererData.RendererGraphicsPipeline->Bind();
 		m_RendererData.RendererShader->Bind();
 
@@ -146,12 +174,12 @@ namespace symphony
 		scissor.right = view.Width;
 		scissor.bottom = view.Height;
 
-		m_RendererData.RendererCommand->GetCommandList()->RSSetViewports(1, &view);
-		m_RendererData.RendererCommand->GetCommandList()->RSSetScissorRects(1, &scissor);
+		GetCurrentCommand()->GetCommandList()->RSSetViewports(1, &view);
+		GetCurrentCommand()->GetCommandList()->RSSetScissorRects(1, &scissor);
 
 		auto descriptorHeap = DX12HeapManager::SamplerHeap;
 		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap->GetDescriptorHeap() };
-		DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
+		GetCurrentCommand()->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 
 		int textureIndex = 0;
 		for (auto mesh : m_Meshes) {
@@ -163,8 +191,8 @@ namespace symphony
 
 			D3D12_GPU_DESCRIPTOR_HANDLE handle = {};
 			handle.ptr = descriptorHeap->GetGPUHandle().ptr + GetTextureBindingOffset(textureIndex);
-			DX12Renderer::GetRendererData().RendererCommand->GetCommandList()->SetGraphicsRootDescriptorTable(1, handle);
-			m_RendererData.RendererCommand->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			GetCurrentCommand()->GetCommandList()->SetGraphicsRootDescriptorTable(1, handle);
+			GetCurrentCommand()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			model->Draw(ubo);
 			
 			textureIndex++;
@@ -175,16 +203,13 @@ namespace symphony
 		ImGui::Render();
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), DX12Renderer::GetRendererData().RendererCommand->GetCommandList());*/
 
-		m_RendererData.RendererCommand->EndFrame(m_RendererData.BufferIndex);
+		GetCurrentCommand()->EndFrame(m_RendererData.BufferIndex);
 
-		m_RendererData.RendererCommand->CloseCommandList();
-		m_RendererData.RendererCommand->ExecuteCommandList();
+		GetCurrentCommand()->CloseCommandList();
+		GetCurrentCommand()->ExecuteCommandList();
 		m_RendererData.RendererSwapChain->Present();
 
-		m_RendererData.BufferIndex = m_RendererData.RendererSwapChain->GetSwapChain()->GetCurrentBackBufferIndex();
-		m_RendererData.RendererCommand->SignalFence(m_RendererData.RendererFences[m_RendererData.BufferIndex]);
-		m_RendererData.RendererFences[m_RendererData.BufferIndex]->WaitEvents();
-		m_RendererData.RendererFences[m_RendererData.BufferIndex]->UpdateFence();
+		GetCurrentCommand()->SignalFence(m_RendererData.RendererFences[m_RendererData.BufferIndex]);
 	}
 
 	void DX12Renderer::Resize(uint32_t width, uint32_t height)

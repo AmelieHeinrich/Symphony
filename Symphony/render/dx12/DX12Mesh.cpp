@@ -32,7 +32,7 @@ namespace symphony
 
 	void DX12Mesh::Draw(RendererUniforms ubo)
 	{
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		auto clist = DX12Renderer::GetCurrentCommand()->GetCommandList();
 
 		ubo.SceneModel = ModelMatrix;
 

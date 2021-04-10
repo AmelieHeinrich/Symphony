@@ -42,11 +42,14 @@ namespace symphony
 		textureData.RowPitch = 4 * textureDesc.Width; // size of all our triangle vertex data
 		textureData.SlicePitch = textureData.RowPitch * textureDesc.Height; // also the size of our triangle vertex data
 
-		auto commandList = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
-		auto commandQueue = DX12Renderer::GetRendererData().RendererCommand->GetCommandQueue();
+		auto commandQueue = DX12Renderer::GetRendererData().CommandQueue;
+		ID3D12CommandAllocator* allocator = 0;
+		ID3D12GraphicsCommandList* clist = 0;
+		device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator));
+		device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator, 0, IID_PPV_ARGS(&clist));
+		allocator->Release();
 
-		UpdateSubresources(commandList, m_TextureResource, m_TextureUploadResource, 0, 0, 1, &textureData);
-		commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_TextureResource, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+		UpdateSubresources(clist, m_TextureResource, m_TextureUploadResource, 0, 0, 1, &textureData);
 	
 		auto heapHandle = descriptorHeap->GetHeapHandle();
 
@@ -61,19 +64,22 @@ namespace symphony
 		device->CreateShaderResourceView(m_TextureResource, &srvDesc, handle);
 		m_TextureCreationIndex++;
 
-		commandList->Close();
-		ID3D12CommandList* ppCommandLists[] = { commandList };
+		clist->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_TextureResource, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ));
+
+		clist->Close();
+		ID3D12CommandList* ppCommandLists[] = { clist };
 		commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
-		auto fence = DX12Renderer::GetRendererData().RendererFences[DX12Renderer::GetRendererData().BufferIndex]->GetFence();
+		auto fence = DX12Renderer::GetRendererData().RendererFences[DX12Renderer::GetRendererData().BufferIndex];
 		auto fenceValue = DX12Renderer::GetRendererData().RendererFences[DX12Renderer::GetRendererData().BufferIndex]->GetUIFence();
 
 		ImageData::FreeImageData(image_Data);
 
-		if (FAILED(commandQueue->Signal(fence, fenceValue)))
+		if (FAILED(commandQueue->Signal(fence->GetFence(), ++fenceValue)))
 		{
 			SY_CORE_ERROR("D3D12: Failed signaling buffer upload!");
 		}
+		fence->WaitEvents();
 	}
 
 	DX12Texture2D::~DX12Texture2D()

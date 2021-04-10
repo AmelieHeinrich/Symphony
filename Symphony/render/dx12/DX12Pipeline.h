@@ -21,6 +21,10 @@ namespace symphony
 
 		void Bind();
 		void Unbind();
+
+		ID3D12PipelineState* GetPSO() {
+			return m_PSO;
+		}
 	private:
 		ID3D12PipelineState* m_PSO = nullptr;
 	};

@@ -79,13 +79,13 @@ namespace symphony
 
 	void DX12Pipeline::Bind()
 	{
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		auto clist = DX12Renderer::GetCurrentCommand()->GetCommandList();
 		clist->SetPipelineState(m_PSO);
 	}
 
 	void DX12Pipeline::Unbind()
 	{
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		auto clist = DX12Renderer::GetCurrentCommand()->GetCommandList();
 		clist->SetPipelineState(nullptr);
 	}
 }

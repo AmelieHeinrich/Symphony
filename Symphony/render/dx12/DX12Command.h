@@ -15,16 +15,13 @@ namespace symphony
 
 		void CloseCommandList();
 		void ExecuteCommandList();
+		void ResetCommandAllocator();
 		void SignalFence(std::shared_ptr<DX12Fence> fence);
 		void ResetCommandAllocatorAndList();
 		void BeginFrame(uint32_t bufferIndex);
 		void EndFrame(uint32_t bufferIndex);
 		void Clear(uint32_t bufferIndex);
 		void ClearColor(float r, float g, float b, float a);
-
-		ID3D12CommandQueue* GetCommandQueue() {
-			return commandQueue;
-		}
 
 		ID3D12CommandAllocator* GetCommandAllocator() {
 			return commandAllocator;
@@ -34,7 +31,6 @@ namespace symphony
 			return commandList;
 		}
 	private:
-		ID3D12CommandQueue* commandQueue = nullptr;
 		ID3D12CommandAllocator* commandAllocator = nullptr;
 		ID3D12GraphicsCommandList* commandList = nullptr;
 		UINT uiDescHeapSizeRTV;

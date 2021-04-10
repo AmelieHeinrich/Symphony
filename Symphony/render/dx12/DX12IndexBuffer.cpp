@@ -24,13 +24,13 @@ namespace symphony
 
 	void DX12IndexBuffer::Bind() const
 	{
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		auto clist = DX12Renderer::GetCurrentCommand()->GetCommandList();
 		clist->IASetIndexBuffer(&m_View);
 	}
 
 	void DX12IndexBuffer::Unbind() const
 	{
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		auto clist = DX12Renderer::GetCurrentCommand()->GetCommandList();
 		clist->IASetIndexBuffer(nullptr);
 	}
 }

@@ -55,6 +55,6 @@ namespace symphony
 	void DX12Gui::EndGUI()
 	{
 		ImGui::Render();
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), DX12Renderer::GetRendererData().RendererCommand->GetCommandList());
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), DX12Renderer::GetCurrentCommand()->GetCommandList());
 	}
 }

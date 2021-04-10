@@ -113,13 +113,13 @@ namespace symphony
 
 	void DX12Shader::Bind()
 	{
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		auto clist = DX12Renderer::GetCurrentCommand()->GetCommandList();
 		clist->SetGraphicsRootSignature(rootSignature);
 	}
 
 	void DX12Shader::Unbind()
 	{
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		auto clist = DX12Renderer::GetCurrentCommand()->GetCommandList();
 		clist->SetGraphicsRootSignature(nullptr);
 	}
 

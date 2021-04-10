@@ -8,7 +8,6 @@ namespace symphony
 	DX12UniformBuffer::DX12UniformBuffer()
 	{
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
-		auto mainDescriptorHeap = DX12HeapManager::RenderTargetViewHeap->GetHeapHandle();
 
 		D3D12_HEAP_PROPERTIES props{};
 		props.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -21,7 +20,7 @@ namespace symphony
 		ZeroMemory(&resourceDesc, sizeof(resourceDesc));
 		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 		resourceDesc.Alignment = 0;
-		resourceDesc.Width = sizeof(RendererUniforms);
+		resourceDesc.Width = 256;
 		resourceDesc.Height = 1;
 		resourceDesc.DepthOrArraySize = 1;
 		resourceDesc.MipLevels = 1;
@@ -35,7 +34,6 @@ namespace symphony
 		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create ubo!");
 
 		m_View = {};
-
 		m_View.BufferLocation = m_Resource->GetGPUVirtualAddress();
 		m_View.SizeInBytes = 256;
 		device->CreateConstantBufferView(&m_View, DX12HeapManager::ConstantBufferHeap->GetHeapHandle());
@@ -49,7 +47,7 @@ namespace symphony
 	void DX12UniformBuffer::Bind(uint32_t offset)
 	{
 		auto frameIndex = DX12Renderer::GetRendererData().BufferIndex;
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		auto clist = DX12Renderer::GetCurrentCommand()->GetCommandList();
 		clist->SetGraphicsRootConstantBufferView(0, m_Resource->GetGPUVirtualAddress() + offset);
 	}
 

@@ -25,13 +25,13 @@ namespace symphony
 
 	void DX12VertexBuffer::Bind()
 	{
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		auto clist = DX12Renderer::GetCurrentCommand()->GetCommandList();
 		clist->IASetVertexBuffers(0, 1, &m_VertexBufferView);
 	}
 
 	void DX12VertexBuffer::Unbind()
 	{
-		auto clist = DX12Renderer::GetRendererData().RendererCommand->GetCommandList();
+		auto clist = DX12Renderer::GetCurrentCommand()->GetCommandList();
 		clist->IASetVertexBuffers(0, 1, nullptr);
 	}
 }

@@ -8,14 +8,7 @@ namespace symphony
 	{
 		auto device = DX12Renderer::GetRendererData().RendererDevice->GetDevice();
 
-		D3D12_COMMAND_QUEUE_DESC queDesc;
-		queDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-		queDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-		queDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-		queDesc.NodeMask = NULL;
-
-		auto res = device->CreateCommandQueue(&queDesc, IID_PPV_ARGS(&commandQueue));
-		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create command queue!");
+		HRESULT res;
 		res = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
 		DX12Renderer::CheckIfFailed(res, "D3D12: Failed to create command allocator!");
 		res = device->CreateCommandList(NULL, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, NULL, IID_PPV_ARGS(&commandList));
@@ -28,7 +21,6 @@ namespace symphony
 	{
 		commandList->Release();
 		commandAllocator->Release();
-		commandQueue->Release();
 	}
 
 	void DX12Command::CloseCommandList()
@@ -42,12 +34,18 @@ namespace symphony
 			commandList
 		};
 
-		commandQueue->ExecuteCommandLists(1, arr);
+		DX12Renderer::GetRendererData().CommandQueue->ExecuteCommandLists(1, arr);
+	}
+
+	void DX12Command::ResetCommandAllocator()
+	{
+		commandAllocator->Reset();
 	}
 
 	void DX12Command::SignalFence(std::shared_ptr<DX12Fence> fence)
 	{
-		commandQueue->Signal(fence->GetFence(), fence->GetUIFence());
+		fence->UpdateFence();
+		DX12Renderer::GetRendererData().CommandQueue->Signal(fence->GetFence(), fence->GetUIFence());
 	}
 
 	void DX12Command::ResetCommandAllocatorAndList()

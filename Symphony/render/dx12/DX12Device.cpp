@@ -30,6 +30,43 @@ namespace symphony
 		}
 
 		adapter->GetParent(__uuidof(IDXGIFactory), (void**)&factory);
+
+
+		
+		{
+			ID3D12InfoQueue* infoQueue = 0;
+			device->QueryInterface(IID_PPV_ARGS(&infoQueue));
+
+			// Break on severities
+			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
+			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
+			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
+
+			// Suppress Messages
+
+			D3D12_MESSAGE_SEVERITY supressSeverities[] =
+			{
+				D3D12_MESSAGE_SEVERITY_INFO
+			};
+
+			D3D12_MESSAGE_ID supressIds[] =
+			{
+				D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,
+				D3D12_MESSAGE_ID_CLEARDEPTHSTENCILVIEW_MISMATCHINGCLEARVALUE,
+				D3D12_MESSAGE_ID_MAP_INVALID_NULLRANGE,
+				D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE,
+			};
+
+			D3D12_INFO_QUEUE_FILTER filter = {};
+			filter.DenyList.NumSeverities = ARRAYSIZE(supressSeverities);
+			filter.DenyList.pSeverityList = supressSeverities;
+			filter.DenyList.NumIDs = ARRAYSIZE(supressIds);
+			filter.DenyList.pIDList = supressIds;
+
+			infoQueue->PushStorageFilter(&filter);
+
+			infoQueue->Release();
+		}
 	}
 
 	DX12Device::~DX12Device()

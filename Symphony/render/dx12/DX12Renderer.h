@@ -38,12 +38,13 @@ namespace symphony
 	{
 		std::shared_ptr<DX12Device> RendererDevice;
 		std::vector<std::shared_ptr<DX12Fence>> RendererFences;
-		std::shared_ptr<DX12Command> RendererCommand;
+		std::vector<std::shared_ptr<DX12Command>> RendererCommands;
 		std::shared_ptr<DX12SwapChain> RendererSwapChain;
 		std::shared_ptr<DX12Shader> RendererShader;
 		std::shared_ptr<DX12Pipeline> RendererGraphicsPipeline;
 
 		ID3D12Resource* RendererDepthResource;
+		ID3D12CommandQueue* CommandQueue;
 
 		uint32_t BufferIndex = 0;
 
@@ -71,6 +72,10 @@ namespace symphony
 		static void Resize(uint32_t width, uint32_t height);
 		static uint32_t GetNumMeshes() {
 			return m_Meshes.size();
+		}
+
+		static std::shared_ptr<DX12Command> GetCurrentCommand() {
+			return m_RendererData.RendererCommands[m_RendererData.BufferIndex];
 		}
 
 		static DX12RendererData& GetRendererData() {
