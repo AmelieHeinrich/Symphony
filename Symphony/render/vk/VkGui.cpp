@@ -47,6 +47,7 @@ namespace symphony
 
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 		ImGui::StyleColorsDark();
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -64,7 +65,8 @@ namespace symphony
 		VkPhysicalDevice _chosenGPU = VulkanRenderer::GetData().m_PhysicalDevice->gpu();
 		VkDevice _device = VulkanRenderer::GetData().m_Device->device();
 		VkQueue _graphicsQueue = VulkanRenderer::GetData().m_Device->graphics_queue()->queue();
-		VkRenderPass _renderPass = VulkanRenderer::GetData().m_RenderPass->render_pass();
+		VkRenderPass _renderPass = VulkanRenderer::GetData().m_ImGuiPass->render_pass();
+		VkPipelineCache ppCache = VulkanRenderer::GetData().graphicsPipeline->GetPipelineCache();
 
 		ImGui_ImplVulkan_InitInfo init_info = {};
 		init_info.Instance = _instance;
@@ -75,6 +77,7 @@ namespace symphony
 		init_info.MinImageCount = 2;
 		init_info.ImageCount = 2;
 		init_info.CheckVkResultFn = check_vk_err;
+		init_info.PipelineCache = ppCache;
 
 		ImGui_ImplVulkan_Init(&init_info, _renderPass);
 
@@ -87,15 +90,15 @@ namespace symphony
 
 	void VulkanGUI::Shutdown()
 	{
+		ImGui_ImplVulkan_Shutdown();
+		ImGui_ImplSDL2_Shutdown();
 		VkDevice _device = VulkanRenderer::GetData().m_Device->device();
 		vkDestroyDescriptorPool(_device, m_ImGuiDescriptorPool, nullptr);
-		ImGui_ImplVulkan_Shutdown();
 	}
 
 	void VulkanGUI::BeginGUI()
 	{
 		SDL_Window* _window = Application::Get().GetWindow().GetWindowHandle();
-		ImGui_ImplSDL2_InitForVulkan(_window);
 
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplSDL2_NewFrame(_window);
@@ -104,11 +107,11 @@ namespace symphony
 
 	void VulkanGUI::EndGUI()
 	{
+		ImGuiIO& io = ImGui::GetIO();
 		VkCommandBuffer cmd = VulkanRenderer::GetData().commandBuffer->GetCommandBuffer();
 		ImGui::Render();
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
 
-		ImGuiIO& io = ImGui::GetIO();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			ImGui::UpdatePlatformWindows();

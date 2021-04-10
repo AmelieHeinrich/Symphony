@@ -11,7 +11,7 @@ class SymphonySandbox : public Application
 {
 public:
 	SymphonySandbox()
-		: Application(RenderAPI::DirectX12, "Symphony Sandbox")
+		: Application(RenderAPI::DirectX11, "Symphony Sandbox")
 	{
 		Renderer::PrintRendererInfo();
 

@@ -28,6 +28,7 @@ namespace symphony
 		s_Data.m_Device = std::make_shared<Device>(s_Data.m_PhysicalDevice->gpu(), s_Data.m_Surface->surface());
 		s_Data.m_SwapChain = std::make_shared<SwapChain>(s_Data.m_PhysicalDevice->gpu(), s_Data.m_Surface->surface(), s_Data.m_Device->device());
 		s_Data.m_RenderPass = std::make_shared<RenderPass>(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain_image_format());
+		s_Data.m_ImGuiPass = std::make_shared<RenderPass>(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain_image_format(), false);
 		s_Data.descriptorSetLayout = std::make_shared<DescriptorSetLayout>();
 
 		std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>("shaderlib/vksl/Vertex.vert", "shaderlib/vksl/Fragment.frag");
@@ -80,10 +81,12 @@ namespace symphony
 		s_Data.commandBuffer.reset();
 		s_Data.graphicsPipeline.reset();
 		s_Data.m_RenderPass.reset();
+		s_Data.m_ImGuiPass.reset();
 		s_Data.descriptorPool.reset();
 
 		s_Data.m_SwapChain = std::make_shared<SwapChain>(s_Data.m_PhysicalDevice->gpu(), s_Data.m_Surface->surface(), s_Data.m_Device->device());
 		s_Data.m_RenderPass = std::make_shared<RenderPass>(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain_image_format());
+		s_Data.m_ImGuiPass = std::make_shared<RenderPass>(s_Data.m_Device->device(), s_Data.m_SwapChain->swap_chain_image_format(), false);
 
 		std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>("shaderlib/vksl/Vertex.vert", "shaderlib/vksl/Fragment.frag");
 
@@ -140,6 +143,7 @@ namespace symphony
 		s_Data.graphicsPipeline.reset();
 		s_Data.descriptorPool.reset();
 		s_Data.descriptorSetLayout.reset();
+		s_Data.m_ImGuiPass.reset();
 		s_Data.m_RenderPass.reset();
 		s_Data.m_SwapChain.reset();
 		s_Data.m_Device.reset();
@@ -168,49 +172,71 @@ namespace symphony
 		{
 			s_Data.commandBuffer->Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-			std::array<VkClearValue, 2> clearColor;
-			clearColor[0].color = { s_Data.ClearColorR, s_Data.ClearColorG, s_Data.ClearColorB, s_Data.ClearColorA };
-			clearColor[1].depthStencil.depth = 1.0f;
-			clearColor[1].depthStencil.stencil = 0;
+			// MAIN PASS
+			{
+				std::array<VkClearValue, 2> clearColor;
+				clearColor[0].color = { s_Data.ClearColorR, s_Data.ClearColorG, s_Data.ClearColorB, s_Data.ClearColorA };
+				clearColor[1].depthStencil.depth = 1.0f;
+				clearColor[1].depthStencil.stencil = 0;
 
-			VkRenderPassBeginInfo renderPassInfo{};
-			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			renderPassInfo.renderPass = s_Data.m_RenderPass->render_pass();
-			renderPassInfo.framebuffer = s_Data.m_SwapChain->swap_chain_framebuffers()[imageIndex];
-			renderPassInfo.renderArea.offset = { 0, 0 };
-			renderPassInfo.renderArea.extent = s_Data.m_SwapChain->swap_chain_extent();
-			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearColor.size());
-			renderPassInfo.pClearValues = clearColor.data();
+				VkRenderPassBeginInfo renderPassInfo{};
+				renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+				renderPassInfo.renderPass = s_Data.m_RenderPass->render_pass();
+				renderPassInfo.framebuffer = s_Data.m_SwapChain->swap_chain_framebuffers()[imageIndex];
+				renderPassInfo.renderArea.offset = { 0, 0 };
+				renderPassInfo.renderArea.extent = s_Data.m_SwapChain->swap_chain_extent();
+				renderPassInfo.clearValueCount = static_cast<uint32_t>(clearColor.size());
+				renderPassInfo.pClearValues = clearColor.data();
 
-			vkCmdBeginRenderPass(s_Data.commandBuffer->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-			vkCmdBindPipeline(s_Data.commandBuffer->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipeline());
+				vkCmdBeginRenderPass(s_Data.commandBuffer->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+				vkCmdBindPipeline(s_Data.commandBuffer->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, s_Data.graphicsPipeline->GetPipeline());
 
-			int numTris = 0;
-			int drawCalls = 0;
-			for (auto mesh : m_Meshes) {
-				auto model = mesh.second;
-				RendererUniforms ubo{};
-				ubo.SceneProjection = glm::perspective(glm::radians(45.0f), s_Data.FBWidth / (float)s_Data.FBHeight, 0.01f, 1000.0f);
-				ubo.SceneProjection[1][1] *= -1;
-				ubo.SceneView = glm::mat4(1.0f);
-				ubo.SceneModel = model->GetModelMatrix();
+				int numTris = 0;
+				int drawCalls = 0;
+				for (auto mesh : m_Meshes) {
+					auto model = mesh.second;
+					RendererUniforms ubo{};
+					ubo.SceneProjection = glm::perspective(glm::radians(45.0f), s_Data.FBWidth / (float)s_Data.FBHeight, 0.01f, 1000.0f);
+					ubo.SceneProjection[1][1] *= -1;
+					ubo.SceneView = glm::mat4(1.0f);
+					ubo.SceneModel = model->GetModelMatrix();
 
-				vkCmdPushConstants(s_Data.commandBuffer->GetCommandBuffer(), s_Data.graphicsPipeline->GetPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(RendererUniforms), &ubo);
-				model->Draw(s_Data.commandBuffer->GetCommandBuffer(), imageIndex);
+					vkCmdPushConstants(s_Data.commandBuffer->GetCommandBuffer(), s_Data.graphicsPipeline->GetPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(RendererUniforms), &ubo);
+					model->Draw(s_Data.commandBuffer->GetCommandBuffer(), imageIndex);
 
-				numTris += model->GetNumberOfVertices() / 3;
-				drawCalls++;
+					numTris += model->GetNumberOfVertices() / 3;
+					drawCalls++;
+				}
+				Renderer::Stats.NumTriangles = numTris;
+				Renderer::Stats.DrawCalls = drawCalls;
+				numTris = 0;
+				drawCalls = 0;
+
+				vkCmdEndRenderPass(s_Data.commandBuffer->GetCommandBuffer());
 			}
-			Renderer::Stats.NumTriangles = numTris;
-			Renderer::Stats.DrawCalls = drawCalls;
-			numTris = 0;
-			drawCalls = 0;
 
-			/*VulkanGUI::BeginGUI();
-			ImGui::ShowDemoWindow();
-			VulkanGUI::EndGUI();*/
+			// IMGUI PASS
+			{
+				std::array<VkClearValue, 2> clearColor = {};
 
-			vkCmdEndRenderPass(s_Data.commandBuffer->GetCommandBuffer());
+				VkRenderPassBeginInfo renderPassInfo{};
+				renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+				renderPassInfo.renderPass = s_Data.m_ImGuiPass->render_pass();
+				renderPassInfo.framebuffer = s_Data.m_SwapChain->swap_chain_framebuffers()[imageIndex];
+				renderPassInfo.renderArea.offset = { 0, 0 };
+				renderPassInfo.renderArea.extent = s_Data.m_SwapChain->swap_chain_extent();
+				renderPassInfo.clearValueCount = 0;
+				renderPassInfo.pClearValues = clearColor.data();
+
+				vkCmdBeginRenderPass(s_Data.commandBuffer->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+				VulkanGUI::BeginGUI();
+				ImGui::ShowDemoWindow();
+				VulkanGUI::EndGUI();
+
+				vkCmdEndRenderPass(s_Data.commandBuffer->GetCommandBuffer());
+			}
+
 			s_Data.commandBuffer->End();
 		}
 

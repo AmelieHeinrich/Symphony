@@ -9,7 +9,7 @@ namespace symphony
 	class RenderPass
 	{
 	public:
-		RenderPass(const VkDevice& device, VkFormat swapchainformat);
+		RenderPass(const VkDevice& device, VkFormat swapchainformat, bool shouldClear = true);
 		~RenderPass();
 
 		const VkRenderPass& render_pass() const {

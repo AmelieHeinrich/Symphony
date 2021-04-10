@@ -44,6 +44,7 @@ namespace symphony
 		std::shared_ptr<Device> m_Device;
 		std::shared_ptr<SwapChain> m_SwapChain;
 		std::shared_ptr<RenderPass> m_RenderPass;
+		std::shared_ptr<RenderPass> m_ImGuiPass;
 		std::shared_ptr<CommandPool> m_CommandPool;
 		std::shared_ptr<CommandBuffer> commandBuffer;
 		std::shared_ptr<GraphicsPipeline> graphicsPipeline;
