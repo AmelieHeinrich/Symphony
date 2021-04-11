@@ -5,7 +5,7 @@
 
 namespace symphony
 {
-	std::string FileSystem::ReadFile(const std::string& filepath, ReadMode readmode)
+	std::string FileSystem::ReadFile(const std::string& filepath)
 	{
 		std::ifstream file(filepath, std::ios::ate | std::ios::binary);
 

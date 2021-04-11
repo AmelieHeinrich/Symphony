@@ -4,6 +4,7 @@
 #include <stb_image.h>
 
 #include <stdexcept>
+#include "core/Application.h"
 
 namespace symphony
 {
@@ -11,10 +12,12 @@ namespace symphony
 	{
 		ImageData data{};
 		
-		data.DataBuffer = stbi_load(filepath, &data.Width, &data.Height, &data.Channels, STBI_rgb_alpha);
+		ThreadPool& pool = Application::Get().GetThreadPool();
+		std::future<uint8_t*> dataBuffer = pool.Submit(stbi_load, filepath, &data.Width, &data.Height, &data.Channels, STBI_rgb_alpha);
+		data.DataBuffer = dataBuffer.get();
 
 		if (!data.DataBuffer) {
-			throw std::runtime_error("Failed to load image!");
+			SY_CORE_ERROR("Failed to load image!");
 		}
 
 		data.Dimensions = dimensions;

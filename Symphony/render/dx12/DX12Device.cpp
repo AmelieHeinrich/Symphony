@@ -4,6 +4,11 @@
 
 namespace symphony
 {
+	static void D3D12DebugCallback()
+	{
+
+	}
+
 	DX12Device::DX12Device(bool enableDebug)
 		: DebugEnabled(enableDebug)
 	{

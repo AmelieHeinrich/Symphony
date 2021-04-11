@@ -3,43 +3,17 @@
 #include "DX11Renderer.h"
 #include <core/Log.h>
 #include <sstream>
+#include <core/FileSystem.h>
 
 namespace symphony
 {
-	static std::string ReadFile(const std::string& filepath)
-	{
-		std::string result;
-		std::ifstream in(filepath, std::ios::in | std::ios::binary); // ifstream closes itself due to RAII
-		if (in)
-		{
-			in.seekg(0, std::ios::end);
-			size_t size = in.tellg();
-			if (size != -1)
-			{
-				result.resize(size);
-				in.seekg(0, std::ios::beg);
-				in.read(&result[0], size);
-			}
-			else
-			{
-				SY_CORE_ERROR("Failed to read file buffer!");
-			}
-		}
-		else
-		{
-			SY_CORE_ERROR("Failed to open file!");
-		}
-
-		return result;
-	}
-
 	const DX11Shader* DX11Shader::s_CurrentlyBound = nullptr;
 
 	DX11Shader::DX11Shader(const std::string& vertexSource, const std::string& fragmentSource)
 		: Shader(vertexSource, fragmentSource)
 	{
-		auto vertCode = ReadFile(vertexSource);
-		auto fragCode = ReadFile(fragmentSource);
+		auto vertCode = FileSystem::ReadFile(vertexSource);
+		auto fragCode = FileSystem::ReadFile(fragmentSource);
 
 		Load(vertCode, fragCode);
 	}

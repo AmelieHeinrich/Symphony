@@ -11,13 +11,13 @@ class SymphonySandbox : public Application
 {
 public:
 	SymphonySandbox()
-		: Application(RenderAPI::DirectX12, "Symphony Sandbox")
+		: Application(RenderAPI::OpenGL, "Symphony Sandbox")
 	{
 		Renderer::PrintRendererInfo();
 
 		Renderer::ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		Mesh gunMesh(MeshBuilder::LoadModelDataAsync("resources/viking_room.obj", "resources/viking_room.png"));
-		Mesh monkeyMesh(MeshBuilder::LoadModelDataAsync("resources/suzanne.obj", "resources/darkMarble.jpg"));
+		Mesh gunMesh(MeshBuilder::LoadModelData("resources/viking_room.obj", "resources/viking_room.png"));
+		Mesh monkeyMesh(MeshBuilder::LoadModelData("resources/suzanne.obj", "resources/darkMarble.jpg"));
 
 		Renderer::AddMesh(gunMesh, "Gun");
 		Renderer::AddMesh(monkeyMesh, "Suzanne");

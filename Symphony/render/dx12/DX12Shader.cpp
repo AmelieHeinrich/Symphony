@@ -2,36 +2,10 @@
 #include "DX12Device.h"
 #include "DX12Renderer.h"
 #include <fstream>
+#include <core/FileSystem.h>
 
 namespace symphony
 {
-	static std::string ReadFile(const std::string& filepath)
-	{
-		std::string result;
-		std::ifstream in(filepath, std::ios::in | std::ios::binary); // ifstream closes itself due to RAII
-		if (in)
-		{
-			in.seekg(0, std::ios::end);
-			size_t size = in.tellg();
-			if (size != -1)
-			{
-				result.resize(size);
-				in.seekg(0, std::ios::beg);
-				in.read(&result[0], size);
-			}
-			else
-			{
-				__debugbreak();
-			}
-		}
-		else
-		{
-			__debugbreak();
-		}
-
-		return result;
-	}
-
 	DX12Shader::DX12Shader(const std::string& vertexFile, const std::string& fragmentFile)
 		: Shader(vertexFile, fragmentFile)
 	{
@@ -96,8 +70,8 @@ namespace symphony
 		}
 
 		{
-			std::string vertSource = ReadFile(vertexFile);
-			std::string fragSource = ReadFile(fragmentFile);
+			std::string vertSource = FileSystem::ReadFile(vertexFile);
+			std::string fragSource = FileSystem::ReadFile(fragmentFile);
 
 			VertexBlob = Compile(vertSource, "vs_5_0", "VSMain");
 			FragmentBlob = Compile(fragSource, "ps_5_0", "PSMain");

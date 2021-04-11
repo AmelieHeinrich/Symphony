@@ -16,6 +16,6 @@ namespace symphony
 	class FileSystem
 	{
 	public:
-		static std::string ReadFile(const std::string& filepath, ReadMode readmode);
+		static std::string ReadFile(const std::string& filepath);
 	};
 }
