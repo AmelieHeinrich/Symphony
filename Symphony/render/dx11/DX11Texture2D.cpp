@@ -4,22 +4,40 @@
 
 namespace symphony
 {
-	DX11Texture2D::DX11Texture2D(const char* filepath)
+	DX11Texture2D::DX11Texture2D(const char* filepath, DXGI_FORMAT format)
 	{
-		ImageData imageData = ImageData::LoadImageData(filepath, 2);
+		ImageData imageData;
+
+		if (format == DXGI_FORMAT_R8G8B8A8_UNORM)
+			imageData = ImageData::LoadImageData(filepath, 2);
+		if (format == DXGI_FORMAT_R16G16B16A16_FLOAT || format == DXGI_FORMAT_R32G32B32A32_FLOAT)
+			imageData = ImageData::LoadFloatImageData(filepath, 2);
+
 		auto device = DX11Renderer::GetRendererData().Device;
 
+		const void* dataBuffer;
+		if (format == DXGI_FORMAT_R8G8B8A8_UNORM)
+			dataBuffer = imageData.DataBuffer;
+		if (format == DXGI_FORMAT_R16G16B16A16_FLOAT || format == DXGI_FORMAT_R32G32B32A32_FLOAT)
+			dataBuffer = imageData.FloatDataBuffer;
+
+		int channelSize;
+		if (imageData.DataBuffer)
+			channelSize = 4;
+		if (imageData.FloatDataBuffer)
+			channelSize = 16;
+
 		D3D11_SUBRESOURCE_DATA initData;
-		initData.pSysMem = imageData.DataBuffer;
-		initData.SysMemPitch = 4 * imageData.Width;
-		initData.SysMemSlicePitch = imageData.Width * imageData.Height * 4;
+		initData.pSysMem = dataBuffer;
+		initData.SysMemPitch = channelSize * imageData.Width;
+		initData.SysMemSlicePitch = imageData.Width * imageData.Height * channelSize;
 
 		D3D11_TEXTURE2D_DESC desc{};
 		desc.Width = imageData.Width;
 		desc.Height = imageData.Height;
 		desc.MipLevels = 1;
 		desc.ArraySize = 1;
-		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.Format = format;
 		desc.CPUAccessFlags = 0;
 		desc.Usage = D3D11_USAGE_DEFAULT;
 		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;

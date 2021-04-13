@@ -18,7 +18,9 @@ namespace symphony
 		void Draw(RendererUniforms ubo);
 	private:
 		std::shared_ptr<DX11Shader> m_SkyboxShader;
-		std::shared_ptr<DX11Mesh> m_SkyboxMesh;
+		std::shared_ptr<DX11VertexBuffer> MeshVBO;
+		std::shared_ptr<DX11IndexBuffer> MeshEBO;
+		std::shared_ptr<DX11Texture2D> MeshT2D;
 		std::shared_ptr<DX11UniformBuffer> m_SkyboxUniformBuffer;
 	};
 }

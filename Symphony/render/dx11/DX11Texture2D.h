@@ -8,7 +8,7 @@ namespace symphony
 	class DX11Texture2D : public Texture
 	{
 	public:
-		DX11Texture2D(const char* filepath);
+		DX11Texture2D(const char* filepath, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
 		~DX11Texture2D();
 
 		void Bind(int slot);

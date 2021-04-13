@@ -31,7 +31,7 @@ public:
 	{
 		while (m_Window->IsWindowOpen())
 		{
-			m_Window->LockMouse(true);
+			//m_Window->LockMouse(true);
 
 			// Update camera
 			{
@@ -81,7 +81,7 @@ public:
 		lastX = xpos;
 		lastY = ypos;
 
-		camera.ProcessMouseMovement(xoffset, yoffset);
+		//camera.ProcessMouseMovement(xoffset, yoffset);
 
 		return true;
 	}

@@ -66,7 +66,7 @@ namespace symphony
 
 		DX11Gui::Init();
 
-		m_RendererData.RendererSkybox = std::make_shared<DX11Skybox>("resources/skybox/skybox.jpg");
+		m_RendererData.RendererSkybox = std::make_shared<DX11Skybox>("resources/skybox/skybox.hdr");
 
 		RendererShader->Bind();
 	}
@@ -148,7 +148,7 @@ namespace symphony
 		// SKYBOX PASS
 		{
 			RendererUniforms ubo{};
-			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
+			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 100.0f);
 			if (!m_RendererData.CustomCamera)
 			{
 				ubo.SceneView = glm::mat4(1.0f);
@@ -157,7 +157,7 @@ namespace symphony
 			{
 				ubo.SceneView = glm::mat4(glm::mat3(m_RendererData.View));
 			}
-			ubo.SceneModel = glm::scale(glm::mat4(1.0f), glm::vec3(1000.0f, 1000.0f, 1000.0f));
+			ubo.SceneModel = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
 			m_RendererData.RendererSkybox->Draw(ubo);
 		}
 
