@@ -8,7 +8,7 @@ namespace symphony
 	{
 		ImageData imageData;
 
-		if (format == DXGI_FORMAT_R8G8B8A8_UNORM)
+		if (format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB)
 			imageData = ImageData::LoadImageData(filepath, 2);
 		if (format == DXGI_FORMAT_R16G16B16A16_FLOAT || format == DXGI_FORMAT_R32G32B32A32_FLOAT)
 			imageData = ImageData::LoadFloatImageData(filepath, 2);
@@ -16,7 +16,7 @@ namespace symphony
 		auto device = DX11Renderer::GetRendererData().Device;
 
 		const void* dataBuffer;
-		if (format == DXGI_FORMAT_R8G8B8A8_UNORM)
+		if (format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB)
 			dataBuffer = imageData.DataBuffer;
 		if (format == DXGI_FORMAT_R16G16B16A16_FLOAT || format == DXGI_FORMAT_R32G32B32A32_FLOAT)
 			dataBuffer = imageData.FloatDataBuffer;

@@ -66,7 +66,7 @@ namespace symphony
 
 		DX11Gui::Init();
 
-		m_RendererData.RendererSkybox = std::make_shared<DX11Skybox>("resources/skybox/skybox.hdr");
+		m_RendererData.RendererSkybox = std::make_shared<DX11Skybox>("resources/skybox/skybox8k.hdr");
 
 		RendererShader->Bind();
 	}
