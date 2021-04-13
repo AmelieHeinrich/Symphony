@@ -22,6 +22,8 @@ namespace symphony
 		void Close();
 
 		static Application& Get() { return *s_Instance; }
+
+		virtual void OnImGuiRender() {};
 	protected:
 		virtual void Run() = 0;
 	protected:

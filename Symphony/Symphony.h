@@ -9,6 +9,12 @@
 #include <core/PlatformDetection.h>
 #include <core/Assert.h>
 #include <core/Log.h>
+#include <core/Input.h>
+
+// EVENT
+#include <events/Event.h>
+#include <events/KeyCodes.h>
+#include <events/MouseCodes.h>
 
 // Renderer
 #include <render/Renderer.h>

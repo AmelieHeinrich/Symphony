@@ -32,7 +32,6 @@ namespace symphony {
 		ID3D11DepthStencilView* m_DepthStencilView;
 		ID3D11DepthStencilState* m_DepthStencilState;
 		ID3D11RasterizerState* m_RasterizerState;
-		ID3D11SamplerState* m_SamplerState;
 
 		friend class DX11RenderContext;
 	};

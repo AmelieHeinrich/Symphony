@@ -6,6 +6,7 @@
 #include "window/Window.h"
 #include <SDL.h>
 #include "DX11Gui.h"
+#include <core/Application.h>
 
 namespace symphony
 {
@@ -65,6 +66,8 @@ namespace symphony
 
 		DX11Gui::Init();
 
+		m_RendererData.RendererSkybox = std::make_shared<DX11Skybox>("resources/skybox/skybox.jpg");
+
 		RendererShader->Bind();
 	}
 
@@ -107,32 +110,63 @@ namespace symphony
 		m_RendererData.RendererContext->SetClearColor(m_RendererData.RendererSwapChain, m_RendererData.CCR, m_RendererData.CCG, m_RendererData.CCB, m_RendererData.CCA);
 		m_RendererData.Context->ClearDepthStencilView(m_RendererData.RendererSwapChain->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1, 0);
 
-		RendererUniformBuffer->BindForShader(0);
+		// MODEL PASS
+		{
+			RendererShader->Bind();
 
-		int numTris = 0;
-		int drawCalls = 0;
-		for (auto mesh : m_Meshes) {
-			auto model = mesh.second;
+			RendererUniformBuffer->BindForShader(0);
 
+			int numTris = 0;
+			int drawCalls = 0;
+			for (auto mesh : m_Meshes) {
+				auto model = mesh.second;
+
+				RendererUniforms ubo{};
+				ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
+				if (!m_RendererData.CustomCamera)
+				{
+					ubo.SceneView = glm::mat4(1.0f);
+				}
+				else
+				{
+					ubo.SceneView = m_RendererData.View;
+				}
+				ubo.SceneModel = model->GetModelMatrix();
+				RendererUniformBuffer->Update(ubo);
+
+				numTris += model->GetNumberOfVertices() / 3;
+				drawCalls++;
+
+				model->Draw();
+			}
+			Renderer::Stats.NumTriangles = numTris;
+			Renderer::Stats.DrawCalls = drawCalls;
+			numTris = 0;
+			drawCalls = 0;
+		}
+
+		// SKYBOX PASS
+		{
 			RendererUniforms ubo{};
 			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
-			ubo.SceneView = glm::mat4(1.0f);
-			ubo.SceneModel = model->GetModelMatrix();
-			RendererUniformBuffer->Update(ubo);
-
-			numTris += model->GetNumberOfVertices() / 3;
-			drawCalls++;
-
-			model->Draw();
+			if (!m_RendererData.CustomCamera)
+			{
+				ubo.SceneView = glm::mat4(1.0f);
+			}
+			else
+			{
+				ubo.SceneView = glm::mat4(glm::mat3(m_RendererData.View));
+			}
+			ubo.SceneModel = glm::scale(glm::mat4(1.0f), glm::vec3(1000.0f, 1000.0f, 1000.0f));
+			m_RendererData.RendererSkybox->Draw(ubo);
 		}
-		Renderer::Stats.NumTriangles = numTris;
-		Renderer::Stats.DrawCalls = drawCalls;
-		numTris = 0;
-		drawCalls = 0;
 
-		DX11Gui::BeginGUI();
-		ImGui::ShowDemoWindow();
-		DX11Gui::EndGUI();
+		// GUI PASS
+		{
+			DX11Gui::BeginGUI();
+			ImGui::ShowDemoWindow();
+			DX11Gui::EndGUI();
+		}
 
 		m_RendererData.RendererSwapChain->Present();
 	}
@@ -168,6 +202,13 @@ namespace symphony
 		m_RendererData.FBHeight = height;
 		m_RendererData.RendererSwapChain->RecreateRenderTargetView(width, height);
 		Draw();
+	}
+
+	void DX11Renderer::SetCamera(const glm::mat4& view)
+	{
+		m_RendererData.View = view;
+
+		m_RendererData.CustomCamera = true;
 	}
 
 	void DX11Renderer::PrintRendererInfo()

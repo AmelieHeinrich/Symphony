@@ -276,4 +276,14 @@ namespace symphony
 		SY_CORE_INFO("Renderer Vertices: " + std::to_string(Stats.GetTotalVertexCount()));
 		SY_CORE_INFO("Renderer Indices: " + std::to_string(Stats.GetTotalIndexCount()));
 	}
+
+	void Renderer::SetCamera(const glm::mat4& view)
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::DirectX11:
+			DX11Renderer::SetCamera(view);
+			break;
+		}
+	}
 }

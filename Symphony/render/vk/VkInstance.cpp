@@ -41,7 +41,6 @@ namespace symphony
         createInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
         createInfo.ppEnabledLayerNames = layers.data();
 
-
         if (vkCreateInstance(&createInfo, nullptr, &m_Instance) != VK_SUCCESS) {
             SY_CORE_ERROR("Vulkan: Failed to create instance!");
         }

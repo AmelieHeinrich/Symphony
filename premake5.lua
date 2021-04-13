@@ -41,7 +41,8 @@ project "Symphony"
         "vendor/imgui/examples/imgui_impl_dx12.h",
         "vendor/imgui/examples/imgui_impl_dx12.cpp", 
         "vendor/stb/stb_image.h",
-        "vendor/tinyobjloader/tiny_obj_loader.h"
+        "vendor/tinyobjloader/tiny_obj_loader.h",
+        "vendor/tinygltfloader/tiny_gltf_loader.h"
     }
 
     defines
@@ -62,7 +63,8 @@ project "Symphony"
         "vendor/stb",
         "vendor/tinyobjloader",
         "vendor/entt/single_include",
-        "vendor/spdlog/include"
+        "vendor/spdlog/include",
+        "vendor/tinygltfloader"
     }
 
 	links

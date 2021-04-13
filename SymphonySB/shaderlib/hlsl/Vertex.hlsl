@@ -24,8 +24,8 @@ VS_OUTPUT VSMain(VS_INPUT input)
 	VS_OUTPUT output = (VS_OUTPUT)0;
 
 	output.position = mul(input.position, Model);
-	output.position = mul(output.position, View);
 	output.position = mul(output.position, Projection);
+	output.position = mul(output.position, View);
 	output.color = input.color;
 	output.texcoord = input.texcoord;
 

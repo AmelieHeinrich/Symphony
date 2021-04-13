@@ -1,5 +1,7 @@
-[12:00:37] [info] SYMPHONY: Application created!
-[12:00:37] [info] SYMPHONY: GL Vendor: NVIDIA Corporation
-[12:00:37] [info] SYMPHONY: GL Renderer: NVIDIA GeForce GTX 1660 Ti/PCIe/SSE2
-[12:00:37] [info] SYMPHONY: GL Version: 4.6.0 NVIDIA 465.89
-[12:00:40] [info] SYMPHONY: Application destroyed!
+[20:00:39] [info] SYMPHONY: Application created!
+[20:00:39] [info] SYMPHONY: D3D11 Device Description: NVIDIA GeForce GTX 1660 Ti
+[20:00:39] [info] SYMPHONY: D3D11 Vendor ID: 4318
+[20:00:39] [info] SYMPHONY: D3D11 Device ID: 8593
+[20:00:39] [info] SYMPHONY: D3D11 Sub System ID: 323162149
+[20:00:39] [info] SYMPHONY: D3D11 Revision: 161
+[20:01:01] [info] SYMPHONY: Application destroyed!

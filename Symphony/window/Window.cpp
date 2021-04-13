@@ -18,7 +18,7 @@ namespace symphony {
 	Window::Window(int width, int height, const char* title, RenderAPI api)
 		: m_API(api)
 	{	
-		SDL_WindowFlags flag;
+		SDL_WindowFlags flag{};
 	
 		switch (api)
 		{
@@ -77,12 +77,59 @@ namespace symphony {
 			switch (event.type)
 			{
 			case SDL_QUIT:
+			{
+				WindowCloseEvent wc_event;
+				m_EventCallback(wc_event);
 				m_IsWindowOpen = 0;
 				break;
+			}
 			case SDL_WINDOWEVENT:
+			{
 				if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+					WindowResizeEvent wr_event(event.window.data1, event.window.data2);
+					m_EventCallback(wr_event);
 					Renderer::Resize(event.window.data1, event.window.data2);
 				}
+				break;
+			}
+			case SDL_KEYDOWN:
+			{
+				int repeat = event.key.repeat;
+
+				KeyPressedEvent kp(event.key.keysym.scancode, repeat);
+				m_EventCallback(kp);
+				break;
+			}
+			case SDL_KEYUP:
+			{
+				KeyReleasedEvent kp(event.key.keysym.scancode);
+				m_EventCallback(kp);
+				break;
+			}
+			case SDL_MOUSEBUTTONDOWN:
+			{
+				MouseButtonPressedEvent mbp(event.button.button);
+				m_EventCallback(mbp);
+				break;
+			}
+			case SDL_MOUSEBUTTONUP:
+			{
+				MouseButtonReleasedEvent mbr(event.button.button);
+				m_EventCallback(mbr);
+				break;
+			}
+			case SDL_MOUSEMOTION:
+			{
+				MouseMovedEvent mme(event.motion.x, event.motion.y);
+				m_EventCallback(mme);
+				break;
+			}
+			case SDL_MOUSEWHEEL:
+			{
+				MouseScrolledEvent mse(event.wheel.x, event.wheel.y);
+				m_EventCallback(mse);
+				break;
+			}
 			}
 		}
 	}
@@ -111,5 +158,32 @@ namespace symphony {
 	void Window::TerminateSDL2()
 	{
 		SDL_Quit();
+	}
+
+	int Window::GetWidth()
+	{
+		int w;
+		SDL_GetWindowSize(m_RawHandle, &w, nullptr);
+		return w;
+	}
+
+	int Window::GetHeight()
+	{
+		int w;
+		SDL_GetWindowSize(m_RawHandle, nullptr, &w);
+		return w;
+	}
+
+	void Window::LockMouse(bool lock)
+	{
+		if (lock)
+		{
+			SDL_SetRelativeMouseMode(SDL_TRUE); SDL_ShowCursor(false);
+			SDL_WarpMouseInWindow(m_RawHandle, GetWidth() / 2, GetHeight() / 2);
+		}
+		else
+		{
+			SDL_SetRelativeMouseMode(SDL_FALSE); SDL_ShowCursor(true);
+		}
 	}
 }

@@ -9,6 +9,7 @@
 #include "DX11UniformBuffer.h"
 #include "DX11Texture2D.h"
 #include "DX11Mesh.h"
+#include "DX11Skybox.h"
 #include <memory>
 #include <core/Log.h>
 
@@ -24,6 +25,7 @@ namespace symphony
 		IDXGIAdapter* DXGIAdapter = nullptr;
 		IDXGIFactory* DXGIFactory = nullptr;
 
+		std::shared_ptr<DX11Skybox> RendererSkybox = nullptr;
 		std::shared_ptr<DX11SwapChain> RendererSwapChain = nullptr;
 		std::shared_ptr<DX11RenderContext> RendererContext = nullptr;
 
@@ -35,6 +37,9 @@ namespace symphony
 
 		uint32_t FBWidth;
 		uint32_t FBHeight;
+
+		glm::mat4 View = glm::mat4(1.0f);
+		bool CustomCamera = false;
 	};
 
 	class DX11Renderer : public Renderer
@@ -54,6 +59,7 @@ namespace symphony
 		static void AddMesh(Mesh mesh, const std::string& name);
 		static void SetMeshTransform(const std::string& meshName, const glm::mat4& transform);
 		static void Resize(uint32_t width, uint32_t height);
+		static void SetCamera(const glm::mat4& view);
 
 		static DirectXRendererData GetRendererData() {
 			return m_RendererData;

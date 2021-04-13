@@ -5,6 +5,7 @@
 #include <iostream>
 #include <core/Log.h>
 #include "GLGui.h"
+#include <core/Application.h>
 
 namespace symphony
 {

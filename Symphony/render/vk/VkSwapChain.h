@@ -12,7 +12,6 @@ namespace symphony
 		SwapChain(VkPhysicalDevice gpu, VkSurfaceKHR surface, const VkDevice& device);
 		~SwapChain();
 
-		// Must be done after renderpass and depth buffer creation
 		void InitFramebuffers(VkRenderPass renderPass);
 
 		static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

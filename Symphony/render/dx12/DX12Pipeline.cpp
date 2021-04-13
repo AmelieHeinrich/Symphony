@@ -37,7 +37,7 @@ namespace symphony
 		std::vector<D3D12_INPUT_ELEMENT_DESC> desc;
 		desc.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 		desc.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float) * 3, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
-		desc.push_back({ "TEXCOORDS", 0, DXGI_FORMAT_R32G32_FLOAT, 0, sizeof(float) * 6, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
+		desc.push_back({ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, sizeof(float) * 6, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 
 		ID3DBlob* vertexShader = reinterpret_cast<ID3DBlob*>(pci.PipelineShader->GetVertexShader());
 		ID3DBlob* fragmentShader = reinterpret_cast<ID3DBlob*>(pci.PipelineShader->GetFragmentShader());

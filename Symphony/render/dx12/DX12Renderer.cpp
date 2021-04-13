@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <SDL.h>
 #include "DX12Gui.h"
+#include <core/Application.h>
 
 namespace symphony
 {
@@ -54,7 +55,7 @@ namespace symphony
 
 	void DX12Renderer::Prepare()
 	{
-		m_RendererData.RendererShader = std::make_shared<DX12Shader>("shaderlib/hlsl/dx12/Vertex.hlsl", "shaderlib/hlsl/dx12/Fragment.hlsl");
+		m_RendererData.RendererShader = std::make_shared<DX12Shader>("shaderlib/hlsl/Vertex.hlsl", "shaderlib/hlsl/Fragment.hlsl");
 
 		DX12PipelineCreateInfo pci;
 		pci.Multisampled = false;

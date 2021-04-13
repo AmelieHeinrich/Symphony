@@ -22,10 +22,9 @@ namespace symphony
 	SymphonyClass MeshBuilder
 	{
 	public:
-		// Can only load .objs for now
-		static std::pair<std::vector<Vertex>, std::vector<uint32_t>> CreateModelFromOBJ(const char* filepath);
 		static ModelData LoadModelData(const char* meshFile, const char* textureFile);
 	private:
-		static ModelData LoadModelDataInternal(const char* meshFile, const char* textureFile);
+		static std::pair<std::vector<Vertex>, std::vector<uint32_t>> CreateModelFromOBJ(const char* filepath);
+		static ModelData LoadModelDataInternalOBJ(const char* meshFile, const char* textureFile);
 	};
 }

@@ -3,6 +3,9 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
+#define TINYGLTFLOADER_IMPLEMENTATION
+#include <tiny_gltf_loader.h>
+
 #include "Renderer.h"
 #include "core/Application.h"
 
@@ -27,7 +30,7 @@ namespace symphony
         std::string warn, err;
 
         if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath)) {
-            throw std::runtime_error(warn + err);
+            SY_CORE_ERROR("OBJ : Failed to load mesh!");
         }
 
         std::unordered_map<Vertex, uint32_t> uniqueVertices{};
@@ -61,7 +64,7 @@ namespace symphony
         return std::make_pair(vertices, indices);
 	}
 
-    ModelData MeshBuilder::LoadModelDataInternal(const char* meshFile, const char* textureFile)
+    ModelData MeshBuilder::LoadModelDataInternalOBJ(const char* meshFile, const char* textureFile)
     {
         ModelData returnData{};
         returnData.RendererResources = MeshBuilder::CreateModelFromOBJ(meshFile);
@@ -72,7 +75,7 @@ namespace symphony
     ModelData MeshBuilder::LoadModelData(const char* meshFile, const char* textureFile)
     {
         ThreadPool& pool = Application::Get().GetThreadPool();
-        std::future<ModelData> result = pool.Submit(LoadModelDataInternal, meshFile, textureFile);
+        std::future<ModelData> result = pool.Submit(LoadModelDataInternalOBJ, meshFile, textureFile);
         return result.get();
     }
 }

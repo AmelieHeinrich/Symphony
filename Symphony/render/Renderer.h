@@ -56,6 +56,7 @@ namespace symphony
 		static void AddMesh(Mesh mesh, const std::string& name);
 		static void SetMeshTransform(const std::string& name, const glm::mat4& matrix);
 		static void Resize(uint32_t width, uint32_t height);
+		static void SetCamera(const glm::mat4& view);
 
 		struct Statistics
 		{

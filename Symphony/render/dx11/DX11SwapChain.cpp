@@ -18,13 +18,12 @@ namespace symphony {
 		swapChainInfo.BufferDesc.Width = width;
 		swapChainInfo.BufferDesc.Height = height;
 		swapChainInfo.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		swapChainInfo.BufferDesc.RefreshRate.Numerator = 256; // TODO: Select refresh rate
+		swapChainInfo.BufferDesc.RefreshRate.Numerator = 60; // TODO: Select refresh rate
 		swapChainInfo.BufferDesc.RefreshRate.Denominator = 1;
 		swapChainInfo.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainInfo.OutputWindow = hwnd;
 		swapChainInfo.SampleDesc.Count = 1;
 		swapChainInfo.SampleDesc.Quality = 0;
-		swapChainInfo.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 		swapChainInfo.Windowed = TRUE;
 
 		HRESULT result = DX11Renderer::GetRendererData().DXGIFactory->CreateSwapChain(device, &swapChainInfo, &m_Handle);
@@ -65,7 +64,7 @@ namespace symphony {
 		depthStencilDesc.MiscFlags = 0;
 
 		result = device->CreateTexture2D(&depthStencilDesc, NULL, &m_DepthStencilBuffer);
-		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create swap chain texture object!");
+		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create swap chain depth texture object!");
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
 		depthStencilViewDesc.Format = depthStencilDesc.Format;
@@ -87,20 +86,10 @@ namespace symphony {
 		D3D11_RASTERIZER_DESC rasterizerDesc = {};
 		rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
 		rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
+		rasterizerDesc.DepthClipEnable = true;
 		rasterizerDesc.FrontCounterClockwise = true;
 		result = device->CreateRasterizerState(&rasterizerDesc, &m_RasterizerState);
 		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create rasterizer state!");
-
-		D3D11_SAMPLER_DESC sampDesc = {};
-		sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-		sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-		sampDesc.MinLOD = 0;
-		sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-		result = device->CreateSamplerState(&sampDesc, &m_SamplerState); //Create sampler state
-		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create sampler state!");
 
 		DX11Renderer::GetRendererData().Context->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
 		DX11Renderer::GetRendererData().Context->OMSetDepthStencilState(m_DepthStencilState, 0);
@@ -117,7 +106,6 @@ namespace symphony {
 
 	DX11SwapChain::~DX11SwapChain()
 	{
-		m_SamplerState->Release();
 		m_RasterizerState->Release();
 		m_DepthStencilState->Release();
 		m_DepthStencilView->Release();
@@ -135,7 +123,6 @@ namespace symphony {
 	{
 		if (m_Handle)
 		{
-			m_SamplerState->Release();
 			m_RasterizerState->Release();
 			m_DepthStencilState->Release();
 			m_DepthStencilView->Release();

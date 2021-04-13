@@ -37,24 +37,11 @@ namespace symphony
 		res = device->CreateShaderResourceView(m_Texture, &srvDesc, &m_ShaderResourceView);
 		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create Texture2D shader resource view!");
 
-		D3D11_SAMPLER_DESC sdesc{};
-		sdesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-		sdesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-		sdesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-		sdesc.MinLOD = 0;
-		sdesc.MaxLOD = D3D11_FLOAT32_MAX;
-		sdesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		sdesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-
-		res = device->CreateSamplerState(&sdesc, &m_SamplerState);
-		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create Texture2D sampler state!");
-
 		ImageData::FreeImageData(imageData);
 	}
 
 	DX11Texture2D::~DX11Texture2D()
 	{
-		m_SamplerState->Release();
 		m_ShaderResourceView->Release();
 		m_Texture->Release();
 	}
@@ -63,7 +50,6 @@ namespace symphony
 	{
 		auto context = DX11Renderer::GetRendererData().Context;
 		context->PSSetShaderResources(slot, 1, &m_ShaderResourceView);
-		context->PSSetSamplers(slot, 1, &m_SamplerState);
 	}
 
 	void DX11Texture2D::Unbind(int slot)
