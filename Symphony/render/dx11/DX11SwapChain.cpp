@@ -83,14 +83,6 @@ namespace symphony {
 		result = device->CreateDepthStencilState(&depthstencildesc, &m_DepthStencilState);
 		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to depth stencil state!");
 
-		D3D11_RASTERIZER_DESC rasterizerDesc = {};
-		rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
-		rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
-		rasterizerDesc.DepthClipEnable = true;
-		rasterizerDesc.FrontCounterClockwise = true;
-		result = device->CreateRasterizerState(&rasterizerDesc, &m_RasterizerState);
-		DX11Renderer::CheckIfFailed(result, "D3D11: Failed to create rasterizer state!");
-
 		DX11Renderer::GetRendererData().Context->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
 		DX11Renderer::GetRendererData().Context->OMSetDepthStencilState(m_DepthStencilState, 0);
 
@@ -106,7 +98,6 @@ namespace symphony {
 
 	DX11SwapChain::~DX11SwapChain()
 	{
-		m_RasterizerState->Release();
 		m_DepthStencilState->Release();
 		m_DepthStencilView->Release();
 		m_DepthStencilBuffer->Release();
@@ -123,7 +114,6 @@ namespace symphony {
 	{
 		if (m_Handle)
 		{
-			m_RasterizerState->Release();
 			m_DepthStencilState->Release();
 			m_DepthStencilView->Release();
 			m_DepthStencilBuffer->Release();

@@ -18,7 +18,8 @@ namespace symphony
 		MeshEBO = std::make_shared<DX11IndexBuffer>(data.RendererResources.second);
 		MeshT2D = std::make_shared<DX11Texture2D>(data.TextureFilepath, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
-		m_SkyboxUniformBuffer = std::make_shared<DX11UniformBuffer>();
+		RendererUniforms ubo{};
+		m_SkyboxUniformBuffer = std::make_shared<DX11UniformBuffer>(&ubo, sizeof(RendererUniforms));
 		m_SkyboxShader->Unbind();
 	}
 
@@ -38,7 +39,7 @@ namespace symphony
 		m_SkyboxShader->Bind();
 		m_SkyboxUniformBuffer->BindForShader(0);
 
-		m_SkyboxUniformBuffer->Update(ubo);
+		m_SkyboxUniformBuffer->Update(&ubo);
 
 		MeshVBO->Bind();
 		MeshEBO->Bind();

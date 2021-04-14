@@ -10,6 +10,7 @@
 #include "DX11Texture2D.h"
 #include "DX11Mesh.h"
 #include "DX11Skybox.h"
+#include "DX11RasterizerLibrary.h"
 #include <memory>
 #include <core/Log.h>
 
@@ -60,6 +61,7 @@ namespace symphony
 		static void SetMeshTransform(const std::string& meshName, const glm::mat4& transform);
 		static void Resize(uint32_t width, uint32_t height);
 		static void SetCamera(const glm::mat4& view);
+		static void SetSkybox(const std::string& path);
 
 		static DirectXRendererData GetRendererData() {
 			return m_RendererData;

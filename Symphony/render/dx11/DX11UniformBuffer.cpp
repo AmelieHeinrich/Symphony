@@ -3,22 +3,17 @@
 
 namespace symphony
 {
-	DX11UniformBuffer::DX11UniformBuffer()
+	DX11UniformBuffer::DX11UniformBuffer(void* data, uint32_t size)
 	{
 		D3D11_BUFFER_DESC buff_desc = {};
 		buff_desc.Usage = D3D11_USAGE_DEFAULT;
-		buff_desc.ByteWidth = sizeof(RendererUniforms);
+		buff_desc.ByteWidth = size;
 		buff_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		buff_desc.CPUAccessFlags = 0;
 		buff_desc.MiscFlags = 0;
 
-		RendererUniforms ubo{};
-		ubo.SceneModel = glm::mat4(1.0f);
-		ubo.SceneProjection = glm::mat4(1.0f);
-		ubo.SceneView = glm::mat4(1.0f);
-
 		D3D11_SUBRESOURCE_DATA init_data = {};
-		init_data.pSysMem = &ubo;
+		init_data.pSysMem = data;
 
 		auto res = DX11Renderer::GetRendererData().Device->CreateBuffer(&buff_desc, &init_data, &m_BufferHandle);
 		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create UBO!");
@@ -41,8 +36,8 @@ namespace symphony
 		DX11Renderer::GetRendererData().Context->PSSetConstantBuffers(0, 1, nullptr);
 	}
 
-	void DX11UniformBuffer::Update(RendererUniforms ubo)
+	void DX11UniformBuffer::Update(void* data)
 	{
-		DX11Renderer::GetRendererData().Context->UpdateSubresource(m_BufferHandle, NULL, NULL, &ubo, NULL, NULL);
+		DX11Renderer::GetRendererData().Context->UpdateSubresource(m_BufferHandle, NULL, NULL, data, NULL, NULL);
 	}
 }

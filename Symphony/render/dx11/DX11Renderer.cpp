@@ -58,15 +58,17 @@ namespace symphony
 		SDL_GetWindowSize(window->GetWindowHandle(), &w, &h);
 		m_RendererData.RendererSwapChain = std::make_shared<DX11SwapChain>(windowRaw, w, h);
 
+		RasterizerLibrary::InitDefaultRasterizers();
+
 		RendererShader = std::make_shared<DX11Shader>("shaderlib/hlsl/Vertex.hlsl", "shaderlib/hlsl/Fragment.hlsl");
-		RendererUniformBuffer = std::make_shared<DX11UniformBuffer>();
+
+		RendererUniforms ubo{};
+		RendererUniformBuffer = std::make_shared<DX11UniformBuffer>(&ubo, sizeof(RendererUniforms));
 
 		m_RendererData.FBWidth = w;
 		m_RendererData.FBHeight = h;
 
 		DX11Gui::Init();
-
-		m_RendererData.RendererSkybox = std::make_shared<DX11Skybox>("resources/skybox/skybox8k.hdr");
 
 		RendererShader->Bind();
 	}
@@ -89,6 +91,7 @@ namespace symphony
 		RendererUniformBuffer.reset();
 		RendererShader.reset();
 
+		RasterizerLibrary::Shutdown();
 		m_RendererData.RendererSwapChain.reset();
 		m_RendererData.DXGIDevice->Release();
 		m_RendererData.DXGIAdapter->Release();
@@ -110,8 +113,27 @@ namespace symphony
 		m_RendererData.RendererContext->SetClearColor(m_RendererData.RendererSwapChain, m_RendererData.CCR, m_RendererData.CCG, m_RendererData.CCB, m_RendererData.CCA);
 		m_RendererData.Context->ClearDepthStencilView(m_RendererData.RendererSwapChain->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1, 0);
 
+		// SKYBOX PASS
+		{
+			RasterizerLibrary::SetRasterizerState("Skybox State");
+			RendererUniforms ubo{};
+			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 100.0f);
+			if (!m_RendererData.CustomCamera)
+			{
+				ubo.SceneView = glm::mat4(1.0f);
+			}
+			else
+			{
+				ubo.SceneView = glm::mat4(glm::mat3(m_RendererData.View));
+			}
+			ubo.SceneModel = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
+			m_RendererData.RendererSkybox->Draw(ubo);
+		}
+
 		// MODEL PASS
 		{
+			RasterizerLibrary::SetRasterizerState("Mesh State");
+
 			RendererShader->Bind();
 
 			RendererUniformBuffer->BindForShader(0);
@@ -132,7 +154,7 @@ namespace symphony
 					ubo.SceneView = m_RendererData.View;
 				}
 				ubo.SceneModel = model->GetModelMatrix();
-				RendererUniformBuffer->Update(ubo);
+				RendererUniformBuffer->Update(&ubo);
 
 				numTris += model->GetNumberOfVertices() / 3;
 				drawCalls++;
@@ -143,22 +165,6 @@ namespace symphony
 			Renderer::Stats.DrawCalls = drawCalls;
 			numTris = 0;
 			drawCalls = 0;
-		}
-
-		// SKYBOX PASS
-		{
-			RendererUniforms ubo{};
-			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 100.0f);
-			if (!m_RendererData.CustomCamera)
-			{
-				ubo.SceneView = glm::mat4(1.0f);
-			}
-			else
-			{
-				ubo.SceneView = glm::mat4(glm::mat3(m_RendererData.View));
-			}
-			ubo.SceneModel = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
-			m_RendererData.RendererSkybox->Draw(ubo);
 		}
 
 		// GUI PASS
@@ -209,6 +215,17 @@ namespace symphony
 		m_RendererData.View = view;
 
 		m_RendererData.CustomCamera = true;
+	}
+
+	void DX11Renderer::SetSkybox(const std::string& path)
+	{
+		if (m_RendererData.RendererSkybox == nullptr)
+			m_RendererData.RendererSkybox = std::make_shared<DX11Skybox>(path);
+		else
+		{
+			m_RendererData.RendererSkybox.reset();
+			m_RendererData.RendererSkybox = std::make_shared<DX11Skybox>(path);
+		}
 	}
 
 	void DX11Renderer::PrintRendererInfo()

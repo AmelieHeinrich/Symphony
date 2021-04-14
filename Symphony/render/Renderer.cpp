@@ -286,4 +286,14 @@ namespace symphony
 			break;
 		}
 	}
+
+	void Renderer::SetSkybox(const std::string& path)
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::DirectX11:
+			DX11Renderer::SetSkybox(path);
+			break;
+		}
+	}
 }

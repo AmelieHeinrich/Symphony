@@ -19,12 +19,12 @@ public:
 		Renderer::PrintRendererInfo();
 
 		Renderer::ClearColor(0.0156862745f, 0.54509803921f, 0.60392156862f, 1.0f);
-		Mesh gunMesh(MeshBuilder::LoadModelData("resources/models/viking_room.obj", "resources/textures/viking_room.png"));
-		Mesh monkeyMesh(MeshBuilder::LoadModelData("resources/models/suzanne.obj", "resources/textures/darkMarble.jpg"));
+		Mesh stanford_dragon(MeshBuilder::LoadModelData("resources/models/dragon.obj", "resources/textures/texture.png"));
 
-		Renderer::AddMesh(gunMesh, "Gun");
-		Renderer::AddMesh(monkeyMesh, "Suzanne");
+		Renderer::AddMesh(stanford_dragon, "Stanford Dragon");
 		Renderer::Prepare();
+
+		Renderer::SetSkybox("resources/skybox/skybox.hdr");
 	}
 
 	void Run() override
@@ -47,10 +47,8 @@ public:
 
 			Renderer::SetCamera(camera.GetViewMatrix());
 
-			glm::mat4 newMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, -0.3f, -3.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			glm::mat4 monkeyMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.3f, -3.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-			Renderer::SetMeshTransform("Gun", newMatrix);
-			Renderer::SetMeshTransform("Suzanne", monkeyMatrix);
+			glm::mat4 dragon_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.0f, -0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+			Renderer::SetMeshTransform("Stanford Dragon", dragon_matrix);
 
 			m_Window->Update();
 			Renderer::Draw();

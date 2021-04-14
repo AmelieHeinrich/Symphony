@@ -19,6 +19,5 @@ namespace symphony {
 		m_DeviceContext->OMSetRenderTargets(1, &swapChain->m_RenderTargetView, swapChain->m_DepthStencilView);
 		m_DeviceContext->ClearRenderTargetView(swapChain->GetRenderTargetView(), ClearColorValues);
 		m_DeviceContext->ClearDepthStencilView(swapChain->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		m_DeviceContext->RSSetState(swapChain->m_RasterizerState);
 	}
 }
