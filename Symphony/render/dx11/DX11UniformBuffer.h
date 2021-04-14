@@ -13,7 +13,7 @@ namespace symphony
 		~DX11UniformBuffer();
 
 		void BindForShader(int bufferIndex);
-		void Unbind();
+		void Unbind(int bufferIndex);
 
 		void Update(void* data);
 

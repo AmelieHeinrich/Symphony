@@ -13,7 +13,9 @@ namespace symphony
 	DirectXRendererData DX11Renderer::m_RendererData;
 	std::unordered_map<std::string, std::shared_ptr<DX11Mesh>> DX11Renderer::m_Meshes;
 	std::shared_ptr<DX11Shader> DX11Renderer::RendererShader;
+
 	std::shared_ptr<DX11UniformBuffer> DX11Renderer::RendererUniformBuffer;
+	std::shared_ptr<DX11UniformBuffer> DX11Renderer::RendererLightUniformBuffer;
 
 	void DX11Renderer::Init(Window* window)
 	{
@@ -63,7 +65,10 @@ namespace symphony
 		RendererShader = std::make_shared<DX11Shader>("shaderlib/hlsl/Vertex.hlsl", "shaderlib/hlsl/Fragment.hlsl");
 
 		RendererUniforms ubo{};
+		LightRendererUniforms lubo{};
+
 		RendererUniformBuffer = std::make_shared<DX11UniformBuffer>(&ubo, sizeof(RendererUniforms));
+		RendererLightUniformBuffer = std::make_shared<DX11UniformBuffer>(&lubo, sizeof(LightRendererUniforms));
 
 		m_RendererData.FBWidth = w;
 		m_RendererData.FBHeight = h;
@@ -88,6 +93,7 @@ namespace symphony
 			i.second.reset();
 		m_Meshes.clear();
 
+		RendererLightUniformBuffer.reset();
 		RendererUniformBuffer.reset();
 		RendererShader.reset();
 
@@ -137,6 +143,11 @@ namespace symphony
 			RendererShader->Bind();
 
 			RendererUniformBuffer->BindForShader(0);
+			RendererUniformBuffer->BindForShader(1);
+			LightRendererUniforms lubo{};
+			lubo.LightDirection = m_RendererData.LightDirection;
+			lubo.CameraPosition = m_RendererData.CameraPosition;
+			RendererLightUniformBuffer->Update(&lubo);
 
 			int numTris = 0;
 			int drawCalls = 0;
@@ -226,6 +237,16 @@ namespace symphony
 			m_RendererData.RendererSkybox.reset();
 			m_RendererData.RendererSkybox = std::make_shared<DX11Skybox>(path);
 		}
+	}
+
+	void DX11Renderer::SetLightPosition(const glm::vec4& lightPos)
+	{
+		m_RendererData.LightDirection = lightPos;
+	}
+
+	void DX11Renderer::SendCameraPosition(const glm::vec3& camPos)
+	{
+		m_RendererData.CameraPosition = glm::vec4(camPos, 1.0f);
 	}
 
 	void DX11Renderer::PrintRendererInfo()

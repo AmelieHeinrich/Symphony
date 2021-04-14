@@ -17,7 +17,7 @@ cbuffer RendererUniforms : register(b0)
 	row_major float4x4 Model;
 	row_major float4x4 View;
 	row_major float4x4 Projection;
-};
+}
 
 VS_OUTPUT VSMain(VS_INPUT input)
 {

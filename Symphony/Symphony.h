@@ -10,6 +10,7 @@
 #include <core/Assert.h>
 #include <core/Log.h>
 #include <core/Input.h>
+#include <core/Timer.h>
 
 // EVENT
 #include <events/Event.h>

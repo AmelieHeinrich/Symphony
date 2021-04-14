@@ -30,7 +30,7 @@ namespace symphony
 		DX11Renderer::GetRendererData().Context->PSSetConstantBuffers(bufferIndex, 1, &m_BufferHandle);
 	}
 
-	void DX11UniformBuffer::Unbind()
+	void DX11UniformBuffer::Unbind(int bufferIndex)
 	{
 		DX11Renderer::GetRendererData().Context->VSSetConstantBuffers(0, 1, nullptr);
 		DX11Renderer::GetRendererData().Context->PSSetConstantBuffers(0, 1, nullptr);

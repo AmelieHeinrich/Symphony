@@ -296,4 +296,22 @@ namespace symphony
 			break;
 		}
 	}
+
+	void Renderer::SendCameraPosition(const glm::vec3& camPos)
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::DirectX11:
+			DX11Renderer::SendCameraPosition(camPos);
+		}
+	}
+
+	void Renderer::SetLightPosition(const glm::vec4& lightPos)
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::DirectX11:
+			DX11Renderer::SetLightPosition(lightPos);
+		}
+	}
 }

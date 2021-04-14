@@ -24,9 +24,16 @@ namespace symphony
 	// Renderer uniforms (nO WAY)
 	struct RendererUniforms
 	{
-		alignas(16) glm::mat4 SceneModel = glm::mat4(1.0f);
-		alignas(16) glm::mat4 SceneProjection = glm::mat4(1.0f);
-		alignas(16) glm::mat4 SceneView = glm::mat4(1.0f);
+		glm::mat4 SceneModel = glm::mat4(1.0f);
+		glm::mat4 SceneProjection = glm::mat4(1.0f);
+		glm::mat4 SceneView = glm::mat4(1.0f);
+	};
+
+	// Support for single lighting for now
+	struct LightRendererUniforms
+	{
+		glm::vec4 LightDirection = glm::vec4(1.0f);
+		glm::vec4 CameraPosition = glm::vec4(0.0f);
 	};
 
 	// Wrapper class around all the renderers
@@ -57,6 +64,8 @@ namespace symphony
 		static void SetMeshTransform(const std::string& name, const glm::mat4& matrix);
 		static void Resize(uint32_t width, uint32_t height);
 		static void SetCamera(const glm::mat4& view);
+		static void SendCameraPosition(const glm::vec3& camPos);
+		static void SetLightPosition(const glm::vec4& lightPos);
 		static void SetSkybox(const std::string& path);
 
 		struct Statistics

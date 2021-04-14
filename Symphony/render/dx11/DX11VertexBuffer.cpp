@@ -75,6 +75,7 @@ namespace symphony
 		Layout.push_back({ "POSITION", 0, LayoutType::Float3, 0 });
 		Layout.push_back({ "COLOR", 0, LayoutType::Float3, 0 });
 		Layout.push_back({ "TEXCOORD", 0, LayoutType::Float2, 0 });
+		Layout.push_back({ "NORMALS", 0, LayoutType::Float3, 0 });
 
 		D3D11_INPUT_ELEMENT_DESC* desc = new D3D11_INPUT_ELEMENT_DESC[Layout.size()];
 
