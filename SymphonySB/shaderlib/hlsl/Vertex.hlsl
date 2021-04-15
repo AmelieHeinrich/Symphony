@@ -25,9 +25,7 @@ VS_OUTPUT VSMain(VS_INPUT input)
 {
 	VS_OUTPUT output = (VS_OUTPUT)0;
 
-	float3 FragPos = float3(mul(Model, float4(input.position.xyz, 1.0)).xyz);
-
-	output.position = float4(FragPos.xyz, 1.0);
+	output.position = mul(input.position, Model);
 	output.position = mul(output.position, Projection);
 	output.position = mul(output.position, View);
 	output.color = input.color;

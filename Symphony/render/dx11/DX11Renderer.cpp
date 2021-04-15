@@ -123,14 +123,15 @@ namespace symphony
 		{
 			RasterizerLibrary::SetRasterizerState("Skybox State");
 			RendererUniforms ubo{};
-			ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 100.0f);
 			if (!m_RendererData.CustomCamera)
 			{
 				ubo.SceneView = glm::mat4(1.0f);
+				ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 100.0f);
 			}
 			else
 			{
 				ubo.SceneView = glm::mat4(glm::mat3(m_RendererData.View));
+				ubo.SceneProjection = m_RendererData.Projection;
 			}
 			ubo.SceneModel = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
 			m_RendererData.RendererSkybox->Draw(ubo);
@@ -151,14 +152,15 @@ namespace symphony
 				auto model = mesh.second;
 
 				RendererUniforms ubo{};
-				ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 1000.0f);
 				if (!m_RendererData.CustomCamera)
 				{
 					ubo.SceneView = glm::mat4(1.0f);
+					ubo.SceneProjection = glm::perspective(glm::radians(45.0f), m_RendererData.FBWidth / (float)m_RendererData.FBHeight, 0.01f, 100.0f);
 				}
 				else
 				{
 					ubo.SceneView = m_RendererData.View;
+					ubo.SceneProjection = m_RendererData.Projection;
 				}
 				ubo.SceneModel = model->GetModelMatrix();
 				RendererUniformBuffer->Update(&ubo);
@@ -227,9 +229,10 @@ namespace symphony
 		Draw();
 	}
 
-	void DX11Renderer::SetCamera(const glm::mat4& view)
+	void DX11Renderer::SetCamera(const glm::mat4& view, const glm::mat4& projection)
 	{
 		m_RendererData.View = view;
+		m_RendererData.Projection = projection;
 
 		m_RendererData.CustomCamera = true;
 	}

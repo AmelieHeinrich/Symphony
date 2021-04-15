@@ -59,7 +59,7 @@ namespace symphony
 		static void AddRenderObject(Mesh mesh, MaterialUniforms ubo, const std::string& name);
 		static void SetMeshTransform(const std::string& name, const glm::mat4& matrix);
 		static void Resize(uint32_t width, uint32_t height);
-		static void SetCamera(const glm::mat4& view);
+		static void SetCamera(const glm::mat4& view, const glm::mat4& projection);
 		static void SendCameraPosition(const glm::vec3& camPos);
 		static void SetLightInformation(const LightInformation& light);
 		static void SetSkybox(const std::string& path);

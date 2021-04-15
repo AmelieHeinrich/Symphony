@@ -43,6 +43,7 @@ namespace symphony
 		LightInformation LightInfo;
 
 		glm::mat4 View = glm::mat4(1.0f);
+		glm::mat4 Projection = glm::mat4(1.0f);
 		bool CustomCamera = false;
 	};
 
@@ -64,7 +65,7 @@ namespace symphony
 		static void AddRenderObject(Mesh mesh, MaterialUniforms ubo, const std::string& name);
 		static void SetMeshTransform(const std::string& meshName, const glm::mat4& transform);
 		static void Resize(uint32_t width, uint32_t height);
-		static void SetCamera(const glm::mat4& view);
+		static void SetCamera(const glm::mat4& view, const glm::mat4& projection);
 		static void SetSkybox(const std::string& path);
 		static void SetLightInformation(const LightInformation& light);
 		static void SendCameraPosition(const glm::vec3& camPos);

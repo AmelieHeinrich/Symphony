@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <imgui.h>
 #include "FirstPersonCamera.h"
+#include "ThirdPersonCamera.h"
 
 using namespace symphony;
 
@@ -12,7 +13,7 @@ class SymphonySandbox : public Application
 {
 public:
 	SymphonySandbox()
-		: Application(RenderAPI::DirectX11, "Symphony Sandbox")
+		: Application(RenderAPI::DirectX11, "Symphony Sandbox"), camera(45.0f, 1280.0f / 720.0f, 0.01f, 100.0f)
 	{
 		InternalTimer::Init();
 
@@ -48,27 +49,18 @@ public:
 		{
 			InternalTimer::Update();
 
-			// Update camera
-			{
-				if (Input::IsKeyPressed(Key::W))
-					camera.ProcessKeyboard(FORWARD, InternalTimer::GetDeltaTime());
-				if (Input::IsKeyPressed(Key::S))
-					camera.ProcessKeyboard(BACKWARD, InternalTimer::GetDeltaTime());
-				if (Input::IsKeyPressed(Key::A))
-					camera.ProcessKeyboard(LEFT, InternalTimer::GetDeltaTime());
-				if (Input::IsKeyPressed(Key::D))
-					camera.ProcessKeyboard(RIGHT, InternalTimer::GetDeltaTime());
-			}
+			camera.OnUpdate(InternalTimer::GetDeltaTime());
 
-			Renderer::SendCameraPosition(camera.Position);
-			Renderer::SetCamera(camera.GetViewMatrix());
+			Renderer::SetCamera(camera.GetViewMatrix(), camera.GetProjectionMatrix());
+			Renderer::SendCameraPosition(camera.GetPosition());
+			camera.SetViewportSize(m_Window->GetWidth(), m_Window->GetHeight());
 
-			glm::mat4 dragon_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.0f, -0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 dragon_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.0f, -5.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 			Renderer::SetMeshTransform("Stanford Dragon", dragon_matrix);
 
-			lightAppInfo.CameraPosition = camera.Position;
-			lightAppInfo.LightPosition = camera.Position;
-			lightAppInfo.LightDirection = camera.Front;
+			lightAppInfo.CameraPosition = camera.GetPosition();
+			lightAppInfo.LightPosition = camera.GetPosition();
+			lightAppInfo.LightDirection = camera.GetForwardDirection();
 
 			Renderer::SetLightInformation(lightAppInfo);
 
@@ -79,38 +71,11 @@ public:
 
 	void OnEvent(Event& e)
 	{
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<MouseMovedEvent>(SY_BIND_EVENT_FN(SymphonySandbox::OnMouseMoved));
-	}
-
-	bool OnMouseMoved(MouseMovedEvent& e)
-	{
-		int xpos = e.GetX();
-		int ypos = e.GetY();
-
-		if (firstMouse)
-		{
-			lastX = xpos;
-			lastY = ypos;
-			firstMouse = false;
-		}
-
-		float xoffset = xpos - lastX;
-		float yoffset = lastY - ypos; 
-
-		lastX = xpos;
-		lastY = ypos;
-
-		camera.ProcessMouseMovement(xoffset, yoffset);
-
-		return true;
+		camera.OnEvent(e);
 	}
 private:
 	LightInformation lightAppInfo;
-	Camera camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
-	float lastX = m_Window->GetWidth() / 2.0f;
-	float lastY = m_Window->GetHeight() / 2.0f;
-	bool firstMouse = true;
+	EditorCamera camera;
 };
 
 Application* symphony::CreateApplication()

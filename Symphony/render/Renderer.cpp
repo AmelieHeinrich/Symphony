@@ -286,12 +286,12 @@ namespace symphony
 		SY_CORE_INFO("Renderer Indices: " + std::to_string(Stats.GetTotalIndexCount()));
 	}
 
-	void Renderer::SetCamera(const glm::mat4& view)
+	void Renderer::SetCamera(const glm::mat4& view, const glm::mat4& projection)
 	{
 		switch (s_RenderAPI)
 		{
 		case RenderAPI::DirectX11:
-			DX11Renderer::SetCamera(view);
+			DX11Renderer::SetCamera(view, projection);
 			break;
 		}
 	}
