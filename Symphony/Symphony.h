@@ -24,3 +24,4 @@
 #include <render/RenderObject.h>
 #include <render/Material.h>
 #include <render/GUI.h>
+#include <render/Light.h>

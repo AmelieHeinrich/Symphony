@@ -65,10 +65,10 @@ namespace symphony
 		RendererShader = std::make_shared<DX11Shader>("shaderlib/hlsl/Vertex.hlsl", "shaderlib/hlsl/Fragment.hlsl");
 
 		RendererUniforms ubo{};
-		LightRendererUniforms lubo{};
+		m_RendererData.LightInfo = {};
 
 		RendererUniformBuffer = std::make_shared<DX11UniformBuffer>(&ubo, sizeof(RendererUniforms));
-		RendererLightUniformBuffer = std::make_shared<DX11UniformBuffer>(&lubo, sizeof(LightRendererUniforms));
+		RendererLightUniformBuffer = std::make_shared<DX11UniformBuffer>(&m_RendererData.LightInfo, sizeof(LightInformation));
 
 		m_RendererData.FBWidth = w;
 		m_RendererData.FBHeight = h;
@@ -144,10 +144,6 @@ namespace symphony
 
 			RendererUniformBuffer->BindForShader(0);
 			RendererLightUniformBuffer->BindForShader(1);
-			LightRendererUniforms lubo{};
-			lubo.LightDirection = m_RendererData.LightDirection;
-			lubo.CameraPosition = m_RendererData.CameraPosition;
-			RendererLightUniformBuffer->Update(&lubo);
 
 			int numTris = 0;
 			int drawCalls = 0;
@@ -166,6 +162,7 @@ namespace symphony
 				}
 				ubo.SceneModel = model->GetModelMatrix();
 				RendererUniformBuffer->Update(&ubo);
+				RendererLightUniformBuffer->Update(&m_RendererData.LightInfo);
 
 				numTris += model->GetNumberOfVertices() / 3;
 				drawCalls++;
@@ -248,14 +245,24 @@ namespace symphony
 		}
 	}
 
-	void DX11Renderer::SetLightPosition(const glm::vec4& lightPos)
+	void DX11Renderer::SetLightInformation(const LightInformation& light)
 	{
-		m_RendererData.LightDirection = lightPos;
+		m_RendererData.LightInfo.Ambient = light.Ambient;
+		m_RendererData.LightInfo.Diffuse = light.Diffuse;
+		m_RendererData.LightInfo.Specular = light.Specular;
+		m_RendererData.LightInfo.CameraPosition = light.CameraPosition;
+		m_RendererData.LightInfo.LightPosition = light.LightPosition;
+		m_RendererData.LightInfo.LightDirection = light.LightDirection;
+		m_RendererData.LightInfo.CutOff = light.CutOff;
+		m_RendererData.LightInfo.OuterCutOff = light.OuterCutOff;
+		m_RendererData.LightInfo.Constant = light.Constant;
+		m_RendererData.LightInfo.Linear = light.Linear;
+		m_RendererData.LightInfo.Quadratic = light.Quadratic;
 	}
 
 	void DX11Renderer::SendCameraPosition(const glm::vec3& camPos)
 	{
-		m_RendererData.CameraPosition = glm::vec4(camPos, 1.0f);
+		m_RendererData.LightInfo.CameraPosition = camPos;
 	}
 
 	void DX11Renderer::PrintRendererInfo()

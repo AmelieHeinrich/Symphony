@@ -44,7 +44,7 @@ namespace symphony
 	{
 		ID3DBlob* shaderBlob;
 		ID3DBlob* errorBlob;
-		HRESULT status = D3DCompile(source.c_str(), source.size(), NULL, NULL, NULL, main.c_str(), profile.c_str(), D3DCOMPILE_DEBUG, 0, &shaderBlob, &errorBlob);
+		HRESULT status = D3DCompile(source.c_str(), source.size(), NULL, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, main.c_str(), profile.c_str(), D3DCOMPILE_DEBUG, 0, &shaderBlob, &errorBlob);
 		if (status != S_OK)
 			info.Message = "Unable to compile shader from source\n";
 		if (errorBlob)

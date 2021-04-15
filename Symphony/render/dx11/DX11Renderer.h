@@ -40,8 +40,7 @@ namespace symphony
 		uint32_t FBWidth;
 		uint32_t FBHeight;
 
-		glm::vec4 LightDirection = glm::vec4(0.0f);
-		glm::vec4 CameraPosition = glm::vec4(0.0f);
+		LightInformation LightInfo;
 
 		glm::mat4 View = glm::mat4(1.0f);
 		bool CustomCamera = false;
@@ -67,7 +66,7 @@ namespace symphony
 		static void Resize(uint32_t width, uint32_t height);
 		static void SetCamera(const glm::mat4& view);
 		static void SetSkybox(const std::string& path);
-		static void SetLightPosition(const glm::vec4& lightPos);
+		static void SetLightInformation(const LightInformation& light);
 		static void SendCameraPosition(const glm::vec3& camPos);
 
 		static DirectXRendererData GetRendererData() {

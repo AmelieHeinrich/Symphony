@@ -24,15 +24,22 @@ public:
 		Mesh stanford_dragon(MeshBuilder::LoadModelData("resources/models/dragon.obj", "resources/textures/texture.jpg"));
 
 		MaterialUniforms ubo{};
-		ubo.Ambient = glm::vec3(0.0f, 0.0f, 0.5f);
-		ubo.Diffuse = glm::vec3(0.0f, 0.0f, 0.5f);
-		ubo.Specular = glm::vec3(0.0f, 0.0f, 0.5f);
+		ubo.Shininess = 32.0f;
 
 		Renderer::AddRenderObject(stanford_dragon, ubo, "Stanford Dragon");
 		Renderer::Prepare();
 
 		Renderer::SetSkybox("resources/skybox/skybox.hdr");
-		Renderer::SetLightPosition(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+		lightAppInfo = {};
+		lightAppInfo.CutOff = glm::cos(glm::radians(12.5f));
+		lightAppInfo.OuterCutOff = glm::cos(glm::radians(17.5f));
+		lightAppInfo.Ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+		lightAppInfo.Diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+		lightAppInfo.Specular = glm::vec3(1.0f, 1.0f, 1.0f);
+		lightAppInfo.Constant = 1.0f;
+		lightAppInfo.Linear = 0.09f;
+		lightAppInfo.Quadratic = 0.032f;
 	}
 
 	void Run() override
@@ -58,6 +65,12 @@ public:
 
 			glm::mat4 dragon_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.0f, -0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 			Renderer::SetMeshTransform("Stanford Dragon", dragon_matrix);
+
+			lightAppInfo.CameraPosition = camera.Position;
+			lightAppInfo.LightPosition = camera.Position;
+			lightAppInfo.LightDirection = camera.Front;
+
+			Renderer::SetLightInformation(lightAppInfo);
 
 			m_Window->Update();
 			Renderer::Draw();
@@ -93,6 +106,7 @@ public:
 		return true;
 	}
 private:
+	LightInformation lightAppInfo;
 	Camera camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 	float lastX = m_Window->GetWidth() / 2.0f;
 	float lastY = m_Window->GetHeight() / 2.0f;

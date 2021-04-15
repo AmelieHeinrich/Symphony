@@ -315,12 +315,12 @@ namespace symphony
 		}
 	}
 
-	void Renderer::SetLightPosition(const glm::vec4& lightPos)
+	void Renderer::SetLightInformation(const LightInformation& light)
 	{
 		switch (s_RenderAPI)
 		{
 		case RenderAPI::DirectX11:
-			DX11Renderer::SetLightPosition(lightPos);
+			DX11Renderer::SetLightInformation(light);
 		}
 	}
 }
