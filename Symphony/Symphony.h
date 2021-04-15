@@ -21,4 +21,6 @@
 #include <render/Renderer.h>
 #include <render/MeshBuilder.h>
 #include <render/Mesh.h>
+#include <render/RenderObject.h>
+#include <render/Material.h>
 #include <render/GUI.h>

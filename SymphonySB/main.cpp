@@ -23,7 +23,12 @@ public:
 		Renderer::ClearColor(0.0156862745f, 0.54509803921f, 0.60392156862f, 1.0f);
 		Mesh stanford_dragon(MeshBuilder::LoadModelData("resources/models/dragon.obj", "resources/textures/texture.jpg"));
 
-		Renderer::AddMesh(stanford_dragon, "Stanford Dragon");
+		MaterialUniforms ubo{};
+		ubo.Ambient = glm::vec3(0.0f, 0.0f, 0.5f);
+		ubo.Diffuse = glm::vec3(0.0f, 0.0f, 0.5f);
+		ubo.Specular = glm::vec3(0.0f, 0.0f, 0.5f);
+
+		Renderer::AddRenderObject(stanford_dragon, ubo, "Stanford Dragon");
 		Renderer::Prepare();
 
 		Renderer::SetSkybox("resources/skybox/skybox.hdr");

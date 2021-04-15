@@ -231,6 +231,15 @@ namespace symphony
 		}
 	}
 
+	void Renderer::AddRenderObject(Mesh mesh, MaterialUniforms ubo, const std::string& name)
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::DirectX11:
+			DX11Renderer::AddRenderObject(mesh, ubo, name);
+		}
+	}
+
 	void Renderer::SetMeshTransform(const std::string& name, const glm::mat4& matrix)
 	{
 		switch (s_RenderAPI)

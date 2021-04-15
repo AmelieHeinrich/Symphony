@@ -11,6 +11,7 @@
 #include "DX11Mesh.h"
 #include "DX11Skybox.h"
 #include "DX11RasterizerLibrary.h"
+#include "DX11RenderObject.h"
 #include <memory>
 #include <core/Log.h>
 
@@ -61,6 +62,7 @@ namespace symphony
 		static void AddIndexBuffer(const std::vector<uint32_t>& indices);
 		static void AddTexture2D(const char* filepath);
 		static void AddMesh(Mesh mesh, const std::string& name);
+		static void AddRenderObject(Mesh mesh, MaterialUniforms ubo, const std::string& name);
 		static void SetMeshTransform(const std::string& meshName, const glm::mat4& transform);
 		static void Resize(uint32_t width, uint32_t height);
 		static void SetCamera(const glm::mat4& view);
@@ -81,7 +83,7 @@ namespace symphony
 		}
 	private:
 		static DirectXRendererData m_RendererData;
-		static std::unordered_map<std::string, std::shared_ptr<DX11Mesh>> m_Meshes;
+		static std::unordered_map<std::string, std::shared_ptr<DX11RenderObject>> m_Meshes;
 		static std::shared_ptr<DX11Shader> RendererShader;
 
 		// UBOS

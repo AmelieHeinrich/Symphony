@@ -22,6 +22,14 @@ cbuffer LightRendererUniforms: register(b1)
 	float4 CameraPosition;
 };
 
+cbuffer MaterialRendererUniforms : register(b2)
+{
+	float3 Ambient;
+	float3 Diffuse;
+	float3 Specular;
+	float Shininess;
+};
+
 float4 PSMain(PS_INPUT input) : SV_TARGET
 {
 	// GAMMA CORRECTION
@@ -44,22 +52,18 @@ float4 PSMain(PS_INPUT input) : SV_TARGET
 
 	// Ambient
 	float ka = 0.1;
-	float3 ia = float3(1.0, 1.0, 1.0);
-	float3 ambient_light = ka * ia;
+	float3 ambient_light = ka * Ambient;
 
 	// Diffuse
 	float kd = 0.7;
-	float3 id = float3(1.0, 1.0, 1.0);
 	float amount_diffuse_light = max(0.0, dot(lightDir, input.normals));
-	float3 diffuse_light = kd * amount_diffuse_light * id;
+	float3 diffuse_light = amount_diffuse_light * Diffuse * kd;
 
 	// SPECULAR LIGHT
 	float ks = 0.5;
-	float3 is = float3(1.0, 1.0, 1.0);
 	float3 reflected_light = reflect(lightDir, input.normals);
-	float shininess = 1.0f; // TODO : Material
-	float amout_specular_light = pow(max(0.1, dot(reflected_light, camDir)), shininess);
-	float3 specular_light = ks * amout_specular_light * is;
+	float amout_specular_light = pow(max(0.1, dot(reflected_light, camDir)), Shininess);
+	float3 specular_light = ks * amout_specular_light * Specular;
 
 	float3 final_light = ambient_light + diffuse_light + specular_light;
 

@@ -4,6 +4,7 @@
 #include <vector>
 #include "core/PlatformDetection.h"
 #include "VertexBuffer.h"
+#include "Material.h"
 #include <glm/glm.hpp>
 #include <utility>
 #include <functional>
@@ -61,6 +62,7 @@ namespace symphony
 		static void AddTexture2D(const char* filepath);
 		static void AddModelData(ModelData data);
 		static void AddMesh(Mesh mesh, const std::string& name);
+		static void AddRenderObject(Mesh mesh, MaterialUniforms ubo, const std::string& name);
 		static void SetMeshTransform(const std::string& name, const glm::mat4& matrix);
 		static void Resize(uint32_t width, uint32_t height);
 		static void SetCamera(const glm::mat4& view);

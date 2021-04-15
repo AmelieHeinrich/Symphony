@@ -11,7 +11,7 @@
 namespace symphony
 {
 	DirectXRendererData DX11Renderer::m_RendererData;
-	std::unordered_map<std::string, std::shared_ptr<DX11Mesh>> DX11Renderer::m_Meshes;
+	std::unordered_map<std::string, std::shared_ptr<DX11RenderObject>> DX11Renderer::m_Meshes;
 	std::shared_ptr<DX11Shader> DX11Renderer::RendererShader;
 
 	std::shared_ptr<DX11UniformBuffer> DX11Renderer::RendererUniformBuffer;
@@ -143,7 +143,7 @@ namespace symphony
 			RendererShader->Bind();
 
 			RendererUniformBuffer->BindForShader(0);
-			RendererUniformBuffer->BindForShader(1);
+			RendererLightUniformBuffer->BindForShader(1);
 			LightRendererUniforms lubo{};
 			lubo.LightDirection = m_RendererData.LightDirection;
 			lubo.CameraPosition = m_RendererData.CameraPosition;
@@ -170,7 +170,7 @@ namespace symphony
 				numTris += model->GetNumberOfVertices() / 3;
 				drawCalls++;
 
-				model->Draw();
+				model->Update(2);
 			}
 			Renderer::Stats.NumTriangles = numTris;
 			Renderer::Stats.DrawCalls = drawCalls;
@@ -205,12 +205,21 @@ namespace symphony
 
 	void DX11Renderer::AddMesh(Mesh mesh, const std::string& name)
 	{
-		m_Meshes[name] = std::make_shared<DX11Mesh>(mesh.GetModelData());
+		
+	}
+
+	void DX11Renderer::AddRenderObject(Mesh mesh, MaterialUniforms ubo, const std::string& name)
+	{
+		m_Meshes[name] = std::make_shared<DX11RenderObject>(std::make_shared<DX11Mesh>(mesh.GetModelData()), std::make_shared<DX11Material>("shaderlib/hlsl/Vertex.hlsl", "shaderlib/hlsl/Fragment.hlsl"));
+		m_Meshes[name]->material->Ambient = ubo.Ambient;
+		m_Meshes[name]->material->Diffuse = ubo.Diffuse;
+		m_Meshes[name]->material->Specular = ubo.Specular;
+		m_Meshes[name]->material->Shininess = ubo.Shininess;
 	}
 
 	void DX11Renderer::SetMeshTransform(const std::string& meshName, const glm::mat4& transform)
 	{
-		m_Meshes[meshName]->ModelMatrix = transform;
+		m_Meshes[meshName]->mesh->ModelMatrix = transform;
 	}
 
 	void DX11Renderer::Resize(uint32_t width, uint32_t height)
