@@ -12,6 +12,7 @@
 #include "DX11Skybox.h"
 #include "DX11RasterizerLibrary.h"
 #include "DX11RenderObject.h"
+#include "DX11RenderTexture.h"
 #include <memory>
 #include <core/Log.h>
 
@@ -30,6 +31,7 @@ namespace symphony
 		std::shared_ptr<DX11Skybox> RendererSkybox = nullptr;
 		std::shared_ptr<DX11SwapChain> RendererSwapChain = nullptr;
 		std::shared_ptr<DX11RenderContext> RendererContext = nullptr;
+		std::shared_ptr<DX11RenderTexture> CurrentFramebuffer = nullptr;
 
 		// Clear color values
 		float CCR = 0.0f;
@@ -69,6 +71,7 @@ namespace symphony
 		static void SetSkybox(const std::string& path);
 		static void SetLightInformation(const LightInformation& light);
 		static void SendCameraPosition(const glm::vec3& camPos);
+		static void EndDraw();
 
 		static DirectXRendererData GetRendererData() {
 			return m_RendererData;

@@ -2,6 +2,7 @@
 
 #include "render/Renderer.h"
 #include "core/Log.h"
+#include <imgui.h>
 
 namespace symphony
 {
@@ -15,7 +16,6 @@ namespace symphony
 		m_Window = std::make_unique<Window>(1280, 720, name.c_str(), api);
 
 		Renderer::Init(m_Window.get());
-
 		SY_CORE_INFO("Application created!");
 	}
 

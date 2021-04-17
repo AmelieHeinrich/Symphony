@@ -13,7 +13,7 @@ class SymphonySandbox : public Application
 {
 public:
 	SymphonySandbox()
-		: Application(RenderAPI::DirectX11, "Symphony Sandbox"), camera(45.0f, 1280.0f / 720.0f, 0.01f, 100.0f)
+		: Application(RenderAPI::DirectX11, "Symphony Sandbox"), camera(45.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
 		InternalTimer::Init();
 
@@ -53,7 +53,6 @@ public:
 
 			Renderer::SetCamera(camera.GetViewMatrix(), camera.GetProjectionMatrix());
 			Renderer::SendCameraPosition(camera.GetPosition());
-			camera.SetViewportSize(m_Window->GetWidth(), m_Window->GetHeight());
 
 			glm::mat4 dragon_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.0f, -5.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 			Renderer::SetMeshTransform("Stanford Dragon", dragon_matrix);
@@ -65,7 +64,12 @@ public:
 			Renderer::SetLightInformation(lightAppInfo);
 
 			m_Window->Update();
+
 			Renderer::Draw();
+
+			camera.SetViewportSize(m_Window->GetWidth(), m_Window->GetHeight());
+
+			Renderer::EndDraw();
 		}
 	}
 

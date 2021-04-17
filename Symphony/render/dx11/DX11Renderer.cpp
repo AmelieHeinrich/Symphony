@@ -58,7 +58,21 @@ namespace symphony
 
 		int w, h;
 		SDL_GetWindowSize(window->GetWindowHandle(), &w, &h);
+
+		D3D11_VIEWPORT vp;
+		vp.Width = (FLOAT)w;
+		vp.Height = (FLOAT)h;
+		vp.MinDepth = 0.0f;
+		vp.MaxDepth = 1.0f;
+		vp.TopLeftX = 0;
+		vp.TopLeftY = 0;
+		DX11Renderer::GetRendererData().Context->RSSetViewports(1, &vp);
+
+		m_RendererData.FBWidth = w;
+		m_RendererData.FBHeight = h;
+
 		m_RendererData.RendererSwapChain = std::make_shared<DX11SwapChain>(windowRaw, w, h);
+		m_RendererData.CurrentFramebuffer = std::make_shared<DX11RenderTexture>(w, h);
 
 		RasterizerLibrary::InitDefaultRasterizers();
 
@@ -69,9 +83,6 @@ namespace symphony
 
 		RendererUniformBuffer = std::make_shared<DX11UniformBuffer>(&ubo, sizeof(RendererUniforms));
 		RendererLightUniformBuffer = std::make_shared<DX11UniformBuffer>(&m_RendererData.LightInfo, sizeof(LightInformation));
-
-		m_RendererData.FBWidth = w;
-		m_RendererData.FBHeight = h;
 
 		DX11Gui::Init();
 
@@ -98,6 +109,7 @@ namespace symphony
 		RendererShader.reset();
 
 		RasterizerLibrary::Shutdown();
+		m_RendererData.CurrentFramebuffer.reset();
 		m_RendererData.RendererSwapChain.reset();
 		m_RendererData.DXGIDevice->Release();
 		m_RendererData.DXGIAdapter->Release();
@@ -116,8 +128,8 @@ namespace symphony
 
 	void DX11Renderer::Draw()
 	{
-		m_RendererData.RendererContext->SetClearColor(m_RendererData.RendererSwapChain, m_RendererData.CCR, m_RendererData.CCG, m_RendererData.CCB, m_RendererData.CCA);
-		m_RendererData.Context->ClearDepthStencilView(m_RendererData.RendererSwapChain->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1, 0);
+		m_RendererData.CurrentFramebuffer->Bind();
+		m_RendererData.CurrentFramebuffer->Clear(glm::vec4{ m_RendererData.CCR, m_RendererData.CCG, m_RendererData.CCB, m_RendererData.CCA });
 
 		// SKYBOX PASS
 		{
@@ -133,7 +145,7 @@ namespace symphony
 				ubo.SceneView = glm::mat4(glm::mat3(m_RendererData.View));
 				ubo.SceneProjection = m_RendererData.Projection;
 			}
-			ubo.SceneModel = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
+			ubo.SceneModel = glm::scale(glm::mat4(1.0f), glm::vec3(1000.0f, 1000.0f, 1000.0f));
 			m_RendererData.RendererSkybox->Draw(ubo);
 		}
 
@@ -176,15 +188,6 @@ namespace symphony
 			numTris = 0;
 			drawCalls = 0;
 		}
-
-		// GUI PASS
-		{
-			DX11Gui::BeginGUI();
-			ImGui::ShowDemoWindow();
-			DX11Gui::EndGUI();
-		}
-
-		m_RendererData.RendererSwapChain->Present();
 	}
 
 	void DX11Renderer::AddVertexBuffer(const std::vector<Vertex>& vertices)
@@ -223,10 +226,27 @@ namespace symphony
 
 	void DX11Renderer::Resize(uint32_t width, uint32_t height)
 	{
+		SDL_SysWMinfo wmInfo;
+		SDL_VERSION(&wmInfo.version);
+		SDL_GetWindowWMInfo(Application::Get().GetWindow().GetWindowHandle() , &wmInfo);
+		HWND windowRaw = wmInfo.info.win.window;
+
 		m_RendererData.FBWidth = width;
 		m_RendererData.FBHeight = height;
-		m_RendererData.RendererSwapChain->RecreateRenderTargetView(width, height);
-		Draw();
+
+		D3D11_VIEWPORT vp;
+		vp.Width = (FLOAT)width;
+		vp.Height = (FLOAT)height;
+		vp.MinDepth = 0.0f;
+		vp.MaxDepth = 1.0f;
+		vp.TopLeftX = 0;
+		vp.TopLeftY = 0;
+		DX11Renderer::GetRendererData().Context->RSSetViewports(1, &vp);
+
+		m_RendererData.RendererSwapChain.reset();
+		m_RendererData.RendererSwapChain = std::make_shared<DX11SwapChain>(windowRaw, width, height);
+		m_RendererData.CurrentFramebuffer.reset();
+		m_RendererData.CurrentFramebuffer = std::make_shared<DX11RenderTexture>(width, height);
 	}
 
 	void DX11Renderer::SetCamera(const glm::mat4& view, const glm::mat4& projection)
@@ -266,6 +286,11 @@ namespace symphony
 	void DX11Renderer::SendCameraPosition(const glm::vec3& camPos)
 	{
 		m_RendererData.LightInfo.CameraPosition = camPos;
+	}
+
+	void DX11Renderer::EndDraw()
+	{
+		m_RendererData.RendererSwapChain->Present();
 	}
 
 	void DX11Renderer::PrintRendererInfo()

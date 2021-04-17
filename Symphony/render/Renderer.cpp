@@ -323,4 +323,14 @@ namespace symphony
 			DX11Renderer::SetLightInformation(light);
 		}
 	}
+
+	void Renderer::EndDraw()
+	{
+		switch (s_RenderAPI)
+		{
+		case RenderAPI::DirectX11:
+			DX11Renderer::EndDraw();
+			break;
+		}
+	}
 }

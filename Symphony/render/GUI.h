@@ -1,15 +1,19 @@
 #pragma once
 
 #include "core/DLLExport.h"
+#include <imgui.h>
 
 namespace symphony
 {
-	class GUI
+	SymphonyClass GUI
 	{
 	public:
-		static void Init();
-		static void Shutdown();
 		static void BeginGUI();
 		static void EndGUI();
+
+		static ImGuiContext* GetCurrentContext()
+		{
+			return ImGui::GetCurrentContext();
+		}
 	};
 }

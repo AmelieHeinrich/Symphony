@@ -46,7 +46,6 @@ namespace symphony
 
 		static void ClearColor(float r, float g, float b, float a);
 
-		// Present
 		static void Draw();
 
 		static void PrintRendererInfo();
@@ -63,6 +62,10 @@ namespace symphony
 		static void SendCameraPosition(const glm::vec3& camPos);
 		static void SetLightInformation(const LightInformation& light);
 		static void SetSkybox(const std::string& path);
+		static void* GetRenderTexture();
+		
+		// Present
+		static void EndDraw();
 
 		struct Statistics
 		{
@@ -74,6 +77,7 @@ namespace symphony
 		};
 		static Renderer::Statistics Stats;
 	private:
+		friend class GUI;
 		static RenderAPI s_RenderAPI;
 	};
 }
