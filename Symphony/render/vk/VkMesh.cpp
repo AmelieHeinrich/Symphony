@@ -8,13 +8,18 @@ namespace symphony
 	{
 		MeshVBO = std::make_shared<VulkanVertexBuffer>(data.RendererResources.first);
 		MeshEBO = std::make_shared<VulkanIndexBuffer>(data.RendererResources.second);
-		MeshT2D = std::make_shared<VulkanTexture2D>(data.TextureFilepath);
-		MeshDSET = std::make_shared<DescriptorSet>(MeshT2D);
+		for (auto texture : data.Textures)
+			MeshT2D.push_back(std::make_shared<VulkanTexture2D>(texture.first.c_str()));
+
+		std::shared_ptr<VulkanTexture2D> texture = MeshT2D[0];
+		MeshDSET = std::make_shared<DescriptorSet>(texture);
 	}
 
 	VulkanMesh::~VulkanMesh()
 	{
-		MeshT2D.reset();
+		for (auto texture : MeshT2D)
+			texture.reset();
+		MeshT2D.clear();
 		MeshEBO.reset();
 		MeshVBO.reset();
 		MeshDSET.reset();
@@ -23,7 +28,8 @@ namespace symphony
 	void VulkanMesh::Recreate(uint32_t width, uint32_t height)
 	{
 		MeshDSET.reset();
-		MeshDSET = std::make_shared<DescriptorSet>(MeshT2D);
+		std::shared_ptr<VulkanTexture2D> texture = MeshT2D[0];
+		MeshDSET = std::make_shared<DescriptorSet>(texture);
 	}
 
 	void VulkanMesh::Draw(VkCommandBuffer buffer, uint32_t imageIndex)

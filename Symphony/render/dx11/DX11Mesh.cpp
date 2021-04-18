@@ -8,12 +8,15 @@ namespace symphony
 	{
 		MeshVBO = std::make_shared<DX11VertexBuffer>(data.RendererResources.first);
 		MeshEBO = std::make_shared<DX11IndexBuffer>(data.RendererResources.second);
-		MeshT2D = std::make_shared<DX11Texture2D>(data.TextureFilepath);
+
+		for (auto texture : data.Textures)
+			MeshT2D.push_back(std::make_shared<DX11Texture2D>(texture.first.c_str()));
 	}
 
 	DX11Mesh::~DX11Mesh()
 	{
-		MeshT2D.reset();
+		for (auto texture : MeshT2D)
+			texture.reset();
 		MeshEBO.reset();
 		MeshVBO.reset();
 	}
@@ -24,13 +27,15 @@ namespace symphony
 
 		MeshVBO->Bind();
 		MeshEBO->Bind();
-		MeshT2D->Bind(0);
+		for (int i = 0; i < MeshT2D.size(); i++)
+			MeshT2D[i]->Bind(i);
 
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		context->DrawIndexed(MeshEBO->GetIndicesSize(), 0, 0);
 
 		MeshVBO->Unbind();
 		MeshEBO->Unbind();
-		MeshT2D->Unbind(0);
+		for (int i = 0; i < MeshT2D.size(); i++)
+			MeshT2D[i]->Unbind(i);
 	}
 }

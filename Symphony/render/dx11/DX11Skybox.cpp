@@ -9,14 +9,16 @@ namespace symphony
 	DX11Skybox::DX11Skybox(const std::string& file)
 	{
 		auto device = DX11Renderer::GetRendererData().Device;
-		ModelData data = MeshBuilder::LoadModelData("resources/skybox/sphere.obj", file.c_str());
+		std::unordered_map<std::string, MaterialTextureType> sphereTextures =
+		{ {file, MaterialTextureType::Albedo} };
+		ModelData data = MeshBuilder::LoadModelData("resources/skybox/sphere.obj", sphereTextures);
 
 		m_SkyboxShader = std::make_shared<DX11Shader>("shaderlib/hlsl/SkyboxVertex.hlsl", "shaderlib/hlsl/SkyboxFragment.hlsl");
 		m_SkyboxShader->Bind();
 
 		MeshVBO = std::make_shared<DX11VertexBuffer>(data.RendererResources.first);
 		MeshEBO = std::make_shared<DX11IndexBuffer>(data.RendererResources.second);
-		MeshT2D = std::make_shared<DX11Texture2D>(data.TextureFilepath, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		MeshT2D = std::make_shared<DX11Texture2D>(file.c_str(), DXGI_FORMAT_R32G32B32A32_FLOAT);
 
 		RendererUniforms ubo{};
 		m_SkyboxUniformBuffer = std::make_shared<DX11UniformBuffer>(&ubo, sizeof(RendererUniforms));

@@ -16,6 +16,15 @@ namespace symphony
 		glm::vec3 Ambient = glm::vec3(1.0f);
 		glm::vec3 Diffuse = glm::vec3(1.0f);
 		glm::vec3 Specular = glm::vec3(1.0f);
+		glm::vec3 Transmittance = glm::vec3(1.0f);
+		glm::vec3 Emission = glm::vec3(1.0f);
+		float Roughness = 0.0f;
+		float Metallic = 0.0f;
+		float Sheen = 0.0f;
+		float IOR = 0.0f;
+		float Dissolve = 0.0f;
+		float ClearcoatThickness = 0.0f;
+		float ClearcoatRoughness = 0.0f;
 		float Shininess = 1.0f;
 
 		std::shared_ptr<DX11Shader> Shader;

@@ -13,7 +13,7 @@ class SymphonySandbox : public Application
 {
 public:
 	SymphonySandbox()
-		: Application(RenderAPI::DirectX11, "Symphony Sandbox"), camera(45.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
+		: Application(RenderAPI::DirectX11, "Symphony Sandbox"), camera(45.0f, 1280.0f / 720.0f, 0.01f, 10000.0f)
 	{
 		InternalTimer::Init();
 
@@ -21,8 +21,11 @@ public:
 
 		Renderer::PrintRendererInfo();
 
+		std::unordered_map<std::string, MaterialTextureType> modelTextures =
+		{ {"resources/textures/texture.jpg", MaterialTextureType::Albedo} };
+
 		Renderer::ClearColor(0.0156862745f, 0.54509803921f, 0.60392156862f, 1.0f);
-		Mesh stanford_dragon(MeshBuilder::LoadModelData("resources/models/dragon.obj", "resources/textures/texture.jpg"));
+		Mesh stanford_dragon(MeshBuilder::LoadModelData("resources/models/dragon.obj", modelTextures));
 
 		MaterialUniforms ubo{};
 		ubo.Shininess = 32.0f;
@@ -59,7 +62,7 @@ public:
 
 			lightAppInfo.CameraPosition = camera.GetPosition();
 			lightAppInfo.LightPosition = camera.GetPosition();
-			lightAppInfo.LightDirection = camera.GetForwardDirection();
+			lightAppInfo.LightDirection = glm::eulerAngles(camera.GetOrientation());
 
 			Renderer::SetLightInformation(lightAppInfo);
 

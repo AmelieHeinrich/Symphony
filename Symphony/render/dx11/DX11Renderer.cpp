@@ -145,7 +145,7 @@ namespace symphony
 				ubo.SceneView = glm::mat4(glm::mat3(m_RendererData.View));
 				ubo.SceneProjection = m_RendererData.Projection;
 			}
-			ubo.SceneModel = glm::scale(glm::mat4(1.0f), glm::vec3(1000.0f, 1000.0f, 1000.0f));
+			ubo.SceneModel = glm::scale(glm::mat4(1.0f), glm::vec3(10000.0f, 10000.0f, 10000.0f));
 			m_RendererData.RendererSkybox->Draw(ubo);
 		}
 

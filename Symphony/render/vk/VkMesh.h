@@ -25,6 +25,6 @@ namespace symphony
 		std::shared_ptr<DescriptorSet> MeshDSET;
 		std::shared_ptr<VulkanVertexBuffer> MeshVBO;
 		std::shared_ptr<VulkanIndexBuffer> MeshEBO;
-		std::shared_ptr<VulkanTexture2D> MeshT2D;
+		std::vector<std::shared_ptr<VulkanTexture2D>> MeshT2D;
 	};
 }

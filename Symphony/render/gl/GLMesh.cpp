@@ -9,7 +9,9 @@ namespace symphony
 		glBindVertexArray(MeshVAO);
 		MeshVBO = std::make_shared<GLVertexBuffer>(data.RendererResources.first);
 		MeshEBO = std::make_shared<GLIndexBuffer>(data.RendererResources.second);
-		MeshT2D = std::make_shared<GLTexture2D>(data.TextureFilepath);
+		
+		for (auto texture : data.Textures)
+			MeshT2D.push_back(std::make_shared<GLTexture2D>(texture.first.c_str()));
 
 		MeshVBO->Bind();
 		// position attribute
@@ -30,7 +32,9 @@ namespace symphony
 		glDeleteVertexArrays(1, &MeshVAO);
 		MeshVBO.reset();
 		MeshEBO.reset();
-		MeshT2D.reset();
+		for (auto texture : MeshT2D)
+			texture.reset();
+		MeshT2D.clear();
 	}
 
 	void GLMesh::Draw()
@@ -38,13 +42,16 @@ namespace symphony
 		glBindVertexArray(MeshVAO);
 		MeshVBO->Bind();
 		MeshEBO->Bind();
-		MeshT2D->Bind(0);
+		
+		for (int i = 0; i < MeshT2D.size(); i++)
+			MeshT2D[i]->Bind(i);
 	
 		glDrawElements(GL_TRIANGLES, MeshEBO->GetIndicesSize() * sizeof(uint32_t), GL_UNSIGNED_INT, nullptr);
 
 		MeshVBO->Unbind();
 		MeshEBO->Unbind();
-		MeshT2D->Unbind();
+		for (int i = 0; i < MeshT2D.size(); i++)
+			MeshT2D[i]->Unbind();
 		glBindVertexArray(0);
 	}
 }

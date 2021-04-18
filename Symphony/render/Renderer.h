@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 #include <utility>
 #include <functional>
+#include <unordered_map>
 
 namespace symphony
 {
@@ -18,7 +19,7 @@ namespace symphony
 	struct ModelData
 	{
 		ModelRendererResources RendererResources;
-		const char* TextureFilepath;
+		std::unordered_map<std::string, MaterialTextureType> Textures;
 	};
 
 	class Window;

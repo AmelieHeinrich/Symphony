@@ -17,7 +17,12 @@ namespace symphony
 			ubo = nullptr;
 		}
 
-		MeshT2D.reset();
+		for (auto texture : MeshT2D)
+		{
+			texture.reset();
+			texture = nullptr;
+		}
+
 		MeshEBO.reset();
 		MeshVBO.reset();
 	}
@@ -26,7 +31,9 @@ namespace symphony
 	{
 		MeshVBO = std::make_shared<DX12VertexBuffer>(m_Data.RendererResources.first);
 		MeshEBO = std::make_shared<DX12IndexBuffer>(m_Data.RendererResources.second);
-		MeshT2D = std::make_shared<DX12Texture2D>(m_Data.TextureFilepath);
+
+		for (auto texture : m_Data.Textures)
+			MeshT2D.push_back(std::make_shared<DX12Texture2D>(texture.first.c_str()));
 		
 		for (int i = 0; i < 2; i++)
 			MeshUBOS[i] = std::make_shared<DX12UniformBuffer>();
@@ -42,7 +49,8 @@ namespace symphony
 		MeshUBOS[bufferIndex]->Bind();
 		MeshVBO->Bind();
 		MeshEBO->Bind();
-		MeshT2D->Bind();
+		for (auto texture : MeshT2D)
+			texture->Bind();
 
 		MeshUBOS[bufferIndex]->Update(ubo);
 		clist->DrawIndexedInstanced(MeshEBO->GetIndicesSize(), 1, 0, 0, 0);

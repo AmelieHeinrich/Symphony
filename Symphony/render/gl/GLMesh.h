@@ -19,7 +19,7 @@ namespace symphony
 	private:
 		std::shared_ptr<GLVertexBuffer> MeshVBO;
 		std::shared_ptr<GLIndexBuffer> MeshEBO;
-		std::shared_ptr<GLTexture2D> MeshT2D;
+		std::vector<std::shared_ptr<GLTexture2D>> MeshT2D;
 		uint32_t MeshVAO;
 	};
 }

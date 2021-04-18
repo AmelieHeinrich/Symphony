@@ -17,6 +17,6 @@ namespace symphony
 	private:
 		std::shared_ptr<DX11VertexBuffer> MeshVBO;
 		std::shared_ptr<DX11IndexBuffer> MeshEBO;
-		std::shared_ptr<DX11Texture2D> MeshT2D;
+		std::vector<std::shared_ptr<DX11Texture2D>> MeshT2D;
 	};
 }

@@ -40,6 +40,15 @@ cbuffer MaterialRendererUniforms : register(b2)
 	float3 Ambient;
 	float3 Diffuse;
 	float3 Specular;
+	float3 Transmittance;
+	float3 Emission;
+	float Roughness;
+	float Metallic;
+	float Sheen;
+	float IOR;
+	float Dissolve;
+	float ClearcoatThickness;
+	float ClearcoatRoughness;
 	float Shininess;
 };
 

@@ -28,6 +28,15 @@ namespace symphony
 		ubo.Ambient = Ambient;
 		ubo.Diffuse = Diffuse;
 		ubo.Specular = Specular;
+		ubo.Transmittance = Transmittance;
+		ubo.Emission = Emission;
+		ubo.Roughness = Roughness;
+		ubo.Metallic = Metallic;
+		ubo.Sheen = Sheen;
+		ubo.IOR = IOR;
+		ubo.Dissolve = Dissolve;
+		ubo.ClearcoatThickness = ClearcoatThickness;
+		ubo.ClearcoatRoughness = ClearcoatRoughness;
 		ubo.Shininess = Shininess;
 
 		UniformBuffer->Update(&ubo);
