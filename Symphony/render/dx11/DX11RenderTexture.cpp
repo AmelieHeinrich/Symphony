@@ -23,6 +23,7 @@ namespace symphony
 		m_DepthStencilState->Release();
 		m_DepthStencilView->Release();
 		m_DepthStencilBuffer->Release();
+		m_SRV->Release();
 		m_RenderTargetView->Release();
 		m_Texture->Release();
 	}
@@ -52,7 +53,9 @@ namespace symphony
 		m_DepthStencilState->Release();
 		m_DepthStencilView->Release();
 		m_DepthStencilBuffer->Release();
+		m_SRV->Release();
 		m_RenderTargetView->Release();
+		m_Texture->Release();
 
 		auto device = DX11Renderer::GetRendererData().Device;
 		auto ctx = DX11Renderer::GetRendererData().Context;
@@ -73,7 +76,9 @@ namespace symphony
 
 	void DX11RenderTexture::Unbind()
 	{
-
+		auto ctx = DX11Renderer::GetRendererData().Context;
+		ctx->OMSetDepthStencilState(0, 0);
+		ctx->OMSetRenderTargets(0, 0, 0);
 	}
 
 	void DX11RenderTexture::LoadBuffers(uint32_t width, uint32_t height)
@@ -82,8 +87,19 @@ namespace symphony
 
 		HRESULT res;
 
-		res = DX11Renderer::GetRendererData().RendererSwapChain->GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&m_Texture);
-		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to get swap chain buffer!");
+		D3D11_TEXTURE2D_DESC rtvtextureDesc = {};
+		rtvtextureDesc.Width = width;
+		rtvtextureDesc.Height = height;
+		rtvtextureDesc.MipLevels = 1;
+		rtvtextureDesc.ArraySize = 1;
+		rtvtextureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtvtextureDesc.SampleDesc.Count = 1;
+		rtvtextureDesc.SampleDesc.Quality = 0;
+		rtvtextureDesc.Usage = D3D11_USAGE_DEFAULT;
+		rtvtextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		rtvtextureDesc.CPUAccessFlags = 0;
+		rtvtextureDesc.MiscFlags = 0;
+		device->CreateTexture2D(&rtvtextureDesc, nullptr, &m_Texture);
 
 		res = device->CreateRenderTargetView(m_Texture, nullptr, &m_RenderTargetView);
 		DX11Renderer::CheckIfFailed(res, "D3D11: Failed to create rtv!");
@@ -115,5 +131,12 @@ namespace symphony
 		depthstencildesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
 		depthstencildesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
 		device->CreateDepthStencilState(&depthstencildesc, &m_DepthStencilState);
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
+		shaderResourceViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+		shaderResourceViewDesc.Texture2D.MipLevels = 1;
+		device->CreateShaderResourceView(m_Texture, &shaderResourceViewDesc, &m_SRV);
 	}
 }

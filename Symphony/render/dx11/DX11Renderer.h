@@ -73,7 +73,7 @@ namespace symphony
 		static void SendCameraPosition(const glm::vec3& camPos);
 		static void EndDraw();
 
-		static DirectXRendererData GetRendererData() {
+		static DirectXRendererData& GetRendererData() {
 			return m_RendererData;
 		}
 

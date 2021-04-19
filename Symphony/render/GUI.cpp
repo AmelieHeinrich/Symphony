@@ -20,6 +20,27 @@ namespace symphony
 		{
 		case RenderAPI::DirectX11:
 			DX11Gui::EndGUI();
+			break;
+		}
+	}
+
+	void GUI::ShowViewport()
+	{
+		switch (Renderer::s_RenderAPI)
+		{
+		case RenderAPI::DirectX11:
+			DX11Gui::ShowViewport();
+			break;
+		}
+	}
+
+	bool GUI::IsViewportFocused()
+	{
+		switch (Renderer::s_RenderAPI)
+		{
+		case RenderAPI::DirectX11:
+			return DX11Gui::IsViewportFocused();
+			break;
 		}
 	}
 }

@@ -33,6 +33,10 @@ namespace symphony
 		ID3D11DepthStencilView* GetDepthStencilView() {
 			return m_DepthStencilView;
 		}
+
+		ID3D11ShaderResourceView* GetShaderResourceView() {
+			return m_SRV;
+		}
 	private:
 		void LoadBuffers(uint32_t width, uint32_t height);
 
@@ -42,5 +46,6 @@ namespace symphony
 		ID3D11DepthStencilView* m_DepthStencilView;
 		ID3D11DepthStencilState* m_DepthStencilState;
 		ID3D11RenderTargetView* m_RenderTargetView;
+		ID3D11ShaderResourceView* m_SRV;
 	};
 }

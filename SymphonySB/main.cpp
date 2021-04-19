@@ -6,6 +6,7 @@
 #include <imgui.h>
 #include "FirstPersonCamera.h"
 #include "ThirdPersonCamera.h"
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace symphony;
 
@@ -13,7 +14,7 @@ class SymphonySandbox : public Application
 {
 public:
 	SymphonySandbox()
-		: Application(RenderAPI::DirectX11, "Symphony Sandbox"), camera(45.0f, 1280.0f / 720.0f, 0.01f, 10000.0f)
+		: Application(RenderAPI::DirectX11, "Symphony Sandbox"), camera(45.0f, 1920.0f / 1080.0f, 0.01f, 10000.0f)
 	{
 		InternalTimer::Init();
 
@@ -28,7 +29,10 @@ public:
 		Mesh stanford_dragon(MeshBuilder::LoadModelData("resources/models/dragon.obj", modelTextures));
 
 		MaterialUniforms ubo{};
-		ubo.Shininess = 32.0f;
+		ubo.Ambient = glm::vec3(1.0f);
+		ubo.Diffuse = glm::vec3(1.0f);
+		ubo.Specular = glm::vec3(1.0f);
+		ubo.Shininess = 1.0f;
 
 		Renderer::AddRenderObject(stanford_dragon, ubo, "Stanford Dragon");
 		Renderer::Prepare();
@@ -52,37 +56,65 @@ public:
 		{
 			InternalTimer::Update();
 
-			camera.OnUpdate(InternalTimer::GetDeltaTime());
-
 			Renderer::SetCamera(camera.GetViewMatrix(), camera.GetProjectionMatrix());
 			Renderer::SendCameraPosition(camera.GetPosition());
 
-			glm::mat4 dragon_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.0f, -5.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), (float)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 dragon_matrix = glm::translate(glm::mat4(1.0f), m_DragonTranslation);
 			Renderer::SetMeshTransform("Stanford Dragon", dragon_matrix);
 
 			lightAppInfo.CameraPosition = camera.GetPosition();
 			lightAppInfo.LightPosition = camera.GetPosition();
 			lightAppInfo.LightDirection = glm::eulerAngles(camera.GetOrientation());
 
+			Renderer::Draw();
+
+			GUI::BeginGUI();
+			ImGui::SetCurrentContext(GUI::GetCurrentContext());
+			
+			// VIEWPORT
+			GUI::ShowViewport();
+
+			if (GUI::IsViewportFocused())
+			{
+				camera.ProcessInput(InternalTimer::GetDeltaTime());
+			}
+			camera.OnUpdate(InternalTimer::GetDeltaTime());
+
+			// LIGHT INFO
+			ImGui::Begin("Light Information");
+			ImGui::SliderFloat3("Light Ambient", glm::value_ptr(lightAppInfo.Ambient), 0, 1);
+			ImGui::SliderFloat3("Light Diffuse", glm::value_ptr(lightAppInfo.Diffuse), 0, 1);
+			ImGui::SliderFloat3("Light Specular", glm::value_ptr(lightAppInfo.Specular), 0, 1);
+			ImGui::SliderFloat("Light Constant", &lightAppInfo.Constant, 0, 1);
+			ImGui::SliderFloat("Light Linear", &lightAppInfo.Linear, 0, 1);
+			ImGui::SliderFloat("Light Quadratic", &lightAppInfo.Quadratic, 0, 1);
+			ImGui::End();
+
+			// DRAGON TRANSFORM
+			ImGui::Begin("Dragon Transform");
+			ImGui::SliderFloat3("Translation", glm::value_ptr(m_DragonTranslation), -10, 10);
+			ImGui::End();
+
+			GUI::EndGUI();
+
 			Renderer::SetLightInformation(lightAppInfo);
 
 			m_Window->Update();
-
-			Renderer::Draw();
-
-			camera.SetViewportSize(m_Window->GetWidth(), m_Window->GetHeight());
-
 			Renderer::EndDraw();
 		}
 	}
 
 	void OnEvent(Event& e)
 	{
-		camera.OnEvent(e);
+		if (GUI::IsViewportFocused())
+		{
+			camera.OnEvent(e);
+		}
 	}
 private:
 	LightInformation lightAppInfo;
 	EditorCamera camera;
+	glm::vec3 m_DragonTranslation = glm::vec3{ -0.0f, -5.0f, -3.0f };
 };
 
 Application* symphony::CreateApplication()

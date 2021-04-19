@@ -13,7 +13,7 @@ namespace symphony
 		Assert::IsTrue(s_Instance, "Application already exists!");
 		s_Instance = this;
 		m_ThreadPool = std::make_unique<ThreadPool>();
-		m_Window = std::make_unique<Window>(1280, 720, name.c_str(), api);
+		m_Window = std::make_unique<Window>(1920, 1080, name.c_str(), api);
 
 		Renderer::Init(m_Window.get());
 		SY_CORE_INFO("Application created!");

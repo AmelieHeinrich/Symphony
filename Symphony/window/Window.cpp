@@ -147,7 +147,6 @@ namespace symphony {
 	void Window::Resize(int w, int h)
 	{
 		SDL_SetWindowSize(m_RawHandle, w, h);
-		m_WindowSurface->ResizeBuffers(0, 0, w, h);
 	}
 
 	void Window::InitialiseSDL2()

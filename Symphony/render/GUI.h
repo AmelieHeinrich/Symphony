@@ -10,6 +10,8 @@ namespace symphony
 	public:
 		static void BeginGUI();
 		static void EndGUI();
+		static void ShowViewport();
+		static bool IsViewportFocused();
 
 		static ImGuiContext* GetCurrentContext()
 		{

@@ -74,4 +74,16 @@ namespace symphony {
 		if (m_Width != width || m_Height != height)
 			RecreateRenderTargetView(width, height);
 	}
+
+	void DX11SwapChain::Bind()
+	{
+		auto ctx = DX11Renderer::GetRendererData().Context;
+		ctx->OMSetRenderTargets(1, &m_RenderTargetView, 0);
+	}
+
+	void DX11SwapChain::Unbind()
+	{
+		auto ctx = DX11Renderer::GetRendererData().Context;
+		ctx->OMSetRenderTargets(0, 0, 0);
+	}
 }

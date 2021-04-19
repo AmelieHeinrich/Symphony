@@ -133,6 +133,8 @@ namespace symphony
             temp.shininess = material.shininess;
             temp.ior = material.ior;
             temp.dissolve = material.dissolve;
+
+            result.push_back(temp);
         }
 
         return result;

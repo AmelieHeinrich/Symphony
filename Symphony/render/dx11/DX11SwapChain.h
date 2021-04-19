@@ -17,6 +17,8 @@ namespace symphony {
 		void Present();
 		void RecreateRenderTargetView(uint32_t width, uint32_t height);
 		void EnsureSize(uint32_t width, uint32_t height);
+		void Bind();
+		void Unbind();
 
 		IDXGISwapChain* GetSwapChain() const { return m_Handle; }
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }

@@ -13,5 +13,10 @@ namespace symphony
 		static void Shutdown();
 		static void BeginGUI();
 		static void EndGUI();
+		static void ShowViewport();
+		static bool IsViewportFocused() { return m_ViewportFocused; }
+
+	private:
+		static bool m_ViewportFocused;
 	};
 }

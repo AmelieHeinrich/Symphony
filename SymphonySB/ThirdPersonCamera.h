@@ -21,8 +21,15 @@ public:
 	void OnUpdate(float dt)
 	{
 		const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
-		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 		m_InitialMousePosition = mouse;
+
+		UpdateView();
+	}
+
+	void ProcessInput(float dt)
+	{
+		const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
+		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 
 		if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
 			MouseRotate(delta);

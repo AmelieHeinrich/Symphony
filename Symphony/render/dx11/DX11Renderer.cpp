@@ -175,8 +175,8 @@ namespace symphony
 					ubo.SceneProjection = m_RendererData.Projection;
 				}
 				ubo.SceneModel = model->GetModelMatrix();
-				RendererUniformBuffer->Update(&ubo);
 				RendererLightUniformBuffer->Update(&m_RendererData.LightInfo);
+				RendererUniformBuffer->Update(&ubo);
 
 				numTris += model->GetNumberOfVertices() / 3;
 				drawCalls++;
@@ -188,6 +188,11 @@ namespace symphony
 			numTris = 0;
 			drawCalls = 0;
 		}
+
+		m_RendererData.CurrentFramebuffer->Unbind();
+
+		m_RendererData.RendererSwapChain->Bind();
+		m_RendererData.RendererContext->SetClearColor(m_RendererData.RendererSwapChain, 0, 0, 0, 1);
 	}
 
 	void DX11Renderer::AddVertexBuffer(const std::vector<Vertex>& vertices)
@@ -216,6 +221,15 @@ namespace symphony
 		m_Meshes[name]->material->Ambient = ubo.Ambient;
 		m_Meshes[name]->material->Diffuse = ubo.Diffuse;
 		m_Meshes[name]->material->Specular = ubo.Specular;
+		m_Meshes[name]->material->Transmittance = ubo.Transmittance;
+		m_Meshes[name]->material->Emission = ubo.Emission;
+		m_Meshes[name]->material->Roughness = ubo.Roughness;
+		m_Meshes[name]->material->Metallic = ubo.Metallic;
+		m_Meshes[name]->material->Sheen = ubo.Sheen;
+		m_Meshes[name]->material->IOR = ubo.IOR;
+		m_Meshes[name]->material->Dissolve = ubo.Dissolve;
+		m_Meshes[name]->material->ClearcoatThickness = ubo.ClearcoatThickness;
+		m_Meshes[name]->material->ClearcoatRoughness = ubo.ClearcoatRoughness;
 		m_Meshes[name]->material->Shininess = ubo.Shininess;
 	}
 
@@ -243,10 +257,8 @@ namespace symphony
 		vp.TopLeftY = 0;
 		DX11Renderer::GetRendererData().Context->RSSetViewports(1, &vp);
 
-		m_RendererData.RendererSwapChain.reset();
-		m_RendererData.RendererSwapChain = std::make_shared<DX11SwapChain>(windowRaw, width, height);
-		m_RendererData.CurrentFramebuffer.reset();
-		m_RendererData.CurrentFramebuffer = std::make_shared<DX11RenderTexture>(width, height);
+		m_RendererData.RendererSwapChain->RecreateRenderTargetView(width, height);
+		m_RendererData.CurrentFramebuffer->Resize(width, height);
 	}
 
 	void DX11Renderer::SetCamera(const glm::mat4& view, const glm::mat4& projection)
@@ -290,6 +302,7 @@ namespace symphony
 
 	void DX11Renderer::EndDraw()
 	{
+		m_RendererData.RendererSwapChain->Unbind();
 		m_RendererData.RendererSwapChain->Present();
 	}
 
