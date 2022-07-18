@@ -5,6 +5,8 @@
 Symphony is a new born open source game engine, first created on March 2 2021.
 Its goal is to provide a fully cross-platform renderer module, an audio system, physics and other core features such as input.
 
+## This game engine stopped development in April 2021.
+
 ## Current stuff it can do
 
 - Fully cross platform backend (Vulkan, OpenGL, DirectX 11, DirectX 12)
